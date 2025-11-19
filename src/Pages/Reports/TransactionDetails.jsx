@@ -1,11 +1,33 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
-import { router } from "@inertiajs/react";
+import { useNavigate, useParams, useEffect } from "react-router-dom";
+import axios from "@/api/axios";
+import { useState } from "react";
 
-export default function TransactionDetails({ transaction }) {
+export default function TransactionDetails() {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [transaction, setTransaction] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransaction = async () => {
+      try {
+        const response = await axios.get(`/api/transactions/${id}`);
+        setTransaction(response.data);
+      } catch (err) {
+        console.error('Failed to fetch transaction:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransaction();
+  }, [id]);
+
+  if (loading) return <AuthenticatedLayout><div>Loading...</div></AuthenticatedLayout>;
+  if (!transaction) return <AuthenticatedLayout><div>Transaction not found</div></AuthenticatedLayout>;
+
   return (
     <AuthenticatedLayout>
-      <Head title="Full Transaction Information" />
 
       <div className="p-6">
   {/* Title and Back Button on One Line */}
@@ -17,7 +39,7 @@ export default function TransactionDetails({ transaction }) {
       Full Transaction Information
     </h1>
     <button
-      onClick={() => router.visit("/transaction-record")}
+      onClick={() => navigate("/transaction-record")}
       className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#6b3e1f] transition shadow-md"
     >
       ← Back

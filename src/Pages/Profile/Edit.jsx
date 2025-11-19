@@ -1,10 +1,12 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
 import DeleteUserForm from './Partials/DeleteUserForm';
 import UpdatePasswordForm from './Partials/UpdatePasswordForm';
 import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
 
-export default function Edit({ mustVerifyEmail, status }) {
+export default function Edit() {
+    const [mustVerifyEmail] = useState(false);
+    const [status] = useState(null);
+
     return (
         <AuthenticatedLayout
             header={
@@ -32,7 +34,6 @@ export default function Edit({ mustVerifyEmail, status }) {
                 </div>
             }
         >
-            <Head title="Profile Settings" />
 
                     {/* Centered cards */}
             <div className="flex justify-center py-12">

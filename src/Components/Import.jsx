@@ -1,18 +1,17 @@
-import { useForm } from "@inertiajs/react";
 import * as XLSX from "xlsx";
 import { useState, useRef } from "react";
+import axios from "@/api/axios"; 
 
 export default function Import() {
-    const { data, post, errors, setData } = useForm({ excel_file: null });
+    const [data, setData] = useState({ excel_file: null });
     const [excelData, setExcelData] = useState([]);
     const [showData, setShowData] = useState(false);
     const [localError, setLocalError] = useState("");
-    const fileInputRef = useRef(null); // ✅ reference for file input
+    const fileInputRef = useRef(null);
 
-    // Handle file selection
     const handleFileChange = (e) => {
         const file = e.target.files[0];
-        setData("excel_file", file);
+        setData({ excel_file: file });
         setLocalError("");
 
         if (file) {
@@ -33,7 +32,7 @@ export default function Import() {
     };
 
     // Save file (upload to backend)
-    const saveFile = (e) => {
+    const saveFile = async (e) => {
         e.preventDefault();
 
         if (!data.excel_file) {
@@ -42,20 +41,28 @@ export default function Import() {
         }
 
         setLocalError("");
-        post(route("import"), {
-            forceFormData: true,
-            onSuccess: () => alert("File uploaded successfully!"),
-        });
+        try {
+            const formData = new FormData();
+            formData.append("excel_file", data.excel_file);
+
+            await axios.post("/api/import", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            alert("File uploaded successfully!");
+        } catch (error) {
+            console.error(error);
+            setLocalError("Failed to upload file.");
+        }
     };
 
     // Remove file and reset input completely
     const removeFile = () => {
-        setData("excel_file", null);
+        setData({ excel_file: null });
         setExcelData([]);
         setShowData(false);
         setLocalError("");
 
-        // ✅ Clear input value manually
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
@@ -66,7 +73,6 @@ export default function Import() {
 
     return (
         <div className="space-y-4">
-            
             <div className="space-y-2">
                 <div className="flex items-center space-x-3">
                     <div className="relative flex-1">
@@ -110,9 +116,9 @@ export default function Import() {
                 </div>
 
                 {/* Error Messages */}
-                {(errors.excel_file || localError) && (
+                {localError && (
                     <div className="text-red-500 text-sm mt-1">
-                        {errors.excel_file || localError}
+                        {localError}
                     </div>
                 )}
             </div>

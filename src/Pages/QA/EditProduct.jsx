@@ -1,37 +1,87 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import axios from "@/api/axios";
+import { useForm } from "@/hooks/useForm";
 
-export default function EditProduct( {product} ) {
-    const {
-            data: productData,
-            setData: setProduct,
-            post: postProduct,
-            processing: processingEditProduct,
-            reset: resetForm,
-        } = useForm({
-            name: product.name || "",
-            quantity: product.quantity || "",
-            price: product.price || "",
-            category: product.category || "",
-            is_archived: product.is_archived || false,
+export default function EditProduct() {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [product, setProduct] = React.useState(null);
+    const [loading, setLoading] = React.useState(true);
+
+    const form = useForm(
+        {
+            name: "",
+            quantity: "",
+            price: "",
+            category: "",
+            is_archived: false,
             file: null,
-        });
+        }
+    );
 
-    const submitProducts = (e) => {
+    // Fetch product on mount
+    useEffect(() => {
+        const fetchProduct = async () => {
+            try {
+                // Try a dedicated single-product endpoint first
+                const listResp = await axios.get('/api/fetchproducts');
+                const found = (listResp.data.products || []).find(p => String(p.id) === String(id));
+                if (found) {
+                    setProduct(found);
+                    form.setData({
+                        name: found.name || "",
+                        quantity: found.quantity || "",
+                        price: found.price || "",
+                        category: found.category || "",
+                        is_archived: found.is_archived || false,
+                        file: null,
+                    });
+                } else {
+                    console.error(`Product with id ${id} not found in fetchproducts response`);
+                }
+            } catch (err) {    
+                console.error("Failed to fetch product:", err);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProduct();
+    }, [id]);
+
+    const submitProducts = async (e) => {
         e.preventDefault();
-        postProduct(route("update-product", product.id), {
-            forceFormData: true,
-            onSuccess: () => {
-                resetForm();
-            },
-        });
+        try {
+            const formData = new FormData();
+            formData.append('name', form.data.name);
+            formData.append('quantity', form.data.quantity);
+            formData.append('price', form.data.price);
+            formData.append('category', form.data.category);
+            formData.append('is_archived', form.data.is_archived ? 1 : 0);
+            if (form.data.file) {
+                formData.append('file', form.data.file);
+            }
+
+            // Backend exposes update-product/:id as POST — use that route
+            await axios.post(`/api/update-product/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
+            navigate('/inventory1');
+        } catch (err) {
+            console.error('Update product error:', err);
+            if (err.response && err.response.data) {
+                console.error('Validation errors:', err.response.data);
+            }
+        }
     };
+
+    if (loading) return <AuthenticatedLayout><div>Loading...</div></AuthenticatedLayout>;
 
     return (
         <AuthenticatedLayout>
-            <Head title="Add Product" />
-
             <div className="flex justify-center py-12 px-4">
                 <form
                     onSubmit={submitProducts} 
@@ -55,14 +105,14 @@ export default function EditProduct( {product} ) {
                                     type="text"
                                     name="name"
                                     className="flex-1 border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                    value={productData.name}
-                                    onChange={(e) => setProduct("name", e.target.value)}
+                                    value={form.data.name}
+                                    onChange={(e) => form.setData("name", e.target.value)}
                                 />
                                 <label className="text-sm bg-gray-200 px-3 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-300 transition">
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={(e) => setProduct("file", e.target.files[0])}
+                                        onChange={(e) => form.setData("file", e.target.files[0])}
                                         className="hidden"
                                     />
                                     <span role="img" aria-label="camera">📷</span> Change Image
@@ -78,8 +128,8 @@ export default function EditProduct( {product} ) {
                             <select
                                 name="category"
                                 className="mt-1 w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                value={productData.category}
-                                onChange={(e) => setProduct("category", e.target.value)}
+                                value={form.data.category}
+                                onChange={(e) => form.setData("category", e.target.value)}
                             >
                                 <option value="">Select category</option>
                                 <option value="chocolate">Chocolate</option>
@@ -97,7 +147,7 @@ export default function EditProduct( {product} ) {
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        setProduct("quantity", Math.max(0, productData.quantity - 1))
+                                        form.setData("quantity", Math.max(0, form.data.quantity - 1))
                                     }
                                     className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
                                 >
@@ -106,14 +156,14 @@ export default function EditProduct( {product} ) {
                                 <input
                                     type="number"
                                     name="quantity"
-                                    value={productData.quantity} 
-                                    onChange={(e) => setProduct("quantity", Number(e.target.value))}
+                                    value={form.data.quantity} 
+                                    onChange={(e) => form.setData("quantity", Number(e.target.value))}
                                     className="w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
                                 />
                                 <button
                                     type="button"
                                     onClick={() =>
-                                        setProduct("quantity", parseInt(productData.quantity || 0) + 1)
+                                        form.setData("quantity", parseInt(form.data.quantity || 0) + 1)
                                     }
                                     className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
                                 >
@@ -131,8 +181,8 @@ export default function EditProduct( {product} ) {
                                 type="number"
                                 name="price"
                                 className="mt-1 w-full border border-gray-400 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
-                                value={productData.price}
-                                onChange={(e) => setProduct("price", Number(e.target.value))}
+                                value={form.data.price}
+                                onChange={(e) => form.setData("price", Number(e.target.value))}
                             />
                         </div>
                     </div>
@@ -141,14 +191,14 @@ export default function EditProduct( {product} ) {
                     <div className="flex justify-end items-center gap-4 px-6 py-4 border-t border-gray-300">
                         <button
                             type="button"
-                            onClick={resetForm}
+                            onClick={() => navigate('/inventory1')}
                             className="text-sm font-semibold text-black hover:underline"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            disabled={processingEditProduct}
+                            disabled={form.processing}
                             className="bg-[#4b2e17] text-white px-5 py-2 rounded-sm font-semibold hover:bg-[#3a2211] transition"
                         >
                             Edit Product

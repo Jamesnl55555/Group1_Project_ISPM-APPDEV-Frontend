@@ -1,11 +1,9 @@
 import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 
-export default function GenerateSalesReportMonthly({ auth, transactions }) {
+export default function GenerateSalesReportMonthly() {
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Monthly Sales Report" />
+        <AuthenticatedLayout>
 
             <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
                 <h1 className="text-2xl font-bold mb-6">Monthly Sales Report</h1>

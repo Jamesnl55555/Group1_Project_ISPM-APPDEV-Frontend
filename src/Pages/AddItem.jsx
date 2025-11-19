@@ -1,11 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import axios from "@/api/axios";
+import useForm from "@/hooks/useForm";
 
-export default function AddItem({ products=[] }) {
-    const form = useForm({cart:[]});
+export default function AddItem() {
+    const [products, setProducts] = useState([]);
+    const form = useForm({ cart: [] });
     const [quantities, setQuantities] = useState({});
+
+    useEffect(() => {
+        const fetchProducts = async () => {
+            try {
+                const resp = await axios.get('/api/fetchproducts');
+                setProducts(resp.data.products || []);
+            } catch (err) {
+                console.error('Failed to fetch products for AddItem:', err);
+            }
+        };
+        fetchProducts();
+    }, []);
 
     const addToCart = (product) => {
         const quantity = quantities[product.id] || 1;
@@ -37,9 +51,19 @@ export default function AddItem({ products=[] }) {
         }
         
 
-        form.post(route("checkout"), {
-        onSuccess: () => clearCart(),
-        onError: (errors) => console.error("Checkout failed:", errors),
+        const payload = {
+            cart: form.data.cart.map(i => ({
+                id: i.id,
+                name: i.name,
+                quantity: i.quantity,
+                price: i.price,
+            })),
+        };
+
+        form.post('/api/checkout', {
+            data: payload,
+            onSuccess: () => clearCart(),
+            onError: (errors) => console.error("Checkout failed:", errors),
         });
     };
 
@@ -54,7 +78,6 @@ export default function AddItem({ products=[] }) {
 
     return (
         <AuthenticatedLayout>
-            <Head title="Add Item" />
 
             <div className="py-12 px-6 flex flex-col items-center">
                 {/* 🟤 Title */}
@@ -167,7 +190,7 @@ export default function AddItem({ products=[] }) {
                             className={`bg-[#4b2e17] text-white py-2 rounded-md mt-4 transition ${
                                 form.data.cart.length === 0 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#3b2412]"
                             }`}
-                            href="/make-transaction" // ✅ Added href
+                            href="/transaction-record" // ✅ Added href
                         >
                             Confirm
                         </button>

@@ -1,13 +1,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 import { useState } from "react";
 
-export default function TransactionHistory({ transactions }) {
+export default function TransactionHistory() {
   const [search, setSearch] = useState("");
 
   return (
     <AuthenticatedLayout>
-      <Head title="Transaction Records List" />
 
       <div className="p-6">
         <h1 className="text-3xl font-bold text-center text-black mb-6">

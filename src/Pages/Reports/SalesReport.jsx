@@ -1,12 +1,11 @@
 // resources/js/Pages/Reports/CreateReport.jsx
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
-  import { router } from '@inertiajs/react';
+import { useNavigate } from 'react-router-dom';
 
-export default function CreateReport({ auth, sales, capital }) {
+export default function CreateReport() {
+    const navigate = useNavigate();
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Create Report" />
+        <AuthenticatedLayout>
 {/* Header with Back button aligned to the right */}
 <div className="flex items-center justify-between mt-6 mb-4"
   style={{ paddingLeft: "7rem", paddingRight: "7rem", marginTop:"-1.5rem"}}>
@@ -26,7 +25,7 @@ export default function CreateReport({ auth, sales, capital }) {
   </h1>
 
   <button
-    onClick={() => router.visit("/dashboard")}
+    onClick={() => navigate("/dashboard")}
     className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-base font-semibold hover:bg-[#6b3e1f] transition shadow-md"
   >
     ← Back
@@ -42,7 +41,7 @@ export default function CreateReport({ auth, sales, capital }) {
   <button
     className="block text-left border border-[#4b2e17] text-black font-bold px-8 py-3 bg-[#f9f5f0] hover:bg-[#e8d4b8] transition-colors duration-200
     w-full sm:w-[50rem] lg:w-[68rem] mx-auto text-2xl"
-    onClick={() => router.visit('/generate-sales-report')}
+    onClick={() => navigate('/generate-sales-report')}
   >
     Generate Sales Report
   </button>
@@ -50,7 +49,7 @@ export default function CreateReport({ auth, sales, capital }) {
   <button
     className="block text-left border border-[#4b2e17] text-black font-bold px-8 py-3 bg-[#f9f5f0] hover:bg-[#e8d4b8] transition-colors duration-200
     w-full sm:w-[50rem] lg:w-[68rem] mx-auto text-2xl"
-    onClick={() => router.visit('/generate-capital-report')}
+    onClick={() => navigate('/generate-capital-report')}
   >
     Generate Capital Report
   </button>

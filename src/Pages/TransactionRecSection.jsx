@@ -1,11 +1,11 @@
 import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { useNavigate } from 'react-router-dom';
 
-export default function TransactionRecSection({ auth }) {
+export default function TransactionRecSection() {
+    const navigate = useNavigate();
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Transaction Record" />
+        <AuthenticatedLayout>
 
             {/* Header with Back button */}
             <div className="flex items-center justify-between mt-6 mb-4"
@@ -26,7 +26,7 @@ export default function TransactionRecSection({ auth }) {
                 </h1>
 
                 <button
-                    onClick={() => router.visit("/dashboard")}
+                    onClick={() => navigate("/dashboard")}
                     className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-base font-semibold hover:bg-[#6b3e1f] transition shadow-md"
                 >
                     ← Back
@@ -38,7 +38,7 @@ export default function TransactionRecSection({ auth }) {
                 <button
                     className="block text-left border border-[#4b2e17] text-black font-bold px-8 py-3 bg-[#f9f5f0] hover:bg-[#e8d4b8] transition-colors duration-200
                     w-full sm:w-[50rem] lg:w-[68rem] mx-auto text-2xl"
-                    onClick={() => router.visit("/make-transaction")}
+                    onClick={() => navigate("/make-transaction")}
                 >
                     Make a Transaction Record Form
                 </button>
@@ -46,7 +46,7 @@ export default function TransactionRecSection({ auth }) {
                 <button
                     className="block text-left border border-[#4b2e17] text-black font-bold px-8 py-3 bg-[#f9f5f0] hover:bg-[#e8d4b8] transition-colors duration-200
                     w-full sm:w-[50rem] lg:w-[68rem] mx-auto text-2xl"
-                    onClick={() => router.visit("/transaction-record")}
+                    onClick={() => navigate("/transaction-record")}
                 >
                     Transaction Records List
                 </button>

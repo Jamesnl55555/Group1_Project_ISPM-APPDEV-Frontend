@@ -1,20 +1,39 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import PrimaryButton from '@/Components/PrimaryButton';
 import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import axios from '@/api/axios';
+import { useForm } from '@/hooks/useForm';
 
-export default function VerifyEmail({ status }) {
-    const { post, processing } = useForm({});
+export default function VerifyEmail() {
+    const navigate = useNavigate();
+    const [status, setStatus] = useState(null);
+    const form = useForm({});
 
-    const submit = (e) => {
+    const submit = async (e) => {
         e.preventDefault();
 
-        post(route('verification.send'));
+        try {
+            await form.post('/api/email/verification-notification');
+            setStatus('verification-link-sent');
+        } catch (err) {
+            console.error('Resend error:', err);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await axios.post('/logout');
+            localStorage.removeItem('auth_token');
+            delete axios.defaults.headers.common['Authorization'];
+            navigate('/login');
+        } catch (err) {
+            console.error('Logout error:', err);
+        }
     };
 
     return (
         <GuestLayout>
-            <Head title="Email Verification" />
-
             <div className="mb-4 text-sm text-gray-600">
                 Thanks for signing up! Before getting started, could you verify
                 your email address by clicking on the link we just emailed to
@@ -31,18 +50,16 @@ export default function VerifyEmail({ status }) {
 
             <form onSubmit={submit}>
                 <div className="mt-4 flex items-center justify-between">
-                    <PrimaryButton disabled={processing}>
+                    <PrimaryButton disabled={form.processing}>
                         Resend Verification Email
                     </PrimaryButton>
 
-                    <Link
-                        href={route('logout')}
-                        method="post"
-                        as="button"
+                    <button
+                        onClick={handleLogout}
                         className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                     >
                         Log Out
-                    </Link>
+                    </button>
                 </div>
             </form>
         </GuestLayout>

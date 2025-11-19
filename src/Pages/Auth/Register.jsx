@@ -2,21 +2,58 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import axios from '@/api/axios';
 
 export default function Register() {
-  const { data, setData, post, processing, errors, reset } = useForm({
+  const navigate = useNavigate();
+  const [data, setData] = useState({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
   });
 
-  const submit = (e) => {
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const handleChange = (field) => (e) =>
+    setData({ ...data, [field]: e.target.value });
+
+  const setDataField = (field, value) => {
+  setData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    post(route('register'), {
-      onFinish: () => reset('password', 'password_confirmation'),
-    });
+    setLoading(true);
+    setErrors({});
+
+  try {
+    await axios.get('/sanctum/csrf-cookie');
+    console.log('Sending registration data:', data); // Debug log
+    const response = await axios.post('/api/register', data);
+    
+    console.log('Registration response:', response.data); // Debug log
+    
+    // Store token if returned
+    if (response.data?.token) {
+      localStorage.setItem('auth_token', response.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+    }
+    
+    navigate('/dashboard');
+  } catch (err) {
+    console.error('Registration error:', err.response?.data || err.message); // Debug log
+    if (err.response?.data?.errors) {
+      setErrors(err.response.data.errors);
+    } else {
+      setErrors({ general: err.response?.data?.message || 'Something went wrong' });
+    }
+  } finally {
+    setLoading(false);
+  }
   };
 
   const getBackgroundColor = (value) => (value ? '#f5e0c3' : '#ffffff');
@@ -62,7 +99,7 @@ export default function Register() {
         className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center relative"
         style={{ backgroundImage: 'url("/images/1.png")' }}
       >
-        <Head title="Register" />
+        <header title="Register" />
 
         {/* Logo */}
         <div className="absolute top-6 left-8">
@@ -88,11 +125,11 @@ export default function Register() {
               <TextInput
                 id="name"
                 name="name"
-                value={data.name}
+                value={data.name || ''}
                 className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
                 autoComplete="name"
                 isFocused={true}
-                onChange={(e) => setData('name', e.target.value)}
+                onChange={(e) => setDataField('name', e.target.value)}
                 required
                 {...createInputHandlers('name')}
                 style={{
@@ -109,10 +146,10 @@ export default function Register() {
                 id="email"
                 type="email"
                 name="email"
-                value={data.email}
+                value={data.email || ''}
                 className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
                 autoComplete="username"
-                onChange={(e) => setData('email', e.target.value)}
+                onChange={(e) => setDataField('email', e.target.value)}
                 required
                 {...createInputHandlers('email')}
                 style={{
@@ -129,10 +166,10 @@ export default function Register() {
                 id="password"
                 type="password"
                 name="password"
-                value={data.password}
+                value={data.password || ''}
                 className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
                 autoComplete="new-password"
-                onChange={(e) => setData('password', e.target.value)}
+                onChange={(e) => setDataField('password', e.target.value)}
                 required
                 {...createInputHandlers('password')}
                 style={{
@@ -149,10 +186,10 @@ export default function Register() {
                 id="password_confirmation"
                 type="password"
                 name="password_confirmation"
-                value={data.password_confirmation}
+                value={data.password_confirmation || ''}
                 className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
                 autoComplete="new-password"
-                onChange={(e) => setData('password_confirmation', e.target.value)}
+                onChange={(e) => setDataField('password_confirmation', e.target.value)}
                 required
                 {...createInputHandlers('password_confirmation')}
                 style={{
@@ -166,19 +203,19 @@ export default function Register() {
             <div className="flex justify-center mt-6">
               <PrimaryButton
                 className="py-2 rounded-md flex justify-center items-center text-white font-semibold text-base"
-                disabled={processing}
+                disabled={loading}
                 style={{
                   fontSize: '15px',
                   width: '120px',
                   backgroundColor: '#422912ff',
                   transition: 'background 0.3s',
-                  cursor: processing ? 'not-allowed' : 'pointer',
+                  cursor: loading ? 'not-allowed' : 'pointer',
                 }}
                 onMouseEnter={(e) => {
-                  if (!processing) e.currentTarget.style.backgroundColor = '#2e1e0fff';
+                  if (!loading) e.currentTarget.style.backgroundColor = '#2e1e0fff';
                 }}
                 onMouseLeave={(e) => {
-                  if (!processing) e.currentTarget.style.backgroundColor = '#422912ff';
+                  if (!loading) e.currentTarget.style.backgroundColor = '#422912ff';
                 }}
               >
                 SIGN UP
@@ -189,7 +226,7 @@ export default function Register() {
             <p className="text-sm text-gray-600 mt-4">
               Already have an account?{' '}
               <Link
-                href={route('login')}
+                to ="/login"
                 className="text-blue-600 font-medium hover:underline"
               >
                 Log In

@@ -1,6 +1,6 @@
 import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import useForm from "@/hooks/useForm";
 
 export default function AddProduct() {
 const {
@@ -20,14 +20,29 @@ const {
 
    const submitProducts = (e) => {
     e.preventDefault();
-    postProduct(route("add-item"), {
+    
+    // Create FormData to handle file upload
+    const formData = new FormData();
+    formData.append('name', productData.name);
+    formData.append('quantity', productData.quantity);
+    formData.append('price', productData.price);
+    formData.append('category', productData.category);
+    formData.append('is_archived', productData.is_archived ? 1 : 0);
+    
+    // Only append file if one was selected
+    if (productData.file) {
+      formData.append('file', productData.file);
+    }
+    
+    postProduct("/api/postproducts", {
+      data: formData,
+      headers: { 'Content-Type': 'multipart/form-data' },
       onSuccess: () => {resetForm()}
     });
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title="Add Product" />
 
             <div className="flex justify-center py-12 px-4">
                 <form

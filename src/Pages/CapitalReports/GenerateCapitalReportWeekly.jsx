@@ -1,11 +1,9 @@
 import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 
-export default function GenerateCapitalReportWeekly({ auth, transactions }) {
+export default function GenerateCapitalReportWeekly() {
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Weekly Capital Report" />
+        <AuthenticatedLayout>
 
             <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
                 <h1 className="text-2xl font-bold mb-6">Weekly Capital Report</h1>

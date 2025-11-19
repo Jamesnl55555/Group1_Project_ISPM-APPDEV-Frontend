@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { useNavigate } from "react-router-dom";
 
 export default function GenerateCapitalReport() {
+    const navigate = useNavigate();
     const [reportType, setReportType] = useState("");
     const [fromDate, setFromDate] = useState("");
     const [toDate, setToDate] = useState("");
@@ -23,15 +24,14 @@ export default function GenerateCapitalReport() {
                 alert("Please select both start and end dates for the custom report.");
                 return;
             }
-            router.visit(routeMap[reportType] + `?from=${fromDate}&to=${toDate}`);
+            navigate(routeMap[reportType] + `?from=${fromDate}&to=${toDate}`);
         } else {
-            router.visit(routeMap[reportType]);
+            navigate(routeMap[reportType]);
         }
     };
 
     return (
         <AuthenticatedLayout>
-            <Head title="Generate Capital Report" />
 
             <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
                 <h1 className="text-2xl font-bold mb-6">Select Capital Report Date Range</h1>
@@ -102,7 +102,7 @@ export default function GenerateCapitalReport() {
 
                 <div className="flex justify-end gap-4">
                     <button
-                        onClick={() => router.visit("/sales-report")}
+                        onClick={() => navigate("/sales-report")}
                         className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100"
                     >
                         Cancel

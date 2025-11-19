@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
-import { router } from "@inertiajs/react";
+import axios from '@/api/axios';
 
 export default function DeleteButton({ id }) {
   const [visible, setVisible] = useState(false);
 
-  const del = (id) => {
-    router.post(route("delete-item", id));
+  const del = async (id) => {
+    try {
+      // Assumption: API DELETE endpoint for products
+      await axios.delete(`/api/products/${id}`);
+    } catch (e) {
+      // ignore error for now
+    }
     setVisible(false);
   };
 

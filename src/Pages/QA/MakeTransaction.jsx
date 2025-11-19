@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { useNavigate } from "react-router-dom";
+import useForm from "@/hooks/useForm";
 
-export default function MakeTransaction({ auth, initialItems }) {
+export default function MakeTransaction() {
+    const navigate = useNavigate();
     // Load items passed from previous page or after confirm
-    const [items, setItems] = useState(initialItems || []);
+    const [items, setItems] = useState([]);
+
+    const { data: formData, post: postTransaction, processing: processingTransaction } = useForm({ items });
 
     const handleAddClick = () => {
-        router.visit("/create-transaction");
+        navigate("/create-transaction");
     };
 
     const totalAmount = items.reduce(
@@ -17,12 +21,15 @@ export default function MakeTransaction({ auth, initialItems }) {
 
     const handleMakeTransaction = () => {
         // handle transaction submission
-        router.post("/store-transaction", { items });
+        postTransaction("/api/store-transaction", {
+            onSuccess: () => {
+                setItems([]);
+            }
+        });
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Record Transaction Form" />
+        <AuthenticatedLayout>
 
             <div className="py-12 px-6 flex flex-col items-center">
                 {/* Header with Back Button */}
@@ -32,7 +39,7 @@ export default function MakeTransaction({ auth, initialItems }) {
                     </h1>
 
                     <button
-                        onClick={() => router.visit("/transaction-record")}
+                        onClick={() => navigate("/transaction-record")}
                         className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-base font-semibold hover:bg-[#6b3e1f] transition shadow-md"
                     >
                         ← Back
@@ -107,6 +114,7 @@ export default function MakeTransaction({ auth, initialItems }) {
                         {items.length > 0 && (
                             <button
                                 onClick={handleMakeTransaction}
+                                disabled={processingTransaction}
                                 className="bg-[#4b2e17] text-white py-2 rounded-md mt-4 w-full hover:bg-[#3b2412] transition"
                             >
                                 Make Transaction

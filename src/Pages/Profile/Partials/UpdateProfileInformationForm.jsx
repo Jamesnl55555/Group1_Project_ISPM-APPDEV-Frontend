@@ -3,25 +3,46 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage } from '@inertiajs/react';
+import axios from '@/api/axios';
+import useForm from '@/hooks/useForm';
+import { useEffect, useState } from 'react';
 
 export default function UpdateProfileInformation({
-    mustVerifyEmail,
-    status,
+    mustVerifyEmail = false,
+    status: initialStatus = null,
     className = '',
 }) {
-    const user = usePage().props.auth.user;
+    const [user, setUser] = useState(null);
+    const [status, setStatus] = useState(initialStatus);
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
+            name: '',
+            email: '',
         });
+
+    useEffect(() => {
+        let mounted = true;
+        axios
+            .get('/api/user')
+            .then((res) => {
+                if (!mounted) return;
+                setUser(res.data);
+                setData('name', res.data.name || '');
+                setData('email', res.data.email || '');
+            })
+            .catch(() => {});
+
+        return () => (mounted = false);
+    }, [setData]);
 
     const submit = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'));
+        // Patch user profile via API endpoint
+        patch('/api/profile', {
+            onSuccess: () => setStatus('profile-updated'),
+        });
     };
 
     return (
@@ -69,18 +90,24 @@ export default function UpdateProfileInformation({
                     <InputError className="mt-2" message={errors.email} />
                 </div>
 
-                {mustVerifyEmail && user.email_verified_at === null && (
+                {mustVerifyEmail && user && user.email_verified_at === null && (
                     <div>
                         <p className="mt-2 text-sm text-gray-800">
                             Your email address is unverified.
-                            <Link
-                                href={route('verification.send')}
-                                method="post"
-                                as="button"
+                            <button
+                                type="button"
+                                onClick={async () => {
+                                    try {
+                                        await axios.post('/api/email/verification-notification');
+                                        setStatus('verification-link-sent');
+                                    } catch (e) {
+                                        // ignore for now
+                                    }
+                                }}
                                 className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                             >
                                 Click here to re-send the verification email.
-                            </Link>
+                            </button>
                         </p>
 
                         {status === 'verification-link-sent' && (

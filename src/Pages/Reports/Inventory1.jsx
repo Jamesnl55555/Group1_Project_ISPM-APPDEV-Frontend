@@ -1,25 +1,41 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head } from '@inertiajs/react';
 import { IconPencil, IconTrash, IconEye } from '@tabler/icons-react';
-import { Link } from '@inertiajs/react';
+import { Link, useNavigate } from 'react-router-dom';
 import DeleteButton from '@/Components/DeleteButton';
-import { useState } from 'react';
-import { router } from "@inertiajs/react";
+import { useState, useEffect } from 'react';
+import axios from '@/api/axios';
 
-export default function Inventory1({ products=[] }) {
+export default function Inventory1() {
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  const edit = (id) => router.get(route("edit-product", id));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get('/api/fetchproducts');
+        setProducts(response.data.products || []);
+      } catch (err) {
+        console.error('Failed to fetch products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
+  const edit = (id) => navigate(`/edit-product/${id}`);
   const del = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      router.post(route("delete-item", id), {
-        onSuccess: () => {
+      axios.delete(`/api/delete-item/${id}`)
+        .then(() => {
           console.log("Product deleted successfully");
-        },
-        onError: (errors) => {
-          console.error("Error deleting product:", errors);
-        },
-      });
+          setProducts(products.filter(p => p.id !== id));
+        })
+        .catch((err) => {
+          console.error("Error deleting product:", err);
+        });
     }
   }
 
@@ -42,11 +58,9 @@ export default function Inventory1({ products=[] }) {
                 Inventory Management
             </h1>}
     >
-      <Head title="Inventory Management" />
-
   {/* Add Product Button */}
 <button
-  onClick={() => router.visit("/add-product")} // 👈 navigates to Add Product page
+  onClick={() => navigate("/add-product")}
   className="w-full sm:w-[68rem] bg-[#fff2e0] border border-black
   font-semibold text-black text-2xl py-3 text-left pl-6
   hover:bg-[#e8d4b8] transition-all duration-200"
@@ -106,11 +120,11 @@ export default function Inventory1({ products=[] }) {
               <td className="px-3 py-2 text-sm text-gray-700">{item.name}</td>
               <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
               <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
-              <td className="px-3 py-2 flex items-center justify-center gap-3">
-                  <i className="fa-solid fa-pen text-green-600 cursor-pointer"><IconPencil onClick={() => edit(item.id)} /></i>
-                  <i className="fa-solid fa-trash text-red-600 cursor-pointer"><IconTrash onClick={() => del(item.id)} /></i>
-                  <i className="fa-solid fa-eye text-gray-700 cursor-pointer"><Link><IconEye /></Link></i>
-              </td>
+        <td className="px-3 py-2 flex items-center justify-center gap-3">
+          <i className="fa-solid fa-pen text-green-600 cursor-pointer" onClick={() => edit(item.id)}><IconPencil /></i>
+          <i className="fa-solid fa-trash text-red-600 cursor-pointer" onClick={() => del(item.id)}><IconTrash /></i>
+          <i className="fa-solid fa-eye text-gray-700 cursor-pointer"><Link><IconEye /></Link></i>
+        </td>
             </tr>
           ))
         )}
@@ -168,8 +182,8 @@ export default function Inventory1({ products=[] }) {
               <td className="px-3 py-2 text-sm text-gray-700">₱ {item.price}</td>
               <td className="px-3 py-2 text-sm text-gray-700">{item.quantity}</td>
               <td className="px-3 py-2 flex items-center justify-center gap-3">
-                <i className="fa-solid fa-pen text-green-600 cursor-pointer"><IconPencil /></i>
-                <i className="fa-solid fa-trash text-red-600 cursor-pointer"><IconTrash /></i>
+                <i className="fa-solid fa-pen text-green-600 cursor-pointer" onClick={() => edit(item.id)}><IconPencil /></i>
+                <i className="fa-solid fa-trash text-red-600 cursor-pointer" onClick={() => del(item.id)}><IconTrash /></i>
                 <i className="fa-solid fa-eye text-gray-700 cursor-pointer"><IconEye /></i>
               </td>
             </tr>

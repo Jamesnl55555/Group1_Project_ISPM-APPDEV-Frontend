@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import {router } from "@inertiajs/react";
+import axios from '@/api/axios';
 
 export default function DeletePHistoryButton({ id }) {
     const [visible, setVisible] = useState(false);
-    const del = (id) => router.post(route("delete-phistory", id));
+    const del = async (id) => {
+        try {
+            await axios.delete(`/api/product-history/${id}`);
+        } catch (e) {}
+    };
 
     return (
         <>

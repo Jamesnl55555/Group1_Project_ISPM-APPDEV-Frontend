@@ -1,20 +1,20 @@
 import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
+import { useNavigate } from "react-router-dom";
 
-export default function GenerateSalesReportCustom({ auth }) {
+export default function GenerateSalesReportCustom() {
+    const navigate = useNavigate();
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
 
     const handleGenerate = () => {
         if (!from || !to) return;
 
-        router.visit(`/generate-sales-report/custom?from=${from}&to=${to}`);
+        navigate(`/generate-sales-report/custom?from=${from}&to=${to}`);
     };
 
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Custom Sales Report" />
+        <AuthenticatedLayout>
 
             <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
                 <h1 className="text-2xl font-bold mb-6">Custom Sales Report</h1>

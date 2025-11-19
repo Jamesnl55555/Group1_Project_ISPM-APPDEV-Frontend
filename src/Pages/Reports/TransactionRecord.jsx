@@ -1,15 +1,31 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, router } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "@/api/axios";
 
 
-export default function TransactionRecord({ transactions }) {
+export default function TransactionRecord() {
+  const navigate = useNavigate();
+  const [transactions, setTransactions] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get('/api/fetchtransactions');
+        setTransactions(response.data.transactions);
+      } catch (err) {
+        console.error('Failed to fetch transactions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransactions();
+  }, []);
 
   return (
     <AuthenticatedLayout>
-      <Head title="Transaction Records List" />
-
       <div className="p-6">
   {/* Header with title and back button aligned in one row */}
   <div
@@ -20,7 +36,7 @@ export default function TransactionRecord({ transactions }) {
       Transaction Records List
     </h1>
     <button
-      onClick={() => router.visit("/dashboard")}
+      onClick={() => navigate("/dashboard")}
       className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#6b3e1f] transition shadow-md"
     >
       ← Back
@@ -95,7 +111,7 @@ export default function TransactionRecord({ transactions }) {
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-center">
   <button
-    onClick={() => router.visit(`/transactions/${t.id}`)}
+    onClick={() => navigate(`/transactions/${t.id}`)}
     className="bg-[#4b2e17] text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-[#6b3e1f] transition"
   >
     Show More

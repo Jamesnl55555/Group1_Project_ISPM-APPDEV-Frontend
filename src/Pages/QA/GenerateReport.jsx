@@ -1,11 +1,9 @@
 // resources/js/Pages/Reports/CreateReport.jsx
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
 
-export default function GenerateReport({ auth, sales, capital }) {
+export default function GenerateReport() {
     return (
-        <AuthenticatedLayout user={auth.user}>
-            <Head title="Create Report" />
+        <AuthenticatedLayout>
 
             <div className="py-12 px-6">
                 <div>
