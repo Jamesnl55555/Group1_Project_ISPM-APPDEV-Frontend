@@ -35,7 +35,7 @@ export default function Register() {
     console.log('Axios baseURL:', import.meta.env.VITE_API_BASE_URL);
 
     console.log('Sending registration data:', data); // Debug log
-    const response = await axios.post('/api/register', data);
+    const response = await axios.post('/register', data);
     
     console.log('Registration response:', response.data); // Debug log
     
