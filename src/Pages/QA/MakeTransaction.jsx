@@ -39,7 +39,7 @@ export default function MakeTransaction() {
                     </h1>
 
                     <button
-                        onClick={() => navigate("/transaction-record")}
+                        onClick={() => navigate("/transaction-rec-sec")}
                         className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-base font-semibold hover:bg-[#6b3e1f] transition shadow-md"
                     >
                         ← Back

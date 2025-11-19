@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000',
-  withCredentials: true,
+  baseURL: import.meta.env.VITE_API_BASE_URL, 
+  withCredentials: true, 
   headers: {
     "X-Requested-With": "XMLHttpRequest",
   },
