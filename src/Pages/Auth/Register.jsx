@@ -31,7 +31,7 @@ export default function Register() {
     setErrors({});
 
   try {
-    await axios.get('/sanctum/csrf-cookie');
+    await axiosInstance.get(import.meta.env.VITE_SANCTUM_CSRF_COOKIE);
     console.log('Sending registration data:', data); // Debug log
     const response = await axios.post('/api/register', data);
     
