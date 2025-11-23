@@ -3,7 +3,8 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from '@/api/axios';
 
 export default function Register() {
@@ -14,14 +15,14 @@ export default function Register() {
     password: '',
     password_confirmation: '',
   });
+
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
   const handleChange = (field) => (e) =>
     setData({ ...data, [field]: e.target.value });
 
   const setDataField = (field, value) => {
-    setData((prev) => ({ ...prev, [field]: value }));
+  setData(prev => ({ ...prev, [field]: value }));
   };
 
   const submit = async (e) => {
@@ -29,242 +30,213 @@ export default function Register() {
     setLoading(true);
     setErrors({});
 
-    try {
-      await axios.get('/sanctum/csrf-cookie');
+  try {
+    await axios.get('/sanctum/csrf-cookie')
+    console.log('Axios baseURL:', import.meta.env.VITE_API_BASE_URL);
 
-      const response = await axios.post('/register', data);
-
-      if (response.data?.token) {
-        localStorage.setItem('auth_token', response.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-      }
-
-      navigate('/dashboard');
-    } catch (err) {
-      if (err.response?.data?.errors) {
-        setErrors(err.response.data.errors);
-      } else {
-        setErrors({ general: err.response?.data?.message || 'Something went wrong' });
-      }
-    } finally {
-      setLoading(false);
+    console.log('Sending registration data:', data); // Debug log
+    const response = await axios.post('/register', data);
+    
+    console.log('Registration response:', response.data); // Debug log
+    
+    // Store token if returned
+    if (response.data?.token) {
+      localStorage.setItem('auth_token', response.data.token);
+      axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
     }
+    
+    navigate('/dashboard');
+  } catch (err) {
+    console.error('Registration error:', err.response?.data || err.message); // Debug log
+    if (err.response?.data?.errors) {
+      setErrors(err.response.data.errors);
+    } else {
+      setErrors({ general: err.response?.data?.message || 'Something went wrong' });
+    }
+  } finally {
+    setLoading(false);
+  }
   };
 
-  const getBackgroundColor = (value) => (value ? '#fff4e5ff' : '#ffffff');
+  const getBackgroundColor = (value) => (value ? '#f5e0c3' : '#ffffff');
 
   const createInputHandlers = (field) => ({
     onFocus: (e) => {
       e.target.style.borderColor = '#563d28';
-      e.target.style.backgroundColor = '#fff4e5ff';
+      e.target.style.backgroundColor = '#f5e0c3';
     },
     onBlur: (e) => {
-      e.target.style.borderColor = '#D1D5DB';
       e.target.style.backgroundColor = getBackgroundColor(data[field]);
+      e.target.style.borderColor = '#D1D5DB';
     },
     onMouseEnter: (e) => {
       if (document.activeElement !== e.target) {
         e.target.style.borderColor = '#563d28';
-        e.target.style.backgroundColor = '#fff4e5ff';
+        e.target.style.backgroundColor = '#f5e0c3';
       }
     },
     onMouseLeave: (e) => {
       if (document.activeElement !== e.target) {
-        e.target.style.borderColor = '#D1D5DB';
         e.target.style.backgroundColor = getBackgroundColor(data[field]);
+        e.target.style.borderColor = '#D1D5DB';
       }
     },
   });
 
   return (
-    <div
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundImage: 'url("/images/1.png")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        padding: '2rem',
-        fontFamily: 'Poppins, sans-serif',
-      }}
-    >
-      {/* Logo */}
-      <img
-        src="/images/2.png"
-        alt="Logo"
-        style={{
-          width: '200px',
-          marginBottom: '2rem',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-        }}
-      />
+    <>
+      {/* Autofill override styles */}
+      <style>{`
+        input:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0px 1000px #fff4e5ff inset !important;
+          -webkit-text-fill-color: #000 !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+        input:-webkit-autofill:focus {
+          -webkit-box-shadow: 0 0 0px 1000px #fff4e5ff inset !important;
+        }
+      `}</style>
 
-      {/* Form Card */}
       <div
-        style={{
-          backgroundColor: 'rgba(255,255,255,0.95)',
-          padding: '2rem',
-          borderRadius: '1.5rem',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-          width: '100%',
-          maxWidth: '400px',
-          textAlign: 'center',
-        }}
+        className="min-h-screen flex flex-col items-center justify-center bg-cover bg-center relative"
+        style={{ backgroundImage: 'url("/images/1.png")' }}
       >
-        <h2
-          style={{
-            fontSize: '2rem',
-            fontWeight: '700',
-            marginBottom: '1.5rem',
-            color: '#000',
-          }}
+        <header title="Register" />
+
+        {/* Logo */}
+        <div className="absolute top-6 left-8">
+          <img
+            src="/images/2.png"
+            alt="888 Chocolates & More Logo"
+            className="drop-shadow-lg"
+            style={{ width: '200px' }}
+          />
+        </div>
+
+        {/* Form Card */}
+        <div
+          className="bg-white bg-opacity-95 p-8 rounded-2xl shadow-lg w-full max-w-md text-center"
+          style={{ marginTop: '3rem' }}
         >
-          SIGN UP
-        </h2>
+          <h2 className="text-3xl font-bold mb-6 text-gray-800">SIGN UP</h2>
 
-        {errors.general && (
-          <div style={{ color: 'red', marginBottom: '1rem' }}>{errors.general}</div>
-        )}
+          <form onSubmit={submit}>
+            {/* Name */}
+            <div className="text-left">
+              <InputLabel htmlFor="name" value="Username" />
+              <TextInput
+                id="name"
+                name="name"
+                value={data.name || ''}
+                className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
+                autoComplete="name"
+                isFocused={true}
+                onChange={(e) => setDataField('name', e.target.value)}
+                required
+                {...createInputHandlers('name')}
+                style={{
+                  backgroundColor: getBackgroundColor(data.name),
+                }}
+              />
+              <InputError message={errors.name} className="mt-2" />
+            </div>
 
-        <form onSubmit={submit}>
-          {/* Name */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="name" value="Username" />
-            <TextInput
-              id="name"
-              name="name"
-              value={data.name || ''}
-              autoComplete="name"
-              onChange={(e) => setDataField('name', e.target.value)}
-              required
-              {...createInputHandlers('name')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.name),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.name} />
-          </div>
+            {/* Email */}
+            <div className="mt-4 text-left">
+              <InputLabel htmlFor="email" value="Email" />
+              <TextInput
+                id="email"
+                type="email"
+                name="email"
+                value={data.email || ''}
+                className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
+                autoComplete="username"
+                onChange={(e) => setDataField('email', e.target.value)}
+                required
+                {...createInputHandlers('email')}
+                style={{
+                  backgroundColor: getBackgroundColor(data.email),
+                }}
+              />
+              <InputError message={errors.email} className="mt-2" />
+            </div>
 
-          {/* Email */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="email" value="Email" />
-            <TextInput
-              id="email"
-              type="email"
-              name="email"
-              value={data.email || ''}
-              autoComplete="username"
-              onChange={(e) => setDataField('email', e.target.value)}
-              required
-              {...createInputHandlers('email')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.email),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.email} />
-          </div>
+            {/* Password */}
+            <div className="mt-4 text-left">
+              <InputLabel htmlFor="password" value="Password" />
+              <TextInput
+                id="password"
+                type="password"
+                name="password"
+                value={data.password || ''}
+                className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
+                autoComplete="new-password"
+                onChange={(e) => setDataField('password', e.target.value)}
+                required
+                {...createInputHandlers('password')}
+                style={{
+                  backgroundColor: getBackgroundColor(data.password),
+                }}
+              />
+              <InputError message={errors.password} className="mt-2" />
+            </div>
 
-          {/* Password */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="password" value="Password" />
-            <TextInput
-              id="password"
-              type="password"
-              name="password"
-              value={data.password || ''}
-              autoComplete="new-password"
-              onChange={(e) => setDataField('password', e.target.value)}
-              required
-              {...createInputHandlers('password')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.password),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.password} />
-          </div>
+            {/* Confirm Password */}
+            <div className="mt-4 text-left">
+              <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
+              <TextInput
+                id="password_confirmation"
+                type="password"
+                name="password_confirmation"
+                value={data.password_confirmation || ''}
+                className="mt-1 block w-full rounded-md border border-gray-300 transition-colors"
+                autoComplete="new-password"
+                onChange={(e) => setDataField('password_confirmation', e.target.value)}
+                required
+                {...createInputHandlers('password_confirmation')}
+                style={{
+                  backgroundColor: getBackgroundColor(data.password_confirmation),
+                }}
+              />
+              <InputError message={errors.password_confirmation} className="mt-2" />
+            </div>
 
-          {/* Confirm Password */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-            <TextInput
-              id="password_confirmation"
-              type="password"
-              name="password_confirmation"
-              value={data.password_confirmation || ''}
-              autoComplete="new-password"
-              onChange={(e) => setDataField('password_confirmation', e.target.value)}
-              required
-              {...createInputHandlers('password_confirmation')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.password_confirmation),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.password_confirmation} />
-          </div>
+            {/* Submit Button */}
+            <div className="flex justify-center mt-6">
+              <PrimaryButton
+                className="py-2 rounded-md flex justify-center items-center text-white font-semibold text-base"
+                disabled={loading}
+                style={{
+                  fontSize: '15px',
+                  width: '120px',
+                  backgroundColor: '#422912ff',
+                  transition: 'background 0.3s',
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) e.currentTarget.style.backgroundColor = '#2e1e0fff';
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) e.currentTarget.style.backgroundColor = '#422912ff';
+                }}
+              >
+                SIGN UP
+              </PrimaryButton>
+            </div>
 
-          {/* Submit Button */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
-            <PrimaryButton
-              type="submit"
-              disabled={loading}
-              style={{
-                width: '120px',
-                backgroundColor: '#422912ff',
-                color: '#fff',
-                fontWeight: '600',
-                fontSize: '1rem',
-                borderRadius: '6px',
-                padding: '0.6rem',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'background 0.3s',
-              }}
-              onMouseEnter={(e) => {
-                if (!loading) e.currentTarget.style.backgroundColor = '#2e1e0fff';
-              }}
-              onMouseLeave={(e) => {
-                if (!loading) e.currentTarget.style.backgroundColor = '#422912ff';
-              }}
-            >
-              SIGN UP
-            </PrimaryButton>
-          </div>
-
-          {/* Sign In Link */}
-          <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#4B5563' }}>
-            Already have an account?{' '}
-            <Link to="/login" style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}>
-              Log In
-            </Link>
-          </p>
-        </form>
+            {/* Sign In Link */}
+            <p className="text-sm text-gray-600 mt-4">
+              Already have an account?{' '}
+              <Link
+                to ="/login"
+                className="text-blue-600 font-medium hover:underline"
+              >
+                Log In
+              </Link>
+            </p>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

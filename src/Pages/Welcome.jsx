@@ -2,122 +2,61 @@ import { Link } from 'react-router-dom';
 
 export default function Welcome() {
   return (
+    <>
+    <header title="Welcome" ></header>
     <div
+      className="relative w-screen h-screen bg-cover bg-center flex flex-col items-center justify-center"
       style={{
-        position: "relative",
-        width: "100vw",
-        height: "100vh",
         backgroundImage: "url('/images/1.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
       }}
     >
-      {/* Dark overlay */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0,0,0,0.1)",
-          backdropFilter: "blur(3px)",
-          zIndex: 10,
-        }}
-      />
-
-      {/* Center content */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 20,
-          textAlign: "center",
-        }}
-      >
-        <img
-          src="/images/2.png"
-          alt="88 Chocolates & More Logo"
-          style={{
-            width: "384px",
-            marginTop: "-3rem",
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-            filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))",
-          }}
-        />
-        <p
-          style={{
-            fontSize: "2rem",
-            fontWeight: 800,
-            lineHeight: "1.2",
-            marginTop: "1rem",
-            color: "#3d1c00",
-            WebkitTextStroke: ".2px white",
-            WebkitTextFillColor: "#3d1c00",
-            textShadow: "1px 2px rgba(0,0,0,0.5)",
-            padding: "0 1rem",
-          }}
-        >
-          Bringing you quality chocolates at an <br />
-          affordable price, always near your place.
-        </p>
-      </div>
-
       {/* Top right buttons */}
-      <div
-        style={{
-          position: "absolute",
-          top: "1.5rem",
-          right: "2.5rem",
-          display: "flex",
-          gap: "1rem",
-          zIndex: 50,
-        }}
-      >
+      <div className="absolute top-6 right-8 flex space-x-3 z-10">
         <Link
           to="/login"
-          style={{
-            padding: "0.5rem 1.5rem",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            borderRadius: "0.375rem",
-            border: "1px solid black",
-            backgroundColor: "transparent",
-            color: "black",
-            textDecoration: "none",
-            transition: "background-color 0.2s",
+          className="border border-black text-black px-5 py-2 rounded-md text-sm font-semibold transition"
+          style={{ backgroundColor: "transparent" }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor =
+              "rgba(243, 244, 246, 0.6)";
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(243,244,246,0.6)")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }}
         >
           LOG IN
         </Link>
 
         <Link
           to="/register"
-          style={{
-            padding: "0.5rem 1.5rem",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            borderRadius: "0.375rem",
-            backgroundColor: "#563d28",
-            color: "white",
-            textDecoration: "none",
-            transition: "background-color 0.2s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#3d1c00")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#563d28")}
+          className="bg-[#563d28] text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#3d1c00ff] transition"
         >
           SIGN UP
         </Link>
       </div>
+
+      {/* Center content */}
+      <div className="flex flex-col items-center text-center mt-10 z-0">
+        <img
+          style={{ marginTop: "-3rem" }}
+          src="/images/2.png"
+          alt="88 Chocolates & More Logo"
+          className="mx-auto w-80 mb-6"
+        />
+        <p
+          className="text-2xl font-extrabold text-[#3d1c00ff] tracking-wide leading-snug px-4 text-center"
+          style={{
+            WebkitTextStroke: ".5px white",
+            WebkitTextFillColor: "#3d1c00ff",
+            textShadow: "1px 2px rgba(0,0,0,0.5)",
+          }}
+        >
+          "Bringing you quality chocolates at an <br />
+          affordable price, always near your place."
+        </p>
+      </div>
     </div>
+    </>
   );
 }
 
