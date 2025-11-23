@@ -23,7 +23,7 @@ export default function Login() {
 
         try {
             await axios.get('/sanctum/csrf-cookie');
-            const response = await axios.post('/login', data);
+            const response = await axios.post('/api/login', data);
 
             if (response.data?.token) {
                 localStorage.setItem('auth_token', response.data.token);
