@@ -1,149 +1,212 @@
+import React, { useState, useRef } from "react";
 import * as XLSX from "xlsx";
-import { useState, useRef } from "react";
-import axios from "@/api/axios"; 
+import axios from "@/api/axios";
 
 export default function Import() {
-    const [data, setData] = useState({ excel_file: null });
-    const [excelData, setExcelData] = useState([]);
-    const [showData, setShowData] = useState(false);
-    const [localError, setLocalError] = useState("");
-    const fileInputRef = useRef(null);
+  const [data, setData] = useState({ excel_file: null });
+  const [excelData, setExcelData] = useState([]);
+  const [showData, setShowData] = useState(false);
+  const [localError, setLocalError] = useState("");
+  const fileInputRef = useRef(null);
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        setData({ excel_file: file });
-        setLocalError("");
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setData({ excel_file: file });
+    setLocalError("");
 
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                const bstr = evt.target.result;
-                const wb = XLSX.read(bstr, { type: "binary" });
-                const wsname = wb.SheetNames[0];
-                const ws = wb.Sheets[wsname];
-                const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
-                setExcelData(jsonData);
-                setShowData(false);
-            };
-            reader.readAsBinaryString(file);
-        } else {
-            setExcelData([]);
-        }
-    };
-
-    // Save file (upload to backend)
-    const saveFile = async (e) => {
-        e.preventDefault();
-
-        if (!data.excel_file) {
-            setLocalError("Please select an Excel file before saving.");
-            return;
-        }
-
-        setLocalError("");
-        try {
-            const formData = new FormData();
-            formData.append("excel_file", data.excel_file);
-
-            await axios.post("/api/import", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-            });
-
-            alert("File uploaded successfully!");
-        } catch (error) {
-            console.error(error);
-            setLocalError("Failed to upload file.");
-        }
-    };
-
-    // Remove file and reset input completely
-    const removeFile = () => {
-        setData({ excel_file: null });
-        setExcelData([]);
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const bstr = evt.target.result;
+        const wb = XLSX.read(bstr, { type: "binary" });
+        const wsname = wb.SheetNames[0];
+        const ws = wb.Sheets[wsname];
+        const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+        setExcelData(jsonData);
         setShowData(false);
-        setLocalError("");
+      };
+      reader.readAsBinaryString(file);
+    } else {
+      setExcelData([]);
+    }
+  };
 
-        if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-        }
-    };
+  // Upload file to backend
+  const saveFile = async (e) => {
+    e.preventDefault();
 
-    const brownButton =
-        "bg-[#4b2e17] text-white font-semibold px-6 py-2 rounded-xl hover:bg-[#3a2312] transition-colors";
+    if (!data.excel_file) {
+      setLocalError("Please select an Excel file before saving.");
+      return;
+    }
 
-    return (
-        <div className="space-y-4">
-            <div className="space-y-2">
-                <div className="flex items-center space-x-3">
-                    <div className="relative flex-1">
-                        <input
-                            ref={fileInputRef} 
-                            type="file"
-                            name="excel_file"
-                            accept=".xlsx, .xls, .csv"
-                            onChange={handleFileChange}
-                            className="border border-gray-300 rounded-lg px-3 py-2 w-full"
-                        />
+    setLocalError("");
 
-                        {/* Delete Icon */}
-                        {data.excel_file && (
-                            <button
-                                type="button"
-                                onClick={removeFile}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-red-600 hover:text-red-800 font-bold text-lg"
-                                title="Remove file"
-                            >
-                                X
-                            </button>
-                        )}
-                    </div>
+    try {
+      const formData = new FormData();
+      formData.append("excel_file", data.excel_file);
 
-                    {/* Save Button */}
-                    <button type="button" className={brownButton} onClick={saveFile}>
-                        Save
-                    </button>
+      await axios.post("/api/import", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-                    {/* Preview Toggle */}
-                    {excelData.length > 0 && (
-                        <button
-                            type="button"
-                            className={`${brownButton} bg-gray-700 hover:bg-gray-800`}
-                            onClick={() => setShowData((prev) => !prev)}
-                        >
-                            {showData ? "Hide Preview" : "Preview"}
-                        </button>
-                    )}
-                </div>
+      alert("File uploaded successfully!");
+    } catch (error) {
+      console.error(error);
+      setLocalError("Failed to upload file.");
+    }
+  };
 
-                {/* Error Messages */}
-                {localError && (
-                    <div className="text-red-500 text-sm mt-1">
-                        {localError}
-                    </div>
-                )}
-            </div>
+  // Remove selected file
+  const removeFile = () => {
+    setData({ excel_file: null });
+    setExcelData([]);
+    setShowData(false);
+    setLocalError("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
-            {/* Excel Preview */}
-            {showData && excelData.length > 0 && (
-                <div className="mt-4 overflow-auto border p-4 rounded-lg shadow-sm max-h-96">
-                    <table className="table-auto border-collapse border border-gray-300 w-full">
-                        <tbody>
-                            {excelData.map((row, i) => (
-                                <tr key={i}>
-                                    {row.map((cell, j) => (
-                                        <td
-                                            key={j}
-                                            className="border px-3 py-1 text-sm text-gray-700"
-                                        >
-                                            {cell}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+  // Custom tested design button style
+  const customButtonStyle = {
+    padding: "0.45rem 1.2rem",
+    fontSize: "0.9rem",
+    fontWeight: 600,
+    color: "#fff",
+    background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    textAlign: "center",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transition: "background 0.3s",
+    boxShadow: "0 3px 5px rgba(0,0,0,0.25)",
+  };
+
+  // Hover effects copied from tested design
+  const handleHover = (e) => {
+    e.currentTarget.style.background =
+      "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+  };
+
+  const handleLeave = (e) => {
+    e.currentTarget.style.background =
+      "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+  };
+
+  return (
+    <div className="space-y-4 w-full">
+      {/* Row: File input, Save, Preview */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "2rem",
+          flexWrap: "wrap",
+        }}
+      >
+        {/* File Input + Remove Button */}
+        <div className="relative" style={{ minWidth: "200px" }}>
+          <input
+            ref={fileInputRef}
+            type="file"
+            name="excel_file"
+            accept=".xlsx, .xls, .csv"
+            onChange={handleFileChange}
+            style={{ width: "100%", color: "#424242ff" }}
+          />
+
+          {data.excel_file && (
+            <button
+              type="button"
+              onClick={removeFile}
+              className="absolute right-[-20px] top-1/2 -translate-y-1/2 text-red-600 hover:text-red-800 font-bold"
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                cursor: "pointer",
+              }}
+              title="Remove file"
+            >
+              X
+            </button>
+          )}
         </div>
-    );
+
+        {/* Save Button (backend upload but tested UI) */}
+        <button
+          type="button"
+          style={customButtonStyle}
+          onClick={saveFile}
+          onMouseEnter={handleHover}
+          onMouseLeave={handleLeave}
+        >
+          Save
+        </button>
+
+        {/* Preview Button */}
+        {excelData.length > 0 && (
+          <button
+            type="button"
+            style={customButtonStyle}
+            onClick={() => setShowData((prev) => !prev)}
+            onMouseEnter={handleHover}
+            onMouseLeave={handleLeave}
+          >
+            {showData ? "Hide Preview" : "Preview"}
+          </button>
+        )}
+      </div>
+
+      {/* Error Message */}
+      {localError && (
+        <div
+          style={{
+            color: "red",
+            fontSize: "0.75rem",
+            marginTop: "0.25rem",
+            fontWeight: 500,
+            textAlign: "center",
+          }}
+        >
+          {localError}
+        </div>
+      )}
+
+      {/* Excel Preview */}
+      {showData && excelData.length > 0 && (
+        <div
+          style={{
+            marginTop: "2rem",
+            overflow: "auto",
+            border: "1px solid #ccc",
+            padding: "1rem",
+            borderRadius: "0.5rem",
+            maxHeight: "400px",
+          }}
+        >
+          <table className="table-auto border-collapse border border-gray-300 w-full">
+            <tbody>
+              {excelData.map((row, i) => (
+                <tr key={i}>
+                  {row.map((cell, j) => (
+                    <td
+                      key={j}
+                      className="border px-3 py-1 text-sm text-gray-700"
+                    >
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
 }

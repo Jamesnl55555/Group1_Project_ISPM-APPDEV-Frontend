@@ -1,7 +1,9 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import DeleteUserForm from './Partials/DeleteUserForm';
-import UpdatePasswordForm from './Partials/UpdatePasswordForm';
-import UpdateProfileInformationForm from './Partials/UpdateProfileInformationForm';
+// EditDeployedStyled.jsx
+import { useState } from "react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import DeleteUserForm from "./Partials/DeleteUserForm";
+import UpdatePasswordForm from "./Partials/UpdatePasswordForm";
+import UpdateProfileInformationForm from "./Partials/UpdateProfileInformationForm";
 
 export default function Edit() {
     const [mustVerifyEmail] = useState(false);
@@ -12,52 +14,73 @@ export default function Edit() {
             header={
                 <div>
                     <h1
-                        className="text-4xl font-extrabold text-[#4b2e17] drop-shadow-sm"
                         style={{
-                            WebkitTextStroke: '.8px #000000',
-                            backgroundImage: 'linear-gradient(to bottom, #ec8845ff, #3b1f0d)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            lineHeight: '1.3',
-                            fontSize: '3rem',
-                            marginLeft: '5rem',
+                            fontSize: "3rem",
+                            fontWeight: 800,
+                            lineHeight: 1.3,
+                            marginLeft: "5rem",
+                            WebkitTextStroke: ".8px #000000",
+                            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            textShadow: "1px 1px 2px rgba(0,0,0,0.3)",
                         }}
                     >
                         Profile Settings
                     </h1>
                     <p
-                        className="text-sm text-gray-600 mt-1"
-                        style={{ marginLeft: '5rem' }}
+                        style={{
+                            marginLeft: "5rem",
+                            marginTop: "-1rem",
+                            fontSize: "0.875rem",
+                            color: "#4b5563",
+                            letterSpacing: "2px",
+                        }}
                     >
                         Manage your account information and security settings
                     </p>
                 </div>
             }
         >
-
-                    {/* Centered cards */}
-            <div className="flex justify-center py-12">
-                <div className="flex flex-col w-full max-w-4xl gap-8">
+            {/* Centered cards */}
+            <div style={{ display: "flex", justifyContent: "center", paddingTop: "3rem", paddingBottom: "3rem" }}>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%", maxWidth: "64rem", gap: "2rem" }}>
+                    
                     {/* PROFILE CARD */}
-                    <div className="bg-white rounded-2xl shadow-inner p-8 border border-[#e2cdbf] w-full">
-                        <UpdateProfileInformationForm
-                            mustVerifyEmail={mustVerifyEmail}
-                            status={status}
-                            className="flex flex-col gap-4"
-                        />
+                    <div style={{
+                        backgroundColor: "#fdf6ee",
+                        borderRadius: "1rem",
+                        boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
+                        padding: "2rem",
+                        border: "1px solid #e2cdbf",
+                    }}>
+                        <UpdateProfileInformationForm mustVerifyEmail={mustVerifyEmail} status={status} />
                     </div>
 
                     {/* PASSWORD CARD */}
-                    <div className="bg-white rounded-2xl shadow-inner p-8 border border-[#e2cdbf] w-full">
-                        <UpdatePasswordForm className="flex flex-col gap-4" />
+                    <div style={{
+                        backgroundColor: "#fdf6ee",
+                        borderRadius: "1rem",
+                        boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
+                        padding: "2rem",
+                        border: "1px solid #e2cdbf",
+                    }}>
+                        <UpdatePasswordForm />
                     </div>
 
                     {/* DELETE CARD */}
-                    <div className="bg-white rounded-2xl shadow-inner p-8 border border-[#e2cdbf] w-full">
-                        <div className="flex justify-center">
+                    <div style={{
+                        backgroundColor: "#fdf6ee",
+                        borderRadius: "1rem",
+                        boxShadow: "inset 0 1px 3px rgba(0,0,0,0.1)",
+                        padding: "2rem",
+                        border: "1px solid #e2cdbf",
+                    }}>
+                        <div style={{ display: "flex", justifyContent: "center" }}>
                             <DeleteUserForm buttonClassName="w-32" />
                         </div>
                     </div>
+
                 </div>
             </div>
         </AuthenticatedLayout>

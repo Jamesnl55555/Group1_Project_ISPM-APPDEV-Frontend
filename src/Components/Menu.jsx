@@ -1,16 +1,16 @@
 export default function Menu({ toggleMenu }) {
-    return (
-        <button 
-            className="menu-icon cursor-pointer p-3 rounded hover:bg-gray-200 transition z-50 relative" 
-            onClick={toggleMenu} 
-            title="Menu"
-            aria-label="Toggle menu"
-        >
-            <div className="flex flex-col justify-center items-center space-y-1.5">
-                <span className="block w-6 h-0.5 bg-gray-700"></span>
-                <span className="block w-6 h-0.5 bg-gray-700"></span>
-                <span className="block w-6 h-0.5 bg-gray-700"></span>
-            </div>
-        </button>
-    );
+  return (
+    <button
+      onClick={toggleMenu}
+      title="Menu"
+      aria-label="Toggle menu"
+      className="cursor-pointer p-2 rounded bg-transparent border-none relative z-50"
+    >
+      <div className="flex flex-col justify-center items-center gap-1">
+        <span className="block w-5 h-0.5 bg-gray-700 rounded-sm"></span>
+        <span className="block w-5 h-0.5 bg-gray-700 rounded-sm"></span>
+        <span className="block w-5 h-0.5 bg-gray-700 rounded-sm"></span>
+      </div>
+    </button>
+  );
 }

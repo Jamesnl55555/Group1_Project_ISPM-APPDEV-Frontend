@@ -6,10 +6,11 @@ import axios from "@/api/axios";
 
 export default function AuthenticatedLayout({ header, children }) {
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true); // Start open on desktop
+  const [sidebarOpen, setSidebarOpen] = useState(true); 
   const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
   const sidebarRef = useRef(null);
 
+  // Fetch user
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -23,12 +24,11 @@ export default function AuthenticatedLayout({ header, children }) {
     fetchUser();
   }, []);
 
+  // Close sidebar on small screens when clicking outside
   useEffect(() => {
     const handleMouseMove = (event) => {
       if (!sidebarRef.current) return;
-      // Only close sidebar on mousemove if window is small (mobile)
-      if (window.innerWidth >= 1024) return; // Keep sidebar open on desktop
-      
+      if (window.innerWidth >= 1024) return; 
       const rect = sidebarRef.current.getBoundingClientRect();
       const outside =
         event.clientX < rect.left ||
@@ -47,8 +47,8 @@ export default function AuthenticatedLayout({ header, children }) {
   if (!user) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar overlay (for clicking outside) */}
+    <div className="min-h-screen flex font-sans">
+      {/* Sidebar overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
@@ -59,34 +59,36 @@ export default function AuthenticatedLayout({ header, children }) {
       {/* Sidebar */}
       <aside
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full bg-[#4b2e17] text-white w-56 transform transition-transform duration-300 z-40 flex flex-col justify-between ${
+        className={`fixed top-0 left-0 h-full w-56 bg-[#4b2e17] text-white flex flex-col justify-between transform transition-transform duration-300 z-40 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div>
-          <div className="flex items-center justify-between px-4 py-6 border-b border-[#5c3c21]">
-            <img src="/images/2.png" alt="Logo" className="h-20 w-auto mx-auto" />
-            <button onClick={() => setSidebarOpen(false)} className="p-1 hover:bg-[#5a3c24] rounded">
-              ✕
-            </button>
+          {/* Logo */}
+          <div className="flex justify-center py-6">
+            <img src="/images/2.png" alt="Logo" className="h-28 mt-12" />
           </div>
 
-          <nav className="mt-6 space-y-3 text-sm">
-            <Link to="/dashboard" className="flex items-center gap-3 px-6 py-2 rounded transition-colors duration-200 hover:bg-[#5a3c24] w-full">
-              📊 Dashboard
-            </Link>
-            <Link to="/inventory1" className="flex items-center gap-3 px-6 py-2 rounded transition-colors duration-200 hover:bg-[#5a3c24] w-full">
-              📦 Products
-            </Link>
-            <Link to="/transaction-record" className="flex items-center gap-3 px-6 py-2 rounded transition-colors duration-200 hover:bg-[#5a3c24] w-full">
-              💰 Transactions
-            </Link>
-            <Link to="/sales-report" className="flex items-center gap-3 px-6 py-2 rounded transition-colors duration-200 hover:bg-[#5a3c24] w-full">
-              📑 Reports
-            </Link>
+          {/* Sidebar links */}
+          <nav className="mt-6 flex flex-col gap-2 text-base">
+            {[
+              { to: "/dashboard", label: "Dashboard", icon: "📊" },
+              { to: "/inventory1", label: "Products", icon: "📦" },
+              { to: "/transaction-record", label: "Transactions", icon: "💰" },
+              { to: "/sales-report", label: "Reports", icon: "📑" },
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="flex items-center gap-3 px-6 py-2 rounded hover:bg-[#5a3c24] transition-colors duration-200"
+              >
+                {link.icon} {link.label}
+              </Link>
+            ))}
           </nav>
         </div>
 
+        {/* Logout */}
         <div className="mb-6 px-6">
           <button
             onClick={async () => {
@@ -104,98 +106,75 @@ export default function AuthenticatedLayout({ header, children }) {
         </div>
       </aside>
 
-      {/* Main */}
+      {/* Main content */}
       <div className="flex-1 flex flex-col">
-        {/* Header Navbar */}
-        <nav className="bg-white border-b border-gray-100" style={{ height: "7rem" }}>
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
-            <div className="flex justify-between items-center h-full">
-              <div className="flex items-center space-x-4 h-full">
-                <Menu toggleMenu={() => setSidebarOpen(!sidebarOpen)} />
-                <Link to="/dashboard">
-                  <img src="/images/2.png" alt="Logo" style={{ height: "7rem" }} />
-                </Link>
+        {/* Header */}
+        <nav className="bg-white border-b border-gray-100 h-28 flex items-center px-6">
+          <div className="flex justify-between items-center w-full">
+            {/* Left: Menu & Logo */}
+            <div className="flex items-center gap-4">
+              <div className="fixed top-4 left-4 z-50">
+                {!sidebarOpen ? (
+                  <Menu toggleMenu={() => setSidebarOpen(true)} />
+                ) : (
+                  <button
+                    onClick={() => setSidebarOpen(false)}
+                    className="p-2 bg-transparent text-white text-lg rounded"
+                    title="Close menu"
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
 
-              <div className="flex items-center space-x-6">
-                <div className="hidden sm:flex space-x-8">
-                  <button
-                    className="text-[#4b2e17] font-medium text-[1.3rem] hover:text-[#916520ff] transition-colors cursor-pointer bg-none border-none p-0"
-                    onClick={() => (window.location.href = "/dashboard")}
-                  >
-                    Dashboard
-                  </button>
+              <Link to="/dashboard">
+                <img src="/images/2.png" alt="Logo" className="max-h-24 ml-24" />
+              </Link>
+            </div>
 
-                  <button
-                    style={{
-                      fontSize: "1.3rem",
-                      color: "#4b2e17",
-                      fontWeight: "500",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      transition: "color 0.2s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "#916520ff")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "#4b2e17")}
-                    onClick={() => {
+            {/* Right links */}
+            <div className="flex items-center gap-6 mr-[-9rem]">
+              {["Dashboard", "Quick Access"].map((label) => (
+                <button
+                  key={label}
+                  className="text-[#4b2e17] font-medium text-lg transition-transform duration-200 hover:scale-105 hover:font-bold bg-none border-none p-0 cursor-pointer"
+                  onClick={() => {
+                    if (label === "Quick Access") {
                       const el = document.getElementById("quick-access");
                       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }}
-                  >
-                    Quick Access
-                  </button>
-                </div>
+                    } else {
+                      window.location.href = "/dashboard";
+                    }
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
 
-                <Link to="/profile" className="flex items-center justify-center w-10 h-10" title="Profile">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4b2e17" className="w-6 h-6">
-                    <path d="M12 12c2.8 0 5-2.2 5-5s-2.2-5-5-5-5 2.2-5 5 2.2 5 5 5z" />
-                    <path d="M4 20c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6v1H4v-1z" />
-                  </svg>
-                </Link>
-              </div>
+              <Link to="/profile" className="flex items-center justify-center w-10 h-10" title="Profile">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4b2e17" className="w-6 h-6">
+                  <path d="M12 12c2.8 0 5-2.2 5-5s-2.2-5-5-5-5 2.2-5 5 2.2 5 5 5z" />
+                  <path d="M4 20c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6v1H4v-1z" />
+                </svg>
+              </Link>
             </div>
           </div>
-
-          {showingNavigationDropdown && (
-            <div className="sm:hidden">
-              <div className="space-y-1 pb-3 pt-2">
-                <ResponsiveNavLink to="/dashboard">Dashboard</ResponsiveNavLink>
-              </div>
-              <div className="border-t border-gray-200 pb-1 pt-4">
-                <div className="px-4">
-                  <div className="text-base font-medium text-gray-800">{user.name}</div>
-                  <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                </div>
-                <div className="mt-3 space-y-1">
-                  <ResponsiveNavLink to="/profile">Profile</ResponsiveNavLink>
-                  <button
-                    onClick={async () => {
-                      try {
-                        await axios.post("/logout");
-                        window.location.href = "/login";
-                      } catch (error) {
-                        console.error("Logout failed:", error);
-                      }
-                    }}
-                  >
-                    Log Out
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </nav>
 
         {/* Optional page header */}
         {header && (
-          <header className="bg-white shadow">
+          <header className="bg-white shadow-sm">
             <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{header}</div>
           </header>
         )}
 
         {/* Main content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-6">
+          {children}
+          <section id="quick-access" className="mt-12">
+            {/* Quick Access content */}
+          </section>
+        </main>
       </div>
     </div>
   );

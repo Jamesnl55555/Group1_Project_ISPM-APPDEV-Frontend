@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // Use React Router for SPA routing
+import { Link } from "react-router-dom"; // SPA routing
 import axios from '@/api/axios';
 import Import from "@/Components/Import";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
@@ -12,8 +12,8 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        await axios.get('/sanctum/csrf-cookie'); // Fetch CSRF cookie
-        const response = await axios.get('/api/user'); // Get user data
+        await axios.get('/sanctum/csrf-cookie'); 
+        const response = await axios.get('/api/user'); 
         setUser(response.data);
       } catch (error) {
         console.error('Error fetching user:', error);
@@ -25,24 +25,40 @@ export default function Dashboard() {
     fetchUser();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
-  if (!user) return <p className="text-center mt-10">Please log in to view dashboard.</p>;
+  if (loading) return <p style={{ textAlign: 'center', marginTop: '2rem' }}>Loading...</p>;
+  if (!user) return <p style={{ textAlign: 'center', marginTop: '2rem' }}>Please log in to view dashboard.</p>;
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <AuthenticatedLayout
         header={
-          <h1 className="text-4xl font-bold text-gray-900" style={{ marginLeft: "7rem", marginTop:"-1.6rem", marginBottom:"-1.6rem" }}>
-            Welcome, {user.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : "[USERNAME]"}!
+          <h1
+            style={{
+              marginLeft: "10.5rem",
+              marginTop: "1rem",
+              marginBottom: "1rem",
+              fontSize: "2.25rem",
+              fontWeight: "bold",
+              color: "#111827",
+            }}
+          >
+            Welcome, {user.name ? user.name.toUpperCase() : "[USERNAME]"}!
           </h1>
         }
       >
-        {/* <Head title="Dashboard" /> Remove if not using Inertia */}
-
-        <div className="py-1">
-          <div className="mx-auto max-w-6xl sm:px-12">
+        <div style={{ paddingTop: "0.25rem" }}>
+          <div style={{ maxWidth: "96rem", margin: "0 auto", padding: "0 9rem" }}>
+            
             {/* Dashboard Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3" style={{marginTop:"-1rem"}}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, 1fr)",
+                gridAutoRows: "auto",
+                gap: "0.75rem",
+                marginTop: "-1rem",
+              }}
+            >
               <DashboardCard
                 title="Sales Report"
                 subtitle={`Capital: ${user.capital}`}
@@ -69,47 +85,114 @@ export default function Dashboard() {
               />
             </div>
 
-            {/* Import Excel Card */}
-            <div className="mt-10">
-              <h2 className="text-xl font-semibold text-[#4b2e17] mb-1">Import Excel</h2>
-              <p className="text-gray-700 text-sm mb-4">Upload your Excel file to update products and transactions.</p>
-              <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
-                <div className="bg-white rounded-xl border border-black p-6 flex flex-col items-center transition-shadow duration-300 hover:shadow-[10px_10px_15px_rgba(0,0,0,0.3)]">
+            {/* Import Excel Section */}
+            <div style={{ marginTop: "2.5rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "#4b2e17", marginBottom: "0.25rem" }}>
+                Import Excel
+              </h2>
+              <p style={{ color: "#374151", fontSize: "0.875rem", marginBottom: "1rem" }}>
+                Upload your Excel file to update products and transactions.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem" }}>
+                <div
+                  style={{
+                    background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
+                    borderRadius: "1rem",
+                    border: "1px solid black",
+                    padding: "2rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    transition: "box-shadow 0.3s",
+                    boxShadow: "none",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "8px 8px 18px rgba(0,0,0,0.35)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+                >
                   <Import />
                 </div>
               </div>
             </div>
 
             {/* Quick Access Section */}
-            <div id="quick-access" className="mt-10">
-              <div className="mt-10">
-                <h2 className="text-xl font-semibold text-[#4b2e17] mb-4">Quick Access</h2>
-                <div className="flex flex-wrap justify-center sm:justify-start text-center gap-12">
-                  {[
-                    { img: "/images/6.png", label: <>Make<br />Transaction</>, href: "/make-transaction" },
-                    { img: "/images/7.png", label: <>Transaction<br />History</>, href: "/transaction-rec-sec" },
-                    { img: "/images/8.png", label: "Add Product", href: "/add-product" },
-                    { img: "/images/9.png", label: <>Generate<br />Report</>, href: "/generate-report" },
-                  ].map((item) => (
-                    <Link
-                      key={item.href}
-                      to={item.href}
-                      className="group flex flex-col items-center cursor-pointer transition-transform hover:scale-105 focus:outline-none"
+            <div id="quick-access" style={{ marginTop: "2.5rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "#4b2e17", marginBottom: "1rem" }}>
+                Quick Access
+              </h2>
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "left", gap: "3rem", textAlign: "center" }}>
+                {[
+                  { img: "/images/6.png", label: "Make\nTransaction", href: "/make-transaction" },
+                  { img: "/images/7.png", label: "Transaction\nHistory", href: "/transaction-rec-sec" },
+                  { img: "/images/8.png", label: "Add Product", href: "/add-product" },
+                  { img: "/images/9.png", label: "Generate\nReport", href: "/generate-report" },
+                ].map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      cursor: "pointer",
+                      transition: "transform 0.3s",
+                      textDecoration: "none",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = "scale(1.05)";
+                      e.currentTarget.querySelector("span").style.fontWeight = "600";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.querySelector("span").style.fontWeight = "300";
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "5rem",
+                        height: "5rem",
+                        borderRadius: "9999px",
+                        background: "linear-gradient(to bottom, #f3dfc3, #d7bfa0)",
+                        border: "1px solid #4b2e17",
+                        transition: "box-shadow 0.3s",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.boxShadow = "5px 5px 15px rgba(75,46,23,0.6)")
+                      }
+                      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
                     >
-                      <div className="flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-b from-[#f3dfc3] to-[#d7bfa0] border border-[#4b2e17] hover:shadow-[5px_5px_15px_rgba(75,46,23,0.6)] transition-all duration-300">
-                        <img src={item.img} alt="icon" className="w-10 h-10 object-contain" />
-                      </div>
-                      <span className="mt-2 text-sm font-light text-black group-hover:font-medium transition-all duration-100">{item.label}</span>
-                    </Link>
-                  ))}
-                </div>
+                      <img
+                        src={item.img}
+                        alt="icon"
+                        style={{ width: "2.5rem", height: "2.5rem", objectFit: "contain" }}
+                      />
+                    </div>
+                    <span
+                      style={{
+                        marginTop: "0.5rem",
+                        fontSize: "0.875rem",
+                        color: "#000",
+                        fontWeight: 300,
+                        textAlign: "center",
+                        whiteSpace: "pre-line",
+                        transition: "font-weight 0.2s",
+                      }}
+                    >
+                      {item.label}
+                    </span>
+                  </a>
+                ))}
               </div>
             </div>
 
             {/* Recent Activity */}
-            <div className="mt-12">
-              <h2 className="text-xl font-semibold text-[#4b2e17] mb-4">Recent Activity</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div style={{ marginTop: "3rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "#4b2e17", marginBottom: "1rem" }}>
+                Recent Activity
+              </h2>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
                 {[
                   { label: "Total Sales", value: "10" },
                   { label: "Total Cost of Sales", value: "₱700" },
@@ -117,10 +200,22 @@ export default function Dashboard() {
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className="bg-gradient-to-b from-[#f9e7d0] to-[#e8d4b8] text-center h-48 sm:h-56 flex flex-col justify-center rounded-xl border border-black transition-shadow duration-300 hover:shadow-[10px_10px_15px_rgba(0,0,0,0.3)]"
+                    style={{
+                      background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
+                      textAlign: "center",
+                      height: "10rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      borderRadius: "1rem",
+                      border: "1px solid black",
+                      transition: "box-shadow 0.3s",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "10px 10px 15px rgba(0,0,0,0.3)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
                   >
-                    <h3 className="text-4xl font-extrabold text-[#4b2e17]">{item.value}</h3>
-                    <p className="text-base text-[#4b2e17] mt-3 font-medium">{item.label}</p>
+                    <h3 style={{ fontSize: "2.25rem", fontWeight: 800, color: "#4b2e17" }}>{item.value}</h3>
+                    <p style={{ fontSize: "1rem", marginTop: "0.75rem", fontWeight: 500, color: "#4b2e17" }}>{item.label}</p>
                   </div>
                 ))}
               </div>
@@ -136,17 +231,43 @@ export default function Dashboard() {
 /* DashboardCard Subcomponent */
 function DashboardCard({ title, subtitle, image, link }) {
   return (
-    <div className="relative group bg-white rounded-xl border border-black overflow-hidden transition-shadow duration-300 hover:shadow-[5px_5px_0px_#4b2e17]" style={{ height: "210px" }}>
-      <div className="p-6">
-        <h2 className="text-lg font-bold text-gray-800">{title}</h2>
-        <p className="mt-3 text-gray-700 text-sm">{subtitle}</p>
+    <div
+      style={{
+        position: "relative",
+        backgroundColor: "white",
+        borderRadius: "1rem",
+        border: "1px solid black",
+        overflow: "hidden",
+        transition: "box-shadow 0.3s",
+        height: "13rem",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "5px 5px 0px #4b2e17")}
+      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+    >
+      <div style={{ padding: "1.5rem" }}>
+        <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
+        <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "#4b5563" }}>{subtitle}</p>
       </div>
-      <div className="absolute inset-0 bg-[#00000088] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex items-center justify-center">
-        <Link to={link} className="w-full h-full">
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.53)",
+          opacity: 0,
+          transition: "opacity 0.3s",
+          borderRadius: "1rem",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
+      >
+        <Link to={link} style={{ width: "100%", height: "100%" }}>
           <img
             src={image}
             alt={title}
-            className="w-full h-full object-cover object-center rounded-xl cursor-pointer transition-all duration-300 border border-black"
+            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "1rem", cursor: "pointer", border: "1px solid black" }}
           />
         </Link>
       </div>
