@@ -14,7 +14,7 @@ import AddProduct from "./Pages/QA/AddProduct";
 import AddItem from "./Pages/AddItem";
 import TransactionRecord from "./Pages/Reports/TransactionRecord";
 import TransactionRecSec from "./Pages/TransactionRecSection";
-
+import SalesReport from ".Reports/SalesReport";
 export default function App() {
   return(
     <Router>
@@ -34,6 +34,9 @@ export default function App() {
         } />
         <Route path="/edit-product/:id" element={
           <PrivateRoute><EditProduct /></PrivateRoute>
+        } />
+        <Route path="/sales-report" element={
+          <PrivateRoute><SalesReport /></PrivateRoute>
         } />
         <Route path="/inventory1" element={
           <PrivateRoute><Inventory1 /></PrivateRoute>
