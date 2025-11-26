@@ -14,7 +14,8 @@ import AddProduct from "./Pages/QA/AddProduct";
 import AddItem from "./Pages/AddItem";
 import TransactionRecord from "./Pages/Reports/TransactionRecord";
 import TransactionRecSec from "./Pages/TransactionRecSection";
-import SalesReport from ".Reports/SalesReport";
+import SalesReport from "./Pages/Reports/SalesReport";
+
 export default function App() {
   return(
     <Router>
