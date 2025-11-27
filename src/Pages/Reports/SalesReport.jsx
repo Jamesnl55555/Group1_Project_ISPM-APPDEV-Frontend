@@ -3,8 +3,25 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useNavigate } from 'react-router-dom';
 
 export default function CreateReport() {
-    const navigate = useNavigate();
-    return (
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await axios.get('/api/fetchtransactions');
+        setTransactions(response.data.transactions);
+      } catch (err) {
+        console.error('Failed to fetch transactions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTransactions();
+  }, []);
+  
+  const navigate = useNavigate();
+  return (
         <AuthenticatedLayout>
 {/* Header with Back button aligned to the right */}
 <div className="flex items-center justify-between mt-6 mb-4"
@@ -86,11 +103,11 @@ export default function CreateReport() {
           </tr>
         </thead>
         <tbody>
-          {sales?.length ? (
-            sales.map((item, index) => (
+          {transactions?.length ? (
+            transactions.map((item, index) => (
               <tr key={index} className="hover:bg-[#f9f5f0] text-center">
                 <td className="border-b border-gray-300 px-6 py-2">#{item.id}</td>
-                <td className="border-b border-gray-300 px-6 py-2">{item.date}</td>
+                <td className="border-b border-gray-300 px-6 py-2">{new Date(item.created_at).toLocaleString()}</td>
                 <td className="border-b border-gray-300 px-6 py-2">₱ {item.amount}</td>
                 <td className="border-b border-gray-300 px-4 py-2 text-right">→</td>
               </tr>
