@@ -109,7 +109,7 @@ export default function CreateReport() {
               <tr key={index} className="hover:bg-[#f9f5f0] text-center">
                 <td className="border-b border-gray-300 px-6 py-2">#{item.id}</td>
                 <td className="border-b border-gray-300 px-6 py-2">{new Date(item.created_at).toLocaleString()}</td>
-                <td className="border-b border-gray-300 px-6 py-2">₱ {item.amount}</td>
+                <td className="border-b border-gray-300 px-6 py-2">₱ {item.total_amount}</td>
                 <td className="border-b border-gray-300 px-4 py-2 text-right">→</td>
               </tr>
             ))
