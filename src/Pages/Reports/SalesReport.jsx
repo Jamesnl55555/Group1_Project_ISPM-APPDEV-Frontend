@@ -13,7 +13,7 @@ export default function CreateReport() {
         const response = await axios.get('/api/fetchtransactions');
         setTransactions(response.data.transactions);
         const response2 = await axios.get('/api/fetchcapital');
-        setCapital(response2.data.transactions);
+        setCapital(response2.data.capital);
       } catch (err) {
         console.error('Failed to fetch datas:', err);
       } finally {
