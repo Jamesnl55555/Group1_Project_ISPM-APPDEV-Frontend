@@ -6,14 +6,14 @@ import { useNavigate } from 'react-router-dom';
 export default function CreateReport() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [capital, setCapital] = useState([]);
+  const [capitals, setCapital] = useState([]);
   useEffect(() => {
     const fetchDatas = async () => {
       try {
         const response = await axios.get('/api/fetchtransactions');
         setTransactions(response.data.transactions);
         const response2 = await axios.get('/api/fetchcapital');
-        setCapital(response2.data.capital);
+        setCapital(response2.data.capitals);
       } catch (err) {
         console.error('Failed to fetch datas:', err);
       } finally {
@@ -153,8 +153,8 @@ export default function CreateReport() {
           </tr>
         </thead>
         <tbody>
-          {capital?.length ? (
-            capital.map((item, index) => (
+          {capitals?.length ? (
+            capitals.map((item, index) => (
               <tr key={index} className="hover:bg-[#f9f5f0] text-center">
                 <td className="border-b border-gray-300 px-6 py-2">#{item.id}</td>
                 <td className="border-b border-gray-300 px-6 py-2">{new Date(item.created_at).toLocaleString()}</td>
