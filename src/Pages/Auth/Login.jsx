@@ -279,7 +279,7 @@ export default function Login() {
                                 justifyContent: "center",
                             }}
                         >
-                            <button
+                            <PrimaryButton
                                 type="submit"
                                 disabled={loading}
                                 style={{
@@ -309,7 +309,7 @@ export default function Login() {
                                 }}
                             >
                                 SIGN IN
-                            </button>
+                            </PrimaryButton>
                         </div>
                     </form>
                 </div>
