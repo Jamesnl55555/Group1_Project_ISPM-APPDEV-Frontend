@@ -49,36 +49,69 @@ export default function AddProduct() {
 
   return (
     <AuthenticatedLayout>
-      <div className="flex justify-center p-12">
+      <div style={{ display: "flex", justifyContent: "center", padding: "3rem 1rem" }}>
         <form
           onSubmit={submitProducts}
-          className="bg-[#fefaf7] border border-gray-300 rounded-2xl shadow-md w-full max-w-xl"
+          encType="multipart/form-data"
+          style={{
+            backgroundColor: "#fefaf7",
+            border: "1px solid gray",
+            borderRadius: "1rem",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            width: "100%",
+            maxWidth: "600px",
+          }}
         >
           {/* Header */}
-          <div className="bg-[#f8ecdf] px-6 py-4 border-b border-gray-300 rounded-t-2xl">
-            <h1 className="text-xl font-bold text-black">Add Product</h1>
+          <div
+            style={{
+              backgroundColor: "#f8ecdf",
+              padding: "1rem 1.5rem",
+              borderBottom: "1px solid gray",
+              borderTopLeftRadius: "1rem",
+              borderTopRightRadius: "1rem",
+            }}
+          >
+            <h1 style={{ fontSize: "1.25rem", fontWeight: "bold", color: "#000" }}>
+              Add Product
+            </h1>
           </div>
 
           {/* Form Fields */}
-          <div className="p-6 flex flex-col gap-5">
+          <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {/* Name + Image */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
+              <label style={{ fontWeight: "600", fontSize: "0.875rem", color: "#333" }}>
                 Add Product Name
               </label>
-              <div className="flex items-center gap-2 mt-1">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.25rem" }}>
                 <input
                   type="text"
                   value={productData.name}
                   onChange={(e) => setProduct("name", e.target.value)}
-                  className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                  style={{
+                    flex: 1,
+                    border: "1px solid gray",
+                    borderRadius: "0.25rem",
+                    padding: "0.5rem",
+                    fontSize: "0.875rem",
+                  }}
                 />
-                <label className="text-sm bg-gray-200 px-3 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-300 transition">
+                <label
+                  style={{
+                    fontSize: "0.875rem",
+                    backgroundColor: "#e2e2e2",
+                    padding: "0.5rem 0.75rem",
+                    border: "1px solid gray",
+                    borderRadius: "0.25rem",
+                    cursor: "pointer",
+                  }}
+                >
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setProduct("file", e.target.files[0])}
-                    className="hidden"
+                    style={{ display: "none" }}
                   />
                   📷 Change Image
                 </label>
@@ -87,13 +120,20 @@ export default function AddProduct() {
 
             {/* Category */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
+              <label style={{ fontWeight: "600", fontSize: "0.875rem", color: "#333" }}>
                 Add Category
               </label>
               <select
                 value={productData.category}
                 onChange={(e) => setProduct("category", e.target.value)}
-                className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                style={{
+                  marginTop: "0.25rem",
+                  width: "100%",
+                  border: "1px solid gray",
+                  borderRadius: "0.25rem",
+                  padding: "0.5rem",
+                  fontSize: "0.875rem",
+                }}
               >
                 <option value="">Select category</option>
                 <option value="chocolate">Chocolate</option>
@@ -104,10 +144,10 @@ export default function AddProduct() {
 
             {/* Quantity */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
+              <label style={{ fontWeight: "600", fontSize: "0.875rem", color: "#333" }}>
                 Indicate Quantity Available
               </label>
-              <div className="flex items-center gap-2 mt-1">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginTop: "0.25rem" }}>
                 <button
                   type="button"
                   onClick={() =>
@@ -116,7 +156,12 @@ export default function AddProduct() {
                       Math.max(0, parseInt(productData.quantity || 0) - 1)
                     )
                   }
-                  className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
+                  style={{
+                    border: "1px solid gray",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    cursor: "pointer",
+                  }}
                 >
                   -
                 </button>
@@ -124,17 +169,25 @@ export default function AddProduct() {
                   type="number"
                   value={productData.quantity}
                   onChange={(e) => setProduct("quantity", Number(e.target.value))}
-                  className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                  style={{
+                    flex: 1,
+                    border: "1px solid gray",
+                    borderRadius: "0.25rem",
+                    padding: "0.5rem",
+                    fontSize: "0.875rem",
+                  }}
                 />
                 <button
                   type="button"
                   onClick={() =>
-                    setProduct(
-                      "quantity",
-                      parseInt(productData.quantity || 0) + 1
-                    )
+                    setProduct("quantity", parseInt(productData.quantity || 0) + 1)
                   }
-                  className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
+                  style={{
+                    border: "1px solid gray",
+                    padding: "0.25rem 0.5rem",
+                    borderRadius: "0.25rem",
+                    cursor: "pointer",
+                  }}
                 >
                   +
                 </button>
@@ -143,7 +196,7 @@ export default function AddProduct() {
 
             {/* Price */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
+              <label style={{ fontWeight: "600", fontSize: "0.875rem", color: "#333" }}>
                 Indicate Price
               </label>
               <input
@@ -151,27 +204,60 @@ export default function AddProduct() {
                 value={productData.price}
                 placeholder="0"
                 onChange={(e) => setProduct("price", Number(e.target.value))}
-                className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                style={{
+                  marginTop: "0.25rem",
+                  width: "100%",
+                  border: "1px solid gray",
+                  borderRadius: "0.25rem",
+                  padding: "0.5rem",
+                  fontSize: "0.875rem",
+                }}
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end items-center gap-4 px-6 py-4 border-t border-gray-300">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: "1rem",
+              padding: "1rem 1.5rem",
+              borderTop: "1px solid gray",
+            }}
+          >
             <button
               type="button"
               onClick={() => {
                 resetForm();
                 navigate("/inventory1");
               }}
-              className="text-sm font-semibold text-black hover:underline"
+              style={{
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                color: "#000",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
             >
               Cancel
             </button>
+
             <button
               type="submit"
               disabled={processingProduct}
-              className="bg-[#4b2e17] text-white px-5 py-2 rounded font-semibold hover:bg-[#3a2211] transition"
+              style={{
+                backgroundColor: "#4b2e17",
+                color: "#fff",
+                padding: "0.5rem 1.25rem",
+                borderRadius: "0.25rem",
+                fontWeight: "600",
+                fontSize: "0.875rem",
+                cursor: "pointer",
+              }}
             >
               Add Product
             </button>
@@ -181,18 +267,52 @@ export default function AddProduct() {
 
       {/* SUCCESS MODAL */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-center w-72">
-            <h1 className="text-2xl font-bold -mt-4">Product Added!</h1>
-            <p className="mt-6 text-gray-600 text-sm">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: "18rem",
+              backgroundColor: "#fff",
+              padding: "2rem",
+              textAlign: "center",
+              borderRadius: "0.5rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            }}
+          >
+            <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginTop: "-1rem" }}>
+              Product Added!
+            </h1>
+
+            <p style={{ marginTop: "2rem", color: "#555", fontSize: "15px" }}>
               Your product has been successfully added.
             </p>
+
             <button
               onClick={() => {
                 setShowSuccessModal(false);
                 navigate("/inventory1");
               }}
-              className="mt-6 w-32 px-4 py-2 bg-gray-300 rounded font-semibold hover:bg-gray-400 transition"
+              style={{
+                marginTop: "1.5rem",
+                width: "8rem",
+                padding: "0.5rem",
+                backgroundColor: "#ccc",
+                borderRadius: "0.3rem",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
             >
               Confirm
             </button>
