@@ -1,19 +1,35 @@
+import React, { useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useState } from "react";
 
-export default function TransactionHistory() {
+export default function TransactionHistory({ transactions = [], user }) {
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+
+  // Filter transactions
+  const filteredTransactions = transactions.filter((t) => {
+    const matchesSearch = !search || t.id.toString().includes(search);
+    const matchesDate = !dateFilter || t.date?.startsWith(dateFilter);
+    return matchesSearch && matchesDate;
+  });
+
+  // Fallback/mock data if no transactions
+  const displayTransactions =
+    filteredTransactions.length > 0
+      ? filteredTransactions
+      : [
+          { id: 1, date: "2025-11-18 - 3:45 PM", amount: 5000, method: "Cash" },
+          { id: 2, date: "2025-11-19 - 4:30 PM", amount: 7500, method: "Card" },
+        ];
 
   return (
-    <AuthenticatedLayout>
-
+    <AuthenticatedLayout user={user}>
       <div className="p-6">
         <h1 className="text-3xl font-bold text-center text-black mb-6">
           Transaction Records List
         </h1>
 
-        {/* Search Section */}
-        <div className="border border-black shadow-[5px_5px_0px_gray] bg-white max-w-5xl mx-auto p-5">
+        {/* Search + Date Filter */}
+        <div className="border border-black shadow-[5px_5px_0px_gray] bg-white max-w-5xl mx-auto p-5 mb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-4">
             <div className="flex-1">
               <label className="block text-sm font-medium text-[#4b2e17] mb-1">
@@ -34,6 +50,8 @@ export default function TransactionHistory() {
               </label>
               <input
                 type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
                 className="w-full border border-gray-400 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#c5a888] outline-none"
               />
             </div>
@@ -60,8 +78,8 @@ export default function TransactionHistory() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.length ? (
-                  transactions.map((t, i) => (
+                {displayTransactions.length ? (
+                  displayTransactions.map((t, i) => (
                     <tr
                       key={i}
                       className={`${
@@ -72,16 +90,21 @@ export default function TransactionHistory() {
                         #{t.id.toString().padStart(10, "0")}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        {t.date || "9/28/2025 - 4:37 PM"}
+                        {t.date}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        ₱ {t.amount?.toLocaleString() || "5,000.00"}
+                        ₱ {t.amount.toLocaleString()}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        {t.method || (i % 2 === 0 ? "Cash" : "Card")}
+                        {t.method}
                       </td>
                       <td className="border border-gray-400 px-3 py-2 text-center">
-                        <button className="bg-[#4b2e17] text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-[#6b3e1f] transition">
+                        <button
+                          onClick={() =>
+                            (window.location.href = `/full-trans-info?id=${t.id}`)
+                          }
+                          className="bg-[#4b2e17] text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-[#6b3e1f] transition"
+                        >
                           Show More
                         </button>
                       </td>

@@ -23,6 +23,7 @@ export default function Import() {
         const wsname = wb.SheetNames[0];
         const ws = wb.Sheets[wsname];
         const jsonData = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
         setExcelData(jsonData);
         setShowData(false);
       };
@@ -64,10 +65,11 @@ export default function Import() {
     setExcelData([]);
     setShowData(false);
     setLocalError("");
+
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Custom tested design button style
+  // Button style from testing version
   const customButtonStyle = {
     padding: "0.45rem 1.2rem",
     fontSize: "0.9rem",
@@ -85,7 +87,6 @@ export default function Import() {
     boxShadow: "0 3px 5px rgba(0,0,0,0.25)",
   };
 
-  // Hover effects copied from tested design
   const handleHover = (e) => {
     e.currentTarget.style.background =
       "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
@@ -98,7 +99,8 @@ export default function Import() {
 
   return (
     <div className="space-y-4 w-full">
-      {/* Row: File input, Save, Preview */}
+
+      {/* File input + Save + Preview row */}
       <div
         style={{
           display: "flex",
@@ -108,6 +110,7 @@ export default function Import() {
           flexWrap: "wrap",
         }}
       >
+
         {/* File Input + Remove Button */}
         <div className="relative" style={{ minWidth: "200px" }}>
           <input
@@ -130,14 +133,13 @@ export default function Import() {
                 padding: 0,
                 cursor: "pointer",
               }}
-              title="Remove file"
             >
               X
             </button>
           )}
         </div>
 
-        {/* Save Button (backend upload but tested UI) */}
+        {/* Save Button (same design from testing) */}
         <button
           type="button"
           style={customButtonStyle}
@@ -177,7 +179,7 @@ export default function Import() {
         </div>
       )}
 
-      {/* Excel Preview */}
+      {/* Preview Table */}
       {showData && excelData.length > 0 && (
         <div
           style={{

@@ -2,9 +2,14 @@ import React from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
 export default function GenerateSalesReportWeekly() {
+    const transactions = [
+        { id: 1, created_at: "2025-11-25", amount: 1500 },
+        { id: 2, created_at: "2025-11-27", amount: 2800 },
+        { id: 3, created_at: "2025-12-01", amount: 3200 },
+    ];
+
     return (
         <AuthenticatedLayout>
-
             <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
                 <h1 className="text-2xl font-bold mb-6">Weekly Sales Report</h1>
 

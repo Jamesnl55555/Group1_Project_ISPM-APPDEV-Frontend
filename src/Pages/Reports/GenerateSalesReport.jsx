@@ -7,8 +7,8 @@ export default function GenerateSalesReport() {
   const [reportType, setReportType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [hover, setHover] = useState(false);
 
-  // Map report types to routes
   const routeMap = {
     Daily: "/generate-sales-report/daily",
     Weekly: "/generate-sales-report/weekly",
@@ -32,7 +32,6 @@ export default function GenerateSalesReport() {
 
   return (
     <AuthenticatedLayout>
-
       <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0] shadow-lg">
         <h1 className="text-2xl font-bold mb-6 text-[#4b2e17]">
           Select Sales Report Date Range
@@ -41,7 +40,7 @@ export default function GenerateSalesReport() {
           Choose a date range to generate your sales report.
         </p>
 
-        {/* ✅ Report Type Selection */}
+        {/* Report Type Selection */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {["Daily", "Weekly", "Monthly", "Custom"].map((type) => (
             <label
@@ -84,7 +83,7 @@ export default function GenerateSalesReport() {
           ))}
         </div>
 
-        {/* ✅ Custom Date Range */}
+        {/* Custom Date Range */}
         {reportType === "Custom" && (
           <div className="mb-6 grid grid-cols-2 gap-4">
             <div>
@@ -112,7 +111,7 @@ export default function GenerateSalesReport() {
           </div>
         )}
 
-        {/* ✅ Buttons */}
+        {/* Buttons */}
         <div className="flex justify-end gap-4">
           <button
             onClick={() => navigate("/sales-report")}
@@ -129,6 +128,8 @@ export default function GenerateSalesReport() {
             }`}
             disabled={!reportType}
             onClick={handleGenerate}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
           >
             Generate Report
           </button>

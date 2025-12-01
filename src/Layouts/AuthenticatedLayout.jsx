@@ -1,14 +1,14 @@
-import { Link } from "react-router-dom";
+// Updated AuthenticatedLayout with testing design applied while preserving deployed logic
 import { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import Menu from "@/Components/Menu";
-import ResponsiveNavLink from "@/Components/ResponsiveNavLink";
 import axios from "@/api/axios";
 
 export default function AuthenticatedLayout({ header, children }) {
   const [user, setUser] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true); 
-  const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const sidebarRef = useRef(null);
+  const location = useLocation();
 
   // Fetch user
   useEffect(() => {
@@ -24,135 +24,184 @@ export default function AuthenticatedLayout({ header, children }) {
     fetchUser();
   }, []);
 
-  // Close sidebar on small screens when clicking outside
+  // Close sidebar when clicking outside
   useEffect(() => {
-    const handleMouseMove = (event) => {
-      if (!sidebarRef.current) return;
-      if (window.innerWidth >= 1024) return; 
-      const rect = sidebarRef.current.getBoundingClientRect();
-      const outside =
-        event.clientX < rect.left ||
-        event.clientX > rect.right ||
-        event.clientY < rect.top ||
-        event.clientY > rect.bottom;
-      if (outside) setSidebarOpen(false);
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setSidebarOpen(false);
+      }
     };
 
-    if (sidebarOpen) document.addEventListener("mousemove", handleMouseMove);
-    else document.removeEventListener("mousemove", handleMouseMove);
+    if (sidebarOpen) document.addEventListener("mousedown", handleClickOutside);
+    else document.removeEventListener("mousedown", handleClickOutside);
 
-    return () => document.removeEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [sidebarOpen]);
+
+  // Smooth scroll to #hash on navigation
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const el = document.getElementById(id);
+
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  }, [location]);
 
   if (!user) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-    <div className="min-h-screen flex font-sans">
-      {/* Sidebar overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        backgroundColor: "#f3f3f3",
+        fontFamily: "'Poppins', sans-serif",
+      }}
+    >
+      {/* SIDEBAR */}
       <aside
         ref={sidebarRef}
-        className={`fixed top-0 left-0 h-full w-56 bg-[#4b2e17] text-white flex flex-col justify-between transform transition-transform duration-300 z-40 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          height: "100%",
+          width: "14rem",
+          backgroundColor: "#4b2e17",
+          color: "white",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.3s",
+          zIndex: 40,
+        }}
       >
         <div>
-          {/* Logo */}
-          <div className="flex justify-center py-6">
-            <img src="/images/2.png" alt="Logo" className="h-28 mt-12" />
+          {/* LOGO */}
+          <div style={{ display: "flex", justifyContent: "center", padding: "1.5rem 0" }}>
+            <img src="/images/2.png" alt="Logo" style={{ height: "7rem", marginTop: "3rem" }} />
           </div>
 
-          {/* Sidebar links */}
-          <nav className="mt-6 flex flex-col gap-2 text-base">
-            {[
-              { to: "/dashboard", label: "Dashboard", icon: "📊" },
-              { to: "/inventory1", label: "Products", icon: "📦" },
-              { to: "/transaction-record", label: "Transactions", icon: "💰" },
-              { to: "/sales-report", label: "Reports", icon: "📑" },
-            ].map((link) => (
-              <Link
-                key={link.to}
-                to={link.to}
-                className="flex items-center gap-3 px-6 py-2 rounded hover:bg-[#5a3c24] transition-colors duration-200"
+          {/* LINKS */}
+          <nav style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: ".5rem", fontSize: "1rem" }}>
+            {[{ href: "/dashboard", label: "Dashboard" },
+              { href: "/inventory1", label: "Products" },
+              { href: "/transaction-record", label: "Transactions" },
+              { href: "/sales-report", label: "Reports" }].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  borderRadius: "0.375rem",
+                  textDecoration: "none",
+                  color: "white",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5a3c24")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
               >
-                {link.icon} {link.label}
-              </Link>
+                {link.label}
+              </a>
             ))}
           </nav>
         </div>
 
-        {/* Logout */}
-        <div className="mb-6 px-6">
+        {/* LOGOUT */}
+        <div style={{ marginBottom: "1.5rem", padding: "0 1.5rem" }}>
           <button
             onClick={async () => {
               try {
                 await axios.post("/api/logout");
                 window.location.href = "/login";
-              } catch (error) {
-                console.error("Logout failed:", error);
+              } catch (err) {
+                console.error("Logout failed", err);
               }
             }}
-            className="flex items-center gap-3 px-6 py-2 hover:bg-[#5a3c24] w-full text-left rounded"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem",
+              width: "100%",
+              padding: "0.5rem",
+              background: "transparent",
+              color: "white",
+              border: "none",
+              borderRadius: "0.375rem",
+              cursor: "pointer",
+              transition: "background 0.2s",
+              fontSize: "1rem",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#5a3c24")}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
           >
             ⏻ Log Out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <nav className="bg-white border-b border-gray-100 h-28 flex items-center px-6">
-          <div className="flex justify-between items-center w-full">
-            {/* Left: Menu & Logo */}
-            <div className="flex items-center gap-4">
-              <div className="fixed top-4 left-4 z-50">
+      {/* MAIN CONTENT */}
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: "white" }}>
+        {/* HEADER NAVBAR */}
+        <nav style={{ height: "7rem" }}>
+          <div
+            style={{
+              maxWidth: "1120px",
+              padding: "0 1.5rem",
+              height: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {/* BURGER MENU */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <div style={{ position: "fixed", top: "1rem", left: "1rem", zIndex: 50 }}>
                 {!sidebarOpen ? (
                   <Menu toggleMenu={() => setSidebarOpen(true)} />
                 ) : (
                   <button
                     onClick={() => setSidebarOpen(false)}
-                    className="p-2 bg-transparent text-white text-lg rounded"
-                    title="Close menu"
+                    style={{ padding: "8px", backgroundColor: "transparent", border: "none", cursor: "pointer", color: "#fff", fontSize: "1.2rem", borderRadius: "0.25rem" }}
                   >
                     ✕
                   </button>
                 )}
               </div>
 
-              <Link to="/dashboard">
-                <img src="/images/2.png" alt="Logo" className="max-h-24 ml-24" />
-              </Link>
+              <a href="/dashboard">
+                <img src="/images/2.png" alt="Logo" style={{ maxHeight: "6rem", marginLeft: "6rem" }} />
+              </a>
             </div>
 
-            {/* Right links */}
-            <div className="flex items-center gap-6 mr-[-9rem]">
-              {["Dashboard", "Quick Access"].map((label) => (
-                <button
-                  key={label}
-                  className="text-[#4b2e17] font-medium text-lg transition-transform duration-200 hover:scale-105 hover:font-bold bg-none border-none p-0 cursor-pointer"
-                  onClick={() => {
-                    if (label === "Quick Access") {
-                      const el = document.getElementById("quick-access");
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    } else {
-                      window.location.href = "/dashboard";
-                    }
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
+            {/* RIGHT SIDE */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", marginRight: "-9rem" }}>
+              <a
+                href="/dashboard"
+                style={{ color: "#4b2e17", fontWeight: 500, fontSize: "1.3rem", textDecoration: "none", transition: "0.3s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.fontWeight = "700"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.fontWeight = "500"; }}
+              >
+                Dashboard
+              </a>
 
-              <Link to="/profile" className="flex items-center justify-center w-10 h-10" title="Profile">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4b2e17" className="w-6 h-6">
+              <a
+                href="#quick-access"
+                style={{ color: "#4b2e17", fontWeight: 500, fontSize: "1.3rem", textDecoration: "none", transition: "0.3s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.transform = "scale(1.05)"; e.currentTarget.style.fontWeight = "700"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.fontWeight = "500"; }}
+              >
+                Quick Access
+              </a>
+
+              <Link to="/profile" title="Profile" style={{ display: "flex", justifyContent: "center", alignItems: "center", width: "2.5rem", height: "2.5rem" }}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#4b2e17" style={{ width: "1.5rem", height: "1.5rem" }}>
                   <path d="M12 12c2.8 0 5-2.2 5-5s-2.2-5-5-5-5 2.2-5 5 2.2 5 5 5z" />
                   <path d="M4 20c0-3.3 2.7-6 6-6h4c3.3 0 6 2.7 6 6v1H4v-1z" />
                 </svg>
@@ -161,19 +210,13 @@ export default function AuthenticatedLayout({ header, children }) {
           </div>
         </nav>
 
-        {/* Optional page header */}
-        {header && (
-          <header className="bg-white shadow-sm">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{header}</div>
-          </header>
-        )}
+        {/* OPTIONAL HEADER */}
+        {header && <header style={{ backgroundColor: "white", boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>{header}</header>}
 
-        {/* Main content */}
-        <main className="flex-1 p-6">
+        {/* MAIN */}
+        <main style={{ flex: 1, padding: "1.5rem" }}>
           {children}
-          <section id="quick-access" className="mt-12">
-            {/* Quick Access content */}
-          </section>
+          <section id="quick-access" style={{ marginTop: "3rem" }}></section>
         </main>
       </div>
     </div>

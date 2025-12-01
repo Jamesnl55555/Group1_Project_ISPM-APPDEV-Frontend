@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom"; // SPA routing
-import axios from '@/api/axios';
+import { Link } from "react-router-dom";
+import axios from "@/api/axios";
 import Import from "@/Components/Import";
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { MantineProvider } from '@mantine/core';
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { MantineProvider } from "@mantine/core";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -12,11 +12,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        await axios.get('/sanctum/csrf-cookie'); 
-        const response = await axios.get('/api/user'); 
+        await axios.get("/sanctum/csrf-cookie");
+        const response = await axios.get("/api/user");
         setUser(response.data);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error("Error fetching user:", error);
       } finally {
         setLoading(false);
       }
@@ -25,8 +25,8 @@ export default function Dashboard() {
     fetchUser();
   }, []);
 
-  if (loading) return <p style={{ textAlign: 'center', marginTop: '2rem' }}>Loading...</p>;
-  if (!user) return <p style={{ textAlign: 'center', marginTop: '2rem' }}>Please log in to view dashboard.</p>;
+  if (loading) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
+  if (!user) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Please log in to view dashboard.</p>;
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
@@ -126,9 +126,9 @@ export default function Dashboard() {
                   { img: "/images/8.png", label: "Add Product", href: "/add-product" },
                   { img: "/images/9.png", label: "Generate\nReport", href: "/generate-report" },
                 ].map((item) => (
-                  <a
+                  <Link
                     key={item.href}
-                    href={item.href}
+                    to={item.href}
                     style={{
                       display: "flex",
                       flexDirection: "column",
@@ -182,7 +182,7 @@ export default function Dashboard() {
                     >
                       {item.label}
                     </span>
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
