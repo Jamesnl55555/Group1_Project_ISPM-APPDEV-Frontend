@@ -24,7 +24,7 @@ export default function Login() {
         try {
             await axios.get("/sanctum/csrf-cookie");
 
-            await axios.post("/login", data);
+            await axios.post("/api/login", data);
 
             navigate("/dashboard");
         } catch (err) {
