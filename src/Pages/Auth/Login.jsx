@@ -11,8 +11,7 @@ export default function Login() {
     const [data, setData] = useState({ email: "", password: "", remember: false });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState(null);
-    const [canResetPassword] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -22,28 +21,35 @@ export default function Login() {
         setErrors({});
 
         try {
+            // For Sanctum SPA cookie authentication
             await axios.get("/sanctum/csrf-cookie");
+
             const response = await axios.post("/api/login", data);
 
             if (response.data?.token) {
-                localStorage.setItem("auth_token", response.data.token);
+                // Use localStorage if "Remember Me" checked, else sessionStorage
+                const storage = data.remember ? localStorage : sessionStorage;
+                storage.setItem("auth_token", response.data.token);
+
+                // Set axios default header for all future requests
                 axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
             }
 
             navigate("/dashboard");
         } catch (err) {
+            // Show validation errors if present
             if (err.response?.data?.errors) {
                 setErrors(err.response.data.errors);
             } else {
-                setErrors({
-                    general: err.response?.data?.message || "Something went wrong",
-                });
+                // Show modal for invalid credentials or general error
+                setShowModal(true);
             }
         } finally {
             setLoading(false);
         }
     };
 
+    // Input field styles and handlers
     const inputBaseStyle = {
         marginTop: "0.25rem",
         width: "22.5rem",
@@ -91,6 +97,56 @@ export default function Login() {
                 padding: "2rem",
             }}
         >
+            {/* Modal for invalid credentials */}
+            {showModal && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 1000,
+                    }}
+                    onClick={() => setShowModal(false)}
+                >
+                    <div
+                        style={{
+                            backgroundColor: "#fff",
+                            padding: "2rem",
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                            maxWidth: "400px",
+                            textAlign: "center",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h2 style={{ fontSize: "1.5rem", marginBottom: "1rem", color: "#b91c1c" }}>
+                            Invalid Credentials
+                        </h2>
+                        <p>Please check your email and password and try again.</p>
+                        <button
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                marginTop: "1rem",
+                                padding: "0.5rem 1rem",
+                                background: "#b91c1c",
+                                color: "#fff",
+                                border: "none",
+                                borderRadius: "6px",
+                                cursor: "pointer",
+                            }}
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div
                 style={{
                     position: "relative",
@@ -101,7 +157,6 @@ export default function Login() {
                     maxWidth: "400px",
                 }}
             >
-                {/* Logo */}
                 <img
                     src="/images/2.png"
                     alt="Logo"
@@ -144,14 +199,9 @@ export default function Login() {
                     </h2>
 
                     <form onSubmit={submit}>
-                        {/* EMAIL FIELD */}
+                        {/* Email Field */}
                         <div>
-                            <InputLabel
-                                htmlFor="email"
-                                value="Email"
-                                style={{ fontWeight: "550", color: "#3b3b3bff" }}
-                            />
-
+                            <InputLabel htmlFor="email" value="Email" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
                                 id="email"
                                 type="email"
@@ -176,22 +226,14 @@ export default function Login() {
                                 onFocus={handleInputFocus}
                                 onBlur={(e) => handleInputBlur(e, data.email, "Email")}
                                 onMouseEnter={handleInputHover}
-                                onMouseLeave={(e) =>
-                                    handleInputHoverLeave(e, data.email, !!errors.email)
-                                }
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.email, !!errors.email)}
                             />
-
                             <InputError message={errors.email} />
                         </div>
 
-                        {/* PASSWORD FIELD */}
+                        {/* Password Field */}
                         <div style={{ marginTop: "1rem" }}>
-                            <InputLabel
-                                htmlFor="password"
-                                value="Password"
-                                style={{ fontWeight: "550", color: "#3b3b3bff" }}
-                            />
-
+                            <InputLabel htmlFor="password" value="Password" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
                                 id="password"
                                 type="password"
@@ -214,19 +256,14 @@ export default function Login() {
                                     color: errors.password ? "red" : "#111827",
                                 }}
                                 onFocus={handleInputFocus}
-                                onBlur={(e) =>
-                                    handleInputBlur(e, data.password, "Password")
-                                }
+                                onBlur={(e) => handleInputBlur(e, data.password, "Password")}
                                 onMouseEnter={handleInputHover}
-                                onMouseLeave={(e) =>
-                                    handleInputHoverLeave(e, data.password, !!errors.password)
-                                }
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.password, !!errors.password)}
                             />
-
                             <InputError message={errors.password} />
                         </div>
 
-                        {/* REMEMBER ME */}
+                        {/* Remember Me */}
                         <div
                             style={{
                                 marginTop: "0.8rem",
@@ -238,47 +275,22 @@ export default function Login() {
                                 marginLeft: "1rem",
                             }}
                         >
-                            <label
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "0.15rem",
-                                }}
-                            >
+                            <label style={{ display: "flex", alignItems: "center", gap: "0.15rem" }}>
                                 <Checkbox
                                     checked={data.remember}
-                                    onChange={(e) =>
-                                        setData({ ...data, remember: e.target.checked })
-                                    }
-                                    style={{
-                                        accentColor: "#4d2603ff",
-                                    }}
+                                    onChange={(e) => setData({ ...data, remember: e.target.checked })}
+                                    style={{ accentColor: "#4d2603ff" }}
                                 />
                                 Remember Me
                             </label>
 
-                            <Link
-                                to="/forgot-password"
-                                style={{
-                                    color: "#000000",
-                                    fontWeight: 700,
-                                    textDecoration: "none",
-                                    marginRight: "2rem",
-                                    fontSize: "0.6rem",
-                                }}
-                            >
+                            <Link to="/forgot-password" style={{ color: "#000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}>
                                 Forgot Password?
                             </Link>
                         </div>
 
-                        {/* LOGIN BUTTON */}
-                        <div
-                            style={{
-                                marginTop: "1.5rem",
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                        >
+                        {/* Login Button */}
+                        <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
                             <PrimaryButton
                                 type="submit"
                                 disabled={loading}
@@ -300,12 +312,10 @@ export default function Login() {
                                     boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.background =
-                                        "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.background =
-                                        "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #4a2f26, #2f1c14)";
                                 }}
                             >
                                 SIGN IN

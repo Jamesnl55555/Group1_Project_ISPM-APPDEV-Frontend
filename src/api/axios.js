@@ -1,17 +1,29 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL, 
-  withCredentials: true, 
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  withCredentials: true,
   headers: {
     "X-Requested-With": "XMLHttpRequest",
   },
 });
 
-// Restore token from localStorage on app startup
-const token = localStorage.getItem('auth_token');
+// Automatically restore token from localStorage (remember me) or sessionStorage
+const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
 if (token) {
   axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 }
+
+// Optional: intercept requests to always attach token (if it changes dynamically)
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default axiosInstance;
