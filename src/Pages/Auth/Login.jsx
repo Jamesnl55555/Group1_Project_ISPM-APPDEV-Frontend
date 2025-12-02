@@ -12,7 +12,6 @@ export default function Login() {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [canResetPassword] = useState(true);
 
     const navigate = useNavigate();
 
@@ -23,14 +22,15 @@ export default function Login() {
         setShowModal(false);
 
         try {
+            // Get CSRF cookie
             await axios.get("/sanctum/csrf-cookie");
-            const response = await axios.post("/api/login", data);
 
-            if (response.data?.token) {
-                const storage = data.remember ? localStorage : sessionStorage;
-                storage.setItem("auth_token", response.data.token);
-                axios.defaults.headers.common["Authorization"] = `Bearer ${response.data.token}`;
-            }
+            // Post login credentials (session-based)
+            await axios.post("/api/login", data);
+
+            // Optional: fetch authenticated user after login
+            // const userRes = await axios.get("/api/user", { withCredentials: true });
+            // console.log(userRes.data);
 
             navigate("/dashboard");
         } catch (err) {
@@ -195,11 +195,7 @@ export default function Login() {
                     <form onSubmit={submit}>
                         {/* EMAIL FIELD */}
                         <div>
-                            <InputLabel
-                                htmlFor="email"
-                                value="Email"
-                                style={{ fontWeight: "550", color: "#3b3b3bff" }}
-                            />
+                            <InputLabel htmlFor="email" value="Email" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
                                 id="email"
                                 type="email"
@@ -224,20 +220,14 @@ export default function Login() {
                                 onFocus={handleInputFocus}
                                 onBlur={(e) => handleInputBlur(e, data.email, "Email")}
                                 onMouseEnter={handleInputHover}
-                                onMouseLeave={(e) =>
-                                    handleInputHoverLeave(e, data.email, !!errors.email)
-                                }
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.email, !!errors.email)}
                             />
                             <InputError message={errors.email} />
                         </div>
 
                         {/* PASSWORD FIELD */}
                         <div style={{ marginTop: "1rem" }}>
-                            <InputLabel
-                                htmlFor="password"
-                                value="Password"
-                                style={{ fontWeight: "550", color: "#3b3b3bff" }}
-                            />
+                            <InputLabel htmlFor="password" value="Password" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
                                 id="password"
                                 type="password"
@@ -260,13 +250,9 @@ export default function Login() {
                                     color: errors.password ? "red" : "#111827",
                                 }}
                                 onFocus={handleInputFocus}
-                                onBlur={(e) =>
-                                    handleInputBlur(e, data.password, "Password")
-                                }
+                                onBlur={(e) => handleInputBlur(e, data.password, "Password")}
                                 onMouseEnter={handleInputHover}
-                                onMouseLeave={(e) =>
-                                    handleInputHoverLeave(e, data.password, !!errors.password)
-                                }
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.password, !!errors.password)}
                             />
                             <InputError message={errors.password} />
                         </div>
@@ -283,18 +269,10 @@ export default function Login() {
                                 marginLeft: "1rem",
                             }}
                         >
-                            <label
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: "0.15rem",
-                                }}
-                            >
+                            <label style={{ display: "flex", alignItems: "center", gap: "0.15rem" }}>
                                 <Checkbox
                                     checked={data.remember}
-                                    onChange={(e) =>
-                                        setData({ ...data, remember: e.target.checked })
-                                    }
+                                    onChange={(e) => setData({ ...data, remember: e.target.checked })}
                                     style={{ accentColor: "#4d2603ff" }}
                                 />
                                 Remember Me
@@ -302,26 +280,14 @@ export default function Login() {
 
                             <Link
                                 to="/forgot-password"
-                                style={{
-                                    color: "#000000",
-                                    fontWeight: 700,
-                                    textDecoration: "none",
-                                    marginRight: "2rem",
-                                    fontSize: "0.6rem",
-                                }}
+                                style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
                             >
                                 Forgot Password?
                             </Link>
                         </div>
 
                         {/* LOGIN BUTTON */}
-                        <div
-                            style={{
-                                marginTop: "1.5rem",
-                                display: "flex",
-                                justifyContent: "center",
-                            }}
-                        >
+                        <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
                             <PrimaryButton
                                 type="submit"
                                 disabled={loading}
@@ -343,12 +309,10 @@ export default function Login() {
                                     boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
                                 }}
                                 onMouseEnter={(e) => {
-                                    e.currentTarget.style.background =
-                                        "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
                                 }}
                                 onMouseLeave={(e) => {
-                                    e.currentTarget.style.background =
-                                        "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #4a2f26, #2f1c14)";
                                 }}
                             >
                                 SIGN IN
