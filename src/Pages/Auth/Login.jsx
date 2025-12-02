@@ -22,15 +22,9 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            // Get CSRF cookie
             await axios.get("/sanctum/csrf-cookie");
 
-            // Post login credentials (session-based)
-            await axios.post("/api/login", data);
-
-            // Optional: fetch authenticated user after login
-            // const userRes = await axios.get("/api/user", { withCredentials: true });
-            // console.log(userRes.data);
+            await axios.post("/login", data);
 
             navigate("/dashboard");
         } catch (err) {
