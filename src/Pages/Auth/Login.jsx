@@ -22,21 +22,13 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            // POST login and get token
-            const response = await axios.post("/api/login", data);
+            // Include cookies for session auth
+            await axios.get('/sanctum/csrf-cookie');
 
-            const token = response.data.token;
-            const user = response.data.user;
+            // POST login with credentials and remember me
+            await axios.post("/api/login", data);
 
-            if (token) {
-                // Store token in localStorage
-                localStorage.setItem("token", token);
-                localStorage.setItem("user", JSON.stringify(user));
-
-                // Set Axios default Authorization header
-                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-            }
-
+            // Successful login: navigate to dashboard
             navigate("/dashboard");
         } catch (err) {
             if (err.response?.status === 401) {
@@ -98,7 +90,6 @@ export default function Login() {
                 padding: "2rem",
             }}
         >
-            {/* Modal for invalid credentials */}
             {showModal && (
                 <div
                     style={{
@@ -154,7 +145,6 @@ export default function Login() {
                     maxWidth: "400px",
                 }}
             >
-                {/* Logo */}
                 <img
                     src="/images/2.png"
                     alt="Logo"
@@ -197,7 +187,6 @@ export default function Login() {
                     </h2>
 
                     <form onSubmit={submit}>
-                        {/* EMAIL FIELD */}
                         <div>
                             <InputLabel htmlFor="email" value="Email" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
@@ -229,7 +218,6 @@ export default function Login() {
                             <InputError message={errors.email} />
                         </div>
 
-                        {/* PASSWORD FIELD */}
                         <div style={{ marginTop: "1rem" }}>
                             <InputLabel htmlFor="password" value="Password" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
                             <TextInput
@@ -261,7 +249,6 @@ export default function Login() {
                             <InputError message={errors.password} />
                         </div>
 
-                        {/* REMEMBER ME */}
                         <div
                             style={{
                                 marginTop: "0.8rem",
@@ -290,7 +277,6 @@ export default function Login() {
                             </Link>
                         </div>
 
-                        {/* LOGIN BUTTON */}
                         <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
                             <PrimaryButton
                                 type="submit"
