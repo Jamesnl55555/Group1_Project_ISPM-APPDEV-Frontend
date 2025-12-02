@@ -22,14 +22,24 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            await axios.get("/sanctum/csrf-cookie");
+            // POST login and get token
+            const response = await axios.post("/api/login", data);
 
-            await axios.post("/api/login", data);
+            const token = response.data.token;
+            const user = response.data.user;
+
+            if (token) {
+                // Store token in localStorage
+                localStorage.setItem("token", token);
+                localStorage.setItem("user", JSON.stringify(user));
+
+                // Set Axios default Authorization header
+                axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+            }
 
             navigate("/dashboard");
         } catch (err) {
             if (err.response?.status === 401) {
-                // Invalid credentials
                 setShowModal(true);
             } else if (err.response?.data?.errors) {
                 setErrors(err.response.data.errors);
@@ -58,7 +68,7 @@ export default function Login() {
     };
 
     const handleInputBlur = (e, value, placeholder) => {
-        e.target.style.borderColor = value ? "#D1D5DB" : "#D1D5DB";
+        e.target.style.borderColor = "#D1D5DB";
         e.target.style.backgroundColor = value ? "#fff4e5ff" : "#ffffff";
         e.target.placeholder = value ? "" : placeholder;
     };
