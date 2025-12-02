@@ -8,4 +8,21 @@ const axiosInstance = axios.create({
   },
 });
 
+const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+if (token) {
+  axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
+// Optional: intercept requests to always attach token (if it changes dynamically)
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('auth_token') || sessionStorage.getItem('auth_token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
 export default axiosInstance;
