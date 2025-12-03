@@ -15,7 +15,6 @@ export default function Login() {
 
     const navigate = useNavigate();
     
-    const API_URL = import.meta.env.VITE_API_BASE_URL; 
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -24,10 +23,10 @@ export default function Login() {
 
         try {
             // Include cookies for session auth
-            await axios.get('https://group1-project-ispm-appdev-backend.onrender.com/sanctum/csrf-cookie');
+            await axios.get('/sanctum/csrf-cookie');
 
             // POST login with credentials and remember me
-            await axios.post('https://group1-project-ispm-appdev-backend.onrender.com/login', data);
+            await axios.post('/login', data);
 
             // Successful login: navigate to dashboard
             navigate("/dashboard");
