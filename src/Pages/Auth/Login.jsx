@@ -22,11 +22,9 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            // Include cookies for session auth
-            await axios.get('/sanctum/csrf-cookie');
-
-            // POST login with credentials and remember me
-            await axios.post('/login', data, { withCredentials: true });
+            
+            await axios.get("/sanctum/csrf-cookie");
+            await axios.post("/login", data);
 
             // Successful login: navigate to dashboard
             navigate("/dashboard");
