@@ -24,10 +24,10 @@ export default function Login() {
 
         try {
             // Include cookies for session auth
-            await axios.get(`${API_URL}/sanctum/csrf-cookie`);
+            await axios.get('https://group1-project-ispm-appdev-backend.onrender.com/sanctum/csrf-cookie');
 
             // POST login with credentials and remember me
-            await axios.post(`${API_URL}/login`, data);
+            await axios.post('https://group1-project-ispm-appdev-backend.onrender.com/login', data);
 
             // Successful login: navigate to dashboard
             navigate("/dashboard");
