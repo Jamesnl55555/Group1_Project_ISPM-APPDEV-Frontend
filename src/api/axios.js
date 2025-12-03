@@ -1,12 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true, // send cookies
+  withCredentials: true,
   headers: {
-    "X-Requested-With": "XMLHttpRequest",
+    'X-Requested-With': 'XMLHttpRequest',
   },
 });
 
-// Remove token logic entirely for session-based auth
+// FORCE credentials in production
+axiosInstance.defaults.withCredentials = true;
+
 export default axiosInstance;
