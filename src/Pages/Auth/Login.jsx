@@ -26,7 +26,7 @@ export default function Login() {
             await axios.get('/sanctum/csrf-cookie');
 
             // POST login with credentials and remember me
-            await axios.post("/api/login", data);
+            await axios.post("/login", data);
 
             // Successful login: navigate to dashboard
             navigate("/dashboard");
