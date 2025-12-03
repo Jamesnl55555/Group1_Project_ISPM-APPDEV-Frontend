@@ -195,7 +195,7 @@ export default function Login() {
                                 name="email"
                                 value={data.email}
                                 placeholder="Email"
-                                autoComplete="username"
+                                autoComplete="Email"
                                 onChange={(e) => {
                                     setData({ ...data, email: e.target.value });
                                     setErrors((prev) => ({ ...prev, email: "" }));
