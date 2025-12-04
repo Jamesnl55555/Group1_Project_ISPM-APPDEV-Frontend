@@ -30,13 +30,10 @@ export default function Register() {
     setErrors({});
 
     try {
-      await axios.get('/sanctum/csrf-cookie');
-
-      const response = await axios.post('/register', data);
+      const response = await axios.post('/api/register', data);
 
       if (response.data?.token) {
         localStorage.setItem('auth_token', response.data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
 
       navigate('/dashboard');

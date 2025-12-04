@@ -22,11 +22,10 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            
-            await axios.get("/sanctum/csrf-cookie");
-            await axios.post("/login", data);
-
-            // Successful login: navigate to dashboard
+            const response = await axios.post("/login", data);
+            if (response.data?.token) {
+                sessionStorage.setItem('auth_token', response.data.token);
+            }
             navigate("/dashboard");
         } catch (err) {
             if (err.response?.status === 401) {

@@ -5,8 +5,23 @@ const axiosInstance = axios.create({
   withCredentials: true, 
   headers: {
     "Accept": "application/json",
-    "X-Requested-With": "XMLHttpRequest",
   },
 });
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem("auth_token"); 
+
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 
 export default axiosInstance;
