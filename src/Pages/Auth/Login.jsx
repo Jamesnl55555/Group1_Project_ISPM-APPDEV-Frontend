@@ -22,7 +22,7 @@ export default function Login() {
         setShowModal(false);
 
         try {
-            const response = await axios.post("/login", data);
+            const response = await axios.post("/api/login", data);
             if (response.data?.token) {
                 sessionStorage.setItem('auth_token', response.data.token);
             }
