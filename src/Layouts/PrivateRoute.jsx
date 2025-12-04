@@ -10,7 +10,7 @@ export default function PrivateRoute({ children }) {
     const checkAuth = async () => {
       try {
         // Make request to /api/user to see if session exists
-        const response = await axios.get('/api/user', { withCredentials: true });
+        const response = await axios.get('/api/user');
 
         if (response.status === 200 && response.data) {
           setIsAuthenticated(true);
