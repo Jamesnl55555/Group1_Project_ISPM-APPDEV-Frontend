@@ -25,7 +25,7 @@ export default function ResetPassword() {
         e.preventDefault();
 
         try {
-            await form.post('/api/reset-password');
+            await axios.post('/api/reset-password', form.data);
             navigate('/login');
         } catch (err) {
             console.error('Reset password error:', err);

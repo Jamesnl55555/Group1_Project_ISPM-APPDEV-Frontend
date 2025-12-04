@@ -20,8 +20,6 @@ export default function ForgotPassword() {
         setStatus(null);
 
         try {
-            await axios.get('/sanctum/csrf-cookie');
-
             const response = await axios.post('/forgot-password', { email });
             setStatus(response.data.status || 'Password reset link sent!');
 

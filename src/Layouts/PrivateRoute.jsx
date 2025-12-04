@@ -8,9 +8,15 @@ export default function PrivateRoute({ children }) {
 
   useEffect(() => {
     const checkAuth = async () => {
+      const localToken = localStorage.getItem('auth_token');
+        if (!localToken) {
+          setIsAuthenticated(false);
+          setLoading(false);
+          return;
+        }
+
       try {
-        // Make request to /api/user to see if session exists
-        const response = await axios.get('/api/user');
+        const response = await axios.get('/api/user', { withCredentials: true });
 
         if (response.status === 200 && response.data) {
           setIsAuthenticated(true);
@@ -19,6 +25,7 @@ export default function PrivateRoute({ children }) {
         }
       } catch (err) {
         setIsAuthenticated(false);
+        localStorage.removeItem('auth_token'); 
       } finally {
         setLoading(false);
       }

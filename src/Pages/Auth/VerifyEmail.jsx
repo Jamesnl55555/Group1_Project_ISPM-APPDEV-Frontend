@@ -14,7 +14,7 @@ export default function VerifyEmail() {
         e.preventDefault();
 
         try {
-            await form.post('/api/email/verification-notification');
+            await axios.post('/api/email/verification-notification', form.data);
             setStatus('verification-link-sent');
         } catch (err) {
             console.error('Resend error:', err);

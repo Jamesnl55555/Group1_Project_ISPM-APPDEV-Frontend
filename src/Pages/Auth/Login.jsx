@@ -24,7 +24,7 @@ export default function Login() {
         try {
             const response = await axios.post("/api/login", data);
             if (response.data?.token) {
-                sessionStorage.setItem('auth_token', response.data.token);
+                localStorage.setItem('auth_token', response.data.token);
             }
             navigate("/dashboard");
         } catch (err) {
