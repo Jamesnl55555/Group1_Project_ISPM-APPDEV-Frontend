@@ -8,11 +8,5 @@ const axiosInstance = axios.create({
     "X-Requested-With": "XMLHttpRequest",
   },
 });
-axiosInstance.interceptors.request.use((config) => {
-  const match = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
-  if (match) {
-    config.headers["X-XSRF-TOKEN"] = decodeURIComponent(match[1]);
-  }
-  return config;
-});
+
 export default axiosInstance;
