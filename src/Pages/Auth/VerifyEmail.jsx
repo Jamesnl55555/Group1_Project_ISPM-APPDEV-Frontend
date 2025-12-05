@@ -23,7 +23,7 @@ export default function VerifyEmail() {
 
     const handleLogout = async () => {
         try {
-            await axios.post('/logout');
+            await axios.post('/api/logout');
             localStorage.removeItem('auth_token');
             delete axios.defaults.headers.common['Authorization'];
             navigate('/login');
