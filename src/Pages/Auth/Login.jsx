@@ -268,9 +268,9 @@ export default function Login() {
                             <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <Link
                                 to="/register"
-                                style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
+                                style={{ color: "#000000", fontWeight: 700, marginRight: "2rem", fontSize: "0.6rem" }}
                             >
-                                Don't have an account? Sign In
+                                SIGN IN
                             </Link>
                             <Link
                                 to="/forgot-password"
