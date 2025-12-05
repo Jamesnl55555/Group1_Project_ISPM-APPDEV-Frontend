@@ -265,7 +265,7 @@ export default function Login() {
                                 />
                                 Remember Me
                             </label>
-
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
                             <Link
                                 to="/register"
                                 style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
@@ -278,6 +278,9 @@ export default function Login() {
                             >
                                 Forgot Password?
                             </Link>
+                            </div>
+                            
+                            
                         </div>
 
                         <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
