@@ -267,6 +267,12 @@ export default function Login() {
                             </label>
 
                             <Link
+                                to="/register"
+                                style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
+                            >
+                                Don't have an account? Sign In
+                            </Link>
+                            <Link
                                 to="/forgot-password"
                                 style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
                             >
