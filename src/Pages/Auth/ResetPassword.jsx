@@ -186,6 +186,7 @@ export default function ResetPassword() {
                             onBlur={(e) => handleBlur(e, 'password', 'Password', form.data.password)}
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'password', form.data.password)}
+                            required
                         />
                         {form.errors.password && (
                             <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
@@ -219,6 +220,7 @@ export default function ResetPassword() {
                             onMouseLeave={(e) =>
                                 handleHoverLeave(e, 'password_confirmation', form.data.password_confirmation)
                             }
+                            required
                         />
                         {form.errors.password_confirmation && (
                             <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
