@@ -56,6 +56,7 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/confirm-password" element={<ConfirmPassword />} />
+        <Route path="/verify" element={<Verify />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={

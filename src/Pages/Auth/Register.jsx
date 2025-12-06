@@ -4,11 +4,10 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import PasswordInput from '@/Components/PasswordInput';
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import axios from '@/api/axios';
 
 export default function Register() {
-  const navigate = useNavigate();
   const [data, setData] = useState({
     name: '',
     email: '',
@@ -17,6 +16,7 @@ export default function Register() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const setDataField = (field, value) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -28,13 +28,11 @@ export default function Register() {
     setErrors({});
 
     try {
-      const response = await axios.post('/api/register', data);
+      const response = await axios.post('/api/register-pending', data);
 
-      if (response.data?.token) {
-        localStorage.setItem('auth_token', response.data.token);
+      if (response.data.success) {
+        setShowModal(true); // Show verification modal
       }
-
-      navigate('/dashboard');
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
@@ -86,18 +84,12 @@ export default function Register() {
         fontFamily: 'Poppins, sans-serif',
       }}
     >
-      {/* Logo */}
       <img
         src="/images/2.png"
         alt="Logo"
-        style={{
-          width: '200px',
-          marginBottom: '2rem',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-        }}
+        style={{ width: '200px', marginBottom: '2rem', boxShadow: '0 4px 6px rgba(0,0,0,0.2)' }}
       />
 
-      {/* Form Card */}
       <div
         style={{
           backgroundColor: 'rgba(255,255,255,0.95)',
@@ -109,23 +101,13 @@ export default function Register() {
           textAlign: 'center',
         }}
       >
-        <h2
-          style={{
-            fontSize: '2rem',
-            fontWeight: '700',
-            marginBottom: '1.5rem',
-            color: '#000',
-          }}
-        >
+        <h2 style={{ fontSize: '2rem', fontWeight: '700', marginBottom: '1.5rem', color: '#000' }}>
           SIGN UP
         </h2>
 
-        {errors.general && (
-          <div style={{ color: 'red', marginBottom: '1rem' }}>{errors.general}</div>
-        )}
+        {errors.general && <div style={{ color: 'red', marginBottom: '1rem' }}>{errors.general}</div>}
 
         <form onSubmit={submit}>
-          {/* Name */}
           <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
             <InputLabel htmlFor="name" value="Username" />
             <TextInput
@@ -149,7 +131,6 @@ export default function Register() {
             <InputError message={errors.name} />
           </div>
 
-          {/* Email */}
           <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
             <InputLabel htmlFor="email" value="Email" />
             <TextInput
@@ -174,10 +155,15 @@ export default function Register() {
             <InputError message={errors.email} />
           </div>
 
-          {/* Password + Confirm Password using PasswordInput */}
-          <PasswordInput form={{ data, setData: setDataField, errors, setError: (field, msg) => setErrors(prev => ({ ...prev, [field]: msg })) }} />
+          <PasswordInput
+            form={{
+              data,
+              setData: setDataField,
+              errors,
+              setError: (field, msg) => setErrors((prev) => ({ ...prev, [field]: msg })),
+            }}
+          />
 
-          {/* Submit Button */}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <PrimaryButton
               type="submit"
@@ -204,15 +190,65 @@ export default function Register() {
             </PrimaryButton>
           </div>
 
-          {/* Sign In Link */}
           <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#4B5563' }}>
             Already have an account?{' '}
-            <Link to="/login" style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}>
+            <Link
+              to="/login"
+              style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
+            >
               Log In
             </Link>
           </p>
         </form>
       </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              background: 'white',
+              padding: '2rem',
+              borderRadius: '1rem',
+              textAlign: 'center',
+              width: '90%',
+              maxWidth: '380px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            }}
+          >
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Verification Email Sent</h3>
+
+            <p style={{ marginBottom: '1.5rem', color: '#555' }}>
+              We sent a verification link to your email. Please check your inbox to complete
+              registration.
+            </p>
+
+            <PrimaryButton
+              onClick={() => setShowModal(false)}
+              style={{
+                padding: '0.6rem 1.2rem',
+                borderRadius: '6px',
+                background: '#422912',
+                color: 'white',
+                cursor: 'pointer',
+                fontWeight: 600,
+              }}
+            >
+              Close
+            </PrimaryButton>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
