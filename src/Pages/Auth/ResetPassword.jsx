@@ -9,8 +9,8 @@ export default function ResetPassword() {
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Store token and email from URL
     const [urlData, setUrlData] = useState({ token: '', email: '' });
+    const [apiErrors, setApiErrors] = useState({}); // store API validation errors
 
     useEffect(() => {
         const tokenFromUrl = searchParams.get('token') || '';
@@ -28,6 +28,8 @@ export default function ResetPassword() {
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
+        setApiErrors({}); // clear previous errors
+        setStatus('');
 
         try {
             const payload = {
@@ -35,21 +37,20 @@ export default function ResetPassword() {
                 token: urlData.token,
                 email: urlData.email,
             };
-            console.log('Submitting reset password:', payload);
 
+            console.log('Submitting reset password:', payload);
             await axios.post('/api/reset-password', payload);
+
             setStatus('Password successfully reset!');
             navigate('/login');
         } catch (err) {
             console.error('Reset password error:', err);
-            // Display validation errors under inputs
             if (err.response?.status === 422 && err.response.data?.errors) {
-                const apiErrors = err.response.data.errors;
-                Object.keys(apiErrors).forEach((key) => {
-                    form.setError(key, apiErrors[key][0]);
-                });
+                // validation errors
+                setApiErrors(err.response.data.errors);
             } else if (err.response?.data?.message) {
-                setStatus(err.response.data.message); // For token expired / invalid
+                // token expired or other messages
+                setStatus(err.response.data.message);
             } else {
                 setStatus('Something went wrong. Please try again.');
             }
@@ -63,9 +64,9 @@ export default function ResetPassword() {
         padding: '0.5rem',
         marginTop: '0.25rem',
         borderRadius: '6px',
-        border: `1px solid ${form.errors[field] ? 'red' : '#D1D5DB'}`,
-        backgroundColor: form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff',
-        color: form.errors[field] ? 'red' : '#111827',
+        border: `1px solid ${apiErrors[field] ? 'red' : '#D1D5DB'}`,
+        backgroundColor: apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff',
+        color: apiErrors[field] ? 'red' : '#111827',
         transition: 'all 0.2s',
     });
 
@@ -76,9 +77,9 @@ export default function ResetPassword() {
     };
 
     const handleBlur = (e, field, placeholder, value) => {
-        e.target.style.borderColor = form.errors[field] ? 'red' : '#D1D5DB';
-        e.target.style.backgroundColor = form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
-        e.target.style.color = form.errors[field] ? 'red' : '#111827';
+        e.target.style.borderColor = apiErrors[field] ? 'red' : '#D1D5DB';
+        e.target.style.backgroundColor = apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
+        e.target.style.color = apiErrors[field] ? 'red' : '#111827';
         e.target.placeholder = value ? '' : placeholder;
     };
 
@@ -88,9 +89,9 @@ export default function ResetPassword() {
     };
 
     const handleHoverLeave = (e, field, value) => {
-        e.target.style.borderColor = form.errors[field] ? 'red' : '#D1D5DB';
-        e.target.style.backgroundColor = form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
-        e.target.style.color = form.errors[field] ? 'red' : '#111827';
+        e.target.style.borderColor = apiErrors[field] ? 'red' : '#D1D5DB';
+        e.target.style.backgroundColor = apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
+        e.target.style.color = apiErrors[field] ? 'red' : '#111827';
     };
 
     return (
@@ -138,7 +139,7 @@ export default function ResetPassword() {
                             marginBottom: '0.5rem',
                             fontSize: '0.875rem',
                             fontWeight: '500',
-                            color: form.errors.token ? 'red' : 'green',
+                            color: apiErrors.token ? 'red' : 'green',
                         }}
                     >
                         {status}
@@ -163,9 +164,9 @@ export default function ResetPassword() {
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'email', urlData.email)}
                         />
-                        {form.errors.email && (
+                        {apiErrors.email && (
                             <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                                {form.errors.email}
+                                {apiErrors.email[0]}
                             </p>
                         )}
                     </div>
@@ -186,11 +187,10 @@ export default function ResetPassword() {
                             onBlur={(e) => handleBlur(e, 'password', 'Password', form.data.password)}
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'password', form.data.password)}
-                            required
                         />
-                        {form.errors.password && (
+                        {apiErrors.password && (
                             <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                                {form.errors.password}
+                                {apiErrors.password[0]}
                             </p>
                         )}
                     </div>
@@ -220,16 +220,14 @@ export default function ResetPassword() {
                             onMouseLeave={(e) =>
                                 handleHoverLeave(e, 'password_confirmation', form.data.password_confirmation)
                             }
-                            required
                         />
-                        {form.errors.password_confirmation && (
+                        {apiErrors.password_confirmation && (
                             <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                                {form.errors.password_confirmation}
+                                {apiErrors.password_confirmation[0]}
                             </p>
                         )}
                     </div>
 
-                    {/* BUTTON */}
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
                         <button
                             type="submit"
