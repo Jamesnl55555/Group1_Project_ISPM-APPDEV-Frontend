@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from '@/api/axios';
 import { useForm } from '@/hooks/useForm';
-import PasswordInput from '@/components/PasswordInput';
+import PasswordInput from '@/Components/PasswordInput';
 
 export default function ResetPassword() {
     const navigate = useNavigate();
