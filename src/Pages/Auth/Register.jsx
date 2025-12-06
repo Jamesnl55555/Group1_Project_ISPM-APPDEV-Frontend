@@ -2,6 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
+import PasswordInput from '@/components/PasswordInput';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '@/api/axios';
@@ -16,9 +17,6 @@ export default function Register() {
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (field) => (e) =>
-    setData({ ...data, [field]: e.target.value });
 
   const setDataField = (field, value) => {
     setData((prev) => ({ ...prev, [field]: value }));
@@ -176,55 +174,8 @@ export default function Register() {
             <InputError message={errors.email} />
           </div>
 
-          {/* Password */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="password" value="Password" />
-            <TextInput
-              id="password"
-              type="password"
-              name="password"
-              value={data.password || ''}
-              autoComplete="new-password"
-              onChange={(e) => setDataField('password', e.target.value)}
-              required
-              {...createInputHandlers('password')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.password),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.password} />
-          </div>
-
-          {/* Confirm Password */}
-          <div style={{ textAlign: 'left', marginBottom: '1rem' }}>
-            <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-            <TextInput
-              id="password_confirmation"
-              type="password"
-              name="password_confirmation"
-              value={data.password_confirmation || ''}
-              autoComplete="new-password"
-              onChange={(e) => setDataField('password_confirmation', e.target.value)}
-              required
-              {...createInputHandlers('password_confirmation')}
-              style={{
-                marginTop: '0.25rem',
-                width: '100%',
-                borderRadius: '6px',
-                border: '1px solid #D1D5DB',
-                padding: '0.5rem',
-                backgroundColor: getBackgroundColor(data.password_confirmation),
-                transition: 'all 0.2s',
-              }}
-            />
-            <InputError message={errors.password_confirmation} />
-          </div>
+          {/* Password + Confirm Password using PasswordInput */}
+          <PasswordInput form={{ data, setData: setDataField, errors, setError: (field, msg) => setErrors(prev => ({ ...prev, [field]: msg })) }} />
 
           {/* Submit Button */}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>

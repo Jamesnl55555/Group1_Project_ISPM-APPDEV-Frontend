@@ -2,23 +2,16 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from '@/api/axios';
 import { useForm } from '@/hooks/useForm';
+import PasswordInput from '@/components/PasswordInput';
 
 export default function ResetPassword() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
-    const [apiErrors, setApiErrors] = useState({});
-    const [urlData, setUrlData] = useState({ token: '', email: '' });
 
-    // Track password rules
-    const [passwordRules, setPasswordRules] = useState({
-        length: false,
-        uppercase: false,
-        lowercase: false,
-        number: false,
-        noSymbol: true,
-    });
+    // Store token and email from URL in state
+    const [urlData, setUrlData] = useState({ token: '', email: '' });
 
     useEffect(() => {
         const tokenFromUrl = searchParams.get('token') || '';
@@ -33,29 +26,9 @@ export default function ResetPassword() {
         password_confirmation: '',
     });
 
-    // Check password rules on change
-    useEffect(() => {
-        const pw = form.data.password;
-        setPasswordRules({
-            length: pw.length >= 8,
-            uppercase: /[A-Z]/.test(pw),
-            lowercase: /[a-z]/.test(pw),
-            number: /[0-9]/.test(pw),
-            noSymbol: /^[A-Za-z0-9]*$/.test(pw),
-        });
-    }, [form.data.password]);
-
     const submit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setApiErrors({});
-        setStatus('');
-
-        // Prevent submission if password rules not met
-        if (!Object.values(passwordRules).every((r) => r)) {
-            setLoading(false);
-            return;
-        }
 
         try {
             const payload = {
@@ -70,30 +43,32 @@ export default function ResetPassword() {
             navigate('/login');
         } catch (err) {
             console.error('Reset password error:', err);
-
             if (err.response?.status === 422) {
-                // Token errors appear under `email`
-                if (err.response.data?.errors?.email) {
-                    setApiErrors({ email: [err.response.data.errors.email[0]] });
-                } else if (err.response.data?.message) {
+                // Show validation errors
+                if (err.response.data?.errors) {
+                    Object.entries(err.response.data.errors).forEach(([field, messages]) => {
+                        if (form.setError) form.setError(field, messages[0]);
+                    });
+                }
+                // Show token expired error if present
+                if (err.response.data?.message) {
                     setStatus(err.response.data.message);
                 }
-            } else {
-                setStatus('Something went wrong. Please try again.');
             }
         } finally {
             setLoading(false);
         }
     };
 
+    // Input styles for email field
     const inputStyle = (field, value) => ({
         width: '100%',
         padding: '0.5rem',
         marginTop: '0.25rem',
         borderRadius: '6px',
-        border: `1px solid ${form.errors[field] || apiErrors[field] ? 'red' : '#D1D5DB'}`,
-        backgroundColor: form.errors[field] || apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff',
-        color: form.errors[field] || apiErrors[field] ? 'red' : '#111827',
+        border: `1px solid ${form.errors[field] ? 'red' : '#D1D5DB'}`,
+        backgroundColor: form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff',
+        color: form.errors[field] ? 'red' : '#111827',
         transition: 'all 0.2s',
     });
 
@@ -104,9 +79,9 @@ export default function ResetPassword() {
     };
 
     const handleBlur = (e, field, placeholder, value) => {
-        e.target.style.borderColor = form.errors[field] || apiErrors[field] ? 'red' : '#D1D5DB';
-        e.target.style.backgroundColor = form.errors[field] || apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
-        e.target.style.color = form.errors[field] || apiErrors[field] ? 'red' : '#111827';
+        e.target.style.borderColor = form.errors[field] ? 'red' : '#D1D5DB';
+        e.target.style.backgroundColor = form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
+        e.target.style.color = form.errors[field] ? 'red' : '#111827';
         e.target.placeholder = value ? '' : placeholder;
     };
 
@@ -116,9 +91,9 @@ export default function ResetPassword() {
     };
 
     const handleHoverLeave = (e, field, value) => {
-        e.target.style.borderColor = form.errors[field] || apiErrors[field] ? 'red' : '#D1D5DB';
-        e.target.style.backgroundColor = form.errors[field] || apiErrors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
-        e.target.style.color = form.errors[field] || apiErrors[field] ? 'red' : '#111827';
+        e.target.style.borderColor = form.errors[field] ? 'red' : '#D1D5DB';
+        e.target.style.backgroundColor = form.errors[field] ? '#ffe5e5' : value ? '#fff4e5ff' : '#ffffff';
+        e.target.style.color = form.errors[field] ? 'red' : '#111827';
     };
 
     return (
@@ -168,7 +143,7 @@ export default function ResetPassword() {
                             marginBottom: '0.5rem',
                             fontSize: '0.875rem',
                             fontWeight: '500',
-                            color: apiErrors.email ? 'red' : 'green',
+                            color: 'red',
                         }}
                     >
                         {status}
@@ -193,67 +168,10 @@ export default function ResetPassword() {
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'email', urlData.email)}
                         />
-                        {apiErrors.email && (
-                            <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
-                                {apiErrors.email[0]}
-                            </p>
-                        )}
                     </div>
 
-                    {/* PASSWORD */}
-                    <div style={{ textAlign: 'left', marginBottom: '1.25rem' }}>
-                        <label htmlFor="password" style={{ fontWeight: '550', color: '#3b3b3bff' }}>
-                            Password
-                        </label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={form.data.password}
-                            placeholder="Password"
-                            style={inputStyle('password', form.data.password)}
-                            onChange={(e) => form.setData('password', e.target.value)}
-                            onFocus={handleFocus}
-                            onBlur={(e) => handleBlur(e, 'password', 'Password', form.data.password)}
-                            onMouseEnter={handleHover}
-                            onMouseLeave={(e) => handleHoverLeave(e, 'password', form.data.password)}
-                        />
-                        {/* Password rules */}
-                        <div style={{ fontSize: '0.7rem', color: 'red', marginTop: '0.25rem' }}>
-                            {!passwordRules.length && <div>• At least 8 characters</div>}
-                            {!passwordRules.uppercase && <div>• At least one uppercase letter (A-Z)</div>}
-                            {!passwordRules.lowercase && <div>• At least one lowercase letter (a-z)</div>}
-                            {!passwordRules.number && <div>• At least one number (0-9)</div>}
-                            {!passwordRules.noSymbol && <div>• No symbols allowed</div>}
-                        </div>
-                    </div>
-
-                    {/* CONFIRM PASSWORD */}
-                    <div style={{ textAlign: 'left', marginBottom: '1.25rem' }}>
-                        <label htmlFor="password_confirmation" style={{ fontWeight: '550', color: '#3b3b3bff' }}>
-                            Confirm Password
-                        </label>
-                        <input
-                            id="password_confirmation"
-                            type="password"
-                            value={form.data.password_confirmation}
-                            placeholder="Confirm Password"
-                            style={inputStyle('password_confirmation', form.data.password_confirmation)}
-                            onChange={(e) => form.setData('password_confirmation', e.target.value)}
-                            onFocus={handleFocus}
-                            onBlur={(e) =>
-                                handleBlur(
-                                    e,
-                                    'password_confirmation',
-                                    'Confirm Password',
-                                    form.data.password_confirmation
-                                )
-                            }
-                            onMouseEnter={handleHover}
-                            onMouseLeave={(e) =>
-                                handleHoverLeave(e, 'password_confirmation', form.data.password_confirmation)
-                            }
-                        />
-                    </div>
+                    {/* PASSWORD + CONFIRM PASSWORD COMPONENT */}
+                    <PasswordInput form={form} />
 
                     {/* BUTTON */}
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
