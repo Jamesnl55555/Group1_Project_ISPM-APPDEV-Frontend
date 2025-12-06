@@ -8,7 +8,7 @@ import PasswordResetRequest from "./Pages/Auth/PasswordResetRequest";
 import ResetPassword from "./Pages/Auth/ResetPassword";
 import ConfirmPassword from "./Pages/Auth/ConfirmPassword";
 import VerifyEmail from "./Pages/Auth/VerifyEmail";
-import Verify from "./Pages/Auth/Verify";
+import ConfirmRegistration from "./Pages/Auth/ConfirmRegistration";
 
 import PrivateRoute from "./Layouts/PrivateRoute";
 
@@ -57,7 +57,7 @@ export default function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/confirm-password" element={<ConfirmPassword />} />
-        <Route path="/verify" element={<Verify />} />
+        <Route path="/confirm-register" element={<ConfirmRegistration />} />
 
         {/* Protected Routes */}
         <Route path="/dashboard" element={
