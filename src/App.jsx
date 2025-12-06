@@ -8,6 +8,7 @@ import PasswordResetRequest from "./Pages/Auth/PasswordResetRequest";
 import ResetPassword from "./Pages/Auth/ResetPassword";
 import ConfirmPassword from "./Pages/Auth/ConfirmPassword";
 import VerifyEmail from "./Pages/Auth/VerifyEmail";
+import Verify from "./Pages/Auth/Verify";
 
 import PrivateRoute from "./Layouts/PrivateRoute";
 
