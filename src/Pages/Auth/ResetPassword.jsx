@@ -24,15 +24,19 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-        await axios.post('/api/reset-password', form.data);
-        setStatus('Password successfully reset!');
-        navigate('/login');
+    await axios.post('/api/reset-password', form.data);
+    setStatus('Password successfully reset!');
+    navigate('/login');
     } catch (err) {
-        console.error('Reset password error:', err);
-    } finally {
-        setLoading(false);
+        if (err.response?.status === 422) {
+            console.log('Validation errors:', err.response.data.errors);
+        } else {
+            console.error('Reset password error:', err);
+        }
     }
-    };
+    setLoading(false);
+    }
+
 
 
     const inputStyle = (field, value) => ({
