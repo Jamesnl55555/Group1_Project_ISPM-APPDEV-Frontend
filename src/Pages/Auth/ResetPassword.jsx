@@ -8,6 +8,7 @@ export default function ResetPassword() {
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
     const emailParam = searchParams.get('email');
+    const [loading, setLoading] = useState(false);
 
     const form = useForm({
         token: token || '',
@@ -19,16 +20,20 @@ export default function ResetPassword() {
     const [status, setStatus] = useState('');
 
     const submit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
+    setLoading(true);
 
-        try {
-            await axios.post('/api/reset-password', form.data);
-            setStatus('Password successfully reset!');
-            navigate('/login');
-        } catch (err) {
-            console.error('Reset password error:', err);
-        }
+    try {
+        await axios.post('/api/reset-password', form.data);
+        setStatus('Password successfully reset!');
+        navigate('/login');
+    } catch (err) {
+        console.error('Reset password error:', err);
+    } finally {
+        setLoading(false);
+    }
     };
+
 
     const inputStyle = (field, value) => ({
         width: '100%',
@@ -192,33 +197,27 @@ export default function ResetPassword() {
                     {/* BUTTON */}
                     <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
                         <button
-                            type="submit"
-                            disabled={form.processing}
-                            style={{
-                                width: '150px',
-                                padding: '0.6rem',
-                                fontSize: '1rem',
-                                color: '#fff',
-                                background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
-                                border: 'none',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                                textAlign: 'center',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                transition: 'background 0.3s',
-                                boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'linear-gradient(to bottom, #3e2b1c, #2e1c0f)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'linear-gradient(to bottom, #4a2f26, #2f1c14)';
-                            }}
-                        >
-                            Reset Password
-                        </button>
+                        type="submit"
+                        disabled={loading}
+                        style={{
+                            width: '150px',
+                            padding: '0.6rem',
+                            fontSize: '1rem',
+                            color: '#fff',
+                            background: loading
+                                ? '#a8a8a8' // << Gray when disabled
+                                : 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
+                            border: 'none',
+                            borderRadius: '6px',
+                            cursor: loading ? 'not-allowed' : 'pointer',
+                            opacity: loading ? 0.6 : 1,
+                            transition: 'background 0.3s',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                        }}
+                    >
+                        {loading ? 'Processing...' : 'Reset Password'}
+                    </button>
+
                     </div>
 
                     <a
