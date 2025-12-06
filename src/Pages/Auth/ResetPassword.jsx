@@ -9,7 +9,7 @@ export default function ResetPassword() {
     const [status, setStatus] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Store token and email from URL in state to ensure they are captured
+    // Store token and email from URL
     const [urlData, setUrlData] = useState({ token: '', email: '' });
 
     useEffect(() => {
@@ -30,7 +30,6 @@ export default function ResetPassword() {
         setLoading(true);
 
         try {
-            // Ensure we always send the latest token/email from URL
             const payload = {
                 ...form.data,
                 token: urlData.token,
@@ -43,15 +42,22 @@ export default function ResetPassword() {
             navigate('/login');
         } catch (err) {
             console.error('Reset password error:', err);
-            if (err.response?.status === 422) {
-                console.error('Validation errors: ', err.response.data.errors);
+            // Display validation errors under inputs
+            if (err.response?.status === 422 && err.response.data?.errors) {
+                const apiErrors = err.response.data.errors;
+                Object.keys(apiErrors).forEach((key) => {
+                    form.setError(key, apiErrors[key][0]);
+                });
+            } else if (err.response?.data?.message) {
+                setStatus(err.response.data.message); // For token expired / invalid
+            } else {
+                setStatus('Something went wrong. Please try again.');
             }
         } finally {
             setLoading(false);
         }
     };
 
-    // Keep all your input style and handlers the same...
     const inputStyle = (field, value) => ({
         width: '100%',
         padding: '0.5rem',
@@ -100,7 +106,6 @@ export default function ResetPassword() {
                 padding: '2rem',
             }}
         >
-            {/* LOGO */}
             <div style={{ position: 'absolute', top: '1.5rem', left: '2rem' }}>
                 <img
                     src="/images/2.png"
@@ -109,7 +114,6 @@ export default function ResetPassword() {
                 />
             </div>
 
-            {/* FORM CARD */}
             <div
                 style={{
                     maxWidth: '400px',
@@ -134,7 +138,7 @@ export default function ResetPassword() {
                             marginBottom: '0.5rem',
                             fontSize: '0.875rem',
                             fontWeight: '500',
-                            color: 'green',
+                            color: form.errors.token ? 'red' : 'green',
                         }}
                     >
                         {status}
@@ -159,6 +163,11 @@ export default function ResetPassword() {
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'email', urlData.email)}
                         />
+                        {form.errors.email && (
+                            <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                                {form.errors.email}
+                            </p>
+                        )}
                     </div>
 
                     {/* PASSWORD */}
@@ -178,6 +187,11 @@ export default function ResetPassword() {
                             onMouseEnter={handleHover}
                             onMouseLeave={(e) => handleHoverLeave(e, 'password', form.data.password)}
                         />
+                        {form.errors.password && (
+                            <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                                {form.errors.password}
+                            </p>
+                        )}
                     </div>
 
                     {/* CONFIRM PASSWORD */}
@@ -206,6 +220,11 @@ export default function ResetPassword() {
                                 handleHoverLeave(e, 'password_confirmation', form.data.password_confirmation)
                             }
                         />
+                        {form.errors.password_confirmation && (
+                            <p style={{ color: 'red', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                                {form.errors.password_confirmation}
+                            </p>
+                        )}
                     </div>
 
                     {/* BUTTON */}
