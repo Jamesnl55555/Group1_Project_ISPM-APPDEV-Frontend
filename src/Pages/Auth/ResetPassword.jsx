@@ -11,16 +11,14 @@ export default function ResetPassword() {
     const [loading, setLoading] = useState(false);
 
     // Store token and email from URL in state
-    const [urlData, setUrlData] = useState({ token: '', email: '' });
+    const [urlData, setUrlData] = useState({ email: '' });
 
     useEffect(() => {
-        const tokenFromUrl = searchParams.get('token') || '';
         const emailFromUrl = searchParams.get('email') || '';
         setUrlData({ token: tokenFromUrl, email: emailFromUrl });
     }, [searchParams]);
 
     const form = useForm({
-        token: urlData.token,
         email: urlData.email,
         password: '',
         password_confirmation: '',
