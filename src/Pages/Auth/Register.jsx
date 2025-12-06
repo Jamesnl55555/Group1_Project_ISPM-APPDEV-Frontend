@@ -2,7 +2,7 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import PasswordInput from '@/components/PasswordInput';
+import PasswordInput from '@/Components/PasswordInput';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from '@/api/axios';
