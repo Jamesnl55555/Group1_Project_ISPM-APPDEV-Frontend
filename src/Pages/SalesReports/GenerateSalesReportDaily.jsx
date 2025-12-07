@@ -6,12 +6,15 @@ import axios from "axios";
 export default function GenerateSalesReportDaily() {
   const [dailySales, setDailySales] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const fetchDaily = async () => {
       try {
+        const userRes = await axios.get("/api/user");
         const response = await axios.get("/api/fetch-daily");
         console.log("API response:", response.data);
+        setUser(userRes.data);
         if (response.data.success) {
           setDailySales(response.data.daily_sales);
         }

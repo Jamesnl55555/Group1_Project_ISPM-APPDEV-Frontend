@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
-export default function GenerateSalesReportCustom({ user }) {
+export default function GenerateSalesReportCustom() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [customSales, setCustomSales] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const handleGenerate = async () => {
+  const [user, setUser] = useState(null);
+  
+  useEffect(() => {
+    const handleGenerate = async () => {
     if (!from || !to) {
       setError("Please select both 'From' and 'To' dates.");
       return;
@@ -21,7 +23,9 @@ export default function GenerateSalesReportCustom({ user }) {
       const response = await axios.get("/api/fetch-custom", {
         params: { from, to },
       });
-
+      
+      const userRes = await axios.get("/api/user");
+      setUser(userRes.data);
       if (response.data.success) {
         setCustomSales(response.data.custom_sales);
       } else {
@@ -36,6 +40,10 @@ export default function GenerateSalesReportCustom({ user }) {
       setLoading(false);
     }
   };
+
+  handleGenerate();
+  } )
+ 
 
   return (
     <AuthenticatedLayout user={user}>

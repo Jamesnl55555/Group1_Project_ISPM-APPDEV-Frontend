@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
-export default function GenerateSalesReportMonthly({ user }) {
-  const [monthlySales, setMonthlySales] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+export default function GenerateSalesReportMonthly() {
+    const [monthlySales, setMonthlySales] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    useEffect(() => {
     const fetchMonthly = async () => {
       try {
+        const userRes = await axios.get("/api/user");
+        setUser(userRes.data);
         const response = await axios.get("/api/fetch-monthly");
 
         if (response.data.success) {

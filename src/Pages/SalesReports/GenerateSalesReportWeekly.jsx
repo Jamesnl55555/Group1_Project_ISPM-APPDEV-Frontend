@@ -3,16 +3,18 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
 export default function GenerateSalesReportWeekly({ user }) {
-  const [weeklySales, setWeeklySales] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
+    const [weeklySales, setWeeklySales] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState(null);
+    useEffect(() => {
     const fetchWeekly = async () => {
       try {
         const response = await axios.get("/api/fetch-weekly");
-
+        const userRes = await axios.get("/api/user");
+        setUser(userRes.data);
         if (response.data.success) {
           setWeeklySales(response.data.weekly_sales);
+          setUser(userRes.data);
         }
       } catch (error) {
         console.error("Error fetching weekly sales:", error);
