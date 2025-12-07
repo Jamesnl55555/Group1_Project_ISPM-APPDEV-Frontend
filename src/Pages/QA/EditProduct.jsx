@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "@/api/axios";
 import { useForm } from "@/hooks/useForm";
@@ -13,38 +13,36 @@ export default function EditProduct() {
 
   const form = useForm({
     name: "",
-    quantity: "",
-    price: "",
+    quantity: 0,
+    price: 0,
     category: "",
     is_archived: false,
     file: null,
   });
 
   useEffect(() => {
-  const fetchProduct = async () => {
-    try {
-      const resp = await axios.get(`/api/fetchproduct/${id}`);
-      const product = resp.data.product;
+    const fetchProduct = async () => {
+      try {
+        const resp = await axios.get(`/api/fetchproduct/${id}`);
+        const product = resp.data.product;
 
-      form.setData({
-        name: product.name || "",
-        quantity: product.quantity || "",
-        price: product.price || "",
-        category: product.category || "",
-        is_archived: product.is_archived || false,
-        file: null,
-      });
-    } catch (err) {
-      console.error("Failed to fetch product:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+        form.setData({
+          name: product.name ?? "",
+          quantity: product.quantity ?? 0,
+          price: product.price ?? 0,
+          category: product.category ?? "",
+          is_archived: product.is_archived ?? false,
+          file: null,
+        });
+      } catch (err) {
+        console.error("Failed to fetch product:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchProduct();
+    fetchProduct();
   }, [id]);
-
-
 
   const submitProducts = async (e) => {
     e.preventDefault();
@@ -97,7 +95,7 @@ export default function EditProduct() {
               <div className="flex items-center gap-2 mt-1">
                 <input
                   type="text"
-                  value={form.data.name}
+                  value={form.data.name ?? ""}
                   onChange={(e) => form.setData("name", e.target.value)}
                   className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
                 />
@@ -119,7 +117,7 @@ export default function EditProduct() {
                 Add Category
               </label>
               <select
-                value={form.data.category}
+                value={form.data.category ?? ""}
                 onChange={(e) => form.setData("category", e.target.value)}
                 className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
               >
@@ -139,10 +137,7 @@ export default function EditProduct() {
                 <button
                   type="button"
                   onClick={() =>
-                    form.setData(
-                      "quantity",
-                      Math.max(0, form.data.quantity - 1)
-                    )
+                    form.setData("quantity", Math.max(0, form.data.quantity - 1))
                   }
                   className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
                 >
@@ -150,7 +145,7 @@ export default function EditProduct() {
                 </button>
                 <input
                   type="number"
-                  value={form.data.quantity}
+                  value={form.data.quantity ?? 0}
                   onChange={(e) =>
                     form.setData("quantity", Number(e.target.value))
                   }
@@ -161,7 +156,7 @@ export default function EditProduct() {
                   onClick={() =>
                     form.setData(
                       "quantity",
-                      parseInt(form.data.quantity || 0) + 1
+                      parseInt(form.data.quantity ?? 0) + 1
                     )
                   }
                   className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
@@ -178,7 +173,7 @@ export default function EditProduct() {
               </label>
               <input
                 type="number"
-                value={form.data.price}
+                value={form.data.price ?? 0}
                 onChange={(e) => form.setData("price", Number(e.target.value))}
                 className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
               />
