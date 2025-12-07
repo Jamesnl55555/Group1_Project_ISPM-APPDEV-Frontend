@@ -6,77 +6,105 @@ import axios from "@/api/axios";
 
 export default function Inventory1() {
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
-  const [search, setSearch] = useState("");
+
+  // INVENTORY DATA
+  const [inventory, setInventory] = useState([]);
+  const [pageInventory, setPageInventory] = useState(1);
+  const [lastPageInventory, setLastPageInventory] = useState(1);
+
+  // LOW STOCK DATA
+  const [lowStock, setLowStock] = useState([]);
+  const [pageLowStock, setPageLowStock] = useState(1);
+  const [lastPageLowStock, setLastPageLowStock] = useState(1);
+
+  // ARCHIVED DATA
+  const [archived, setArchived] = useState([]);
+  const [pageArchived, setPageArchived] = useState(1);
+  const [lastPageArchived, setLastPageArchived] = useState(1);
+
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+
+  // FETCH INVENTORY
+  const fetchInventory = async (page = 1) => {
+    try {
+      const res = await axios.get(`/api/fetchproducts?page=${page}`);
+      setInventory(res.data.products);
+      setLastPageInventory(res.data.last_page);
+    } catch (err) {
+      console.error("Failed to load inventory:", err);
+    }
+  };
+
+  // FETCH LOW STOCK
+  const fetchLowStock = async (page = 1) => {
+    try {
+      const res = await axios.get(`/api/fetchproducts-lowstock?page=${page}`);
+      setLowStock(res.data.products);
+      setLastPageLowStock(res.data.last_page);
+    } catch (err) {
+      console.error("Failed to load low stock:", err);
+    }
+  };
+
+  // FETCH ARCHIVED
+  const fetchArchived = async (page = 1) => {
+    try {
+      const res = await axios.get(`/api/fetchproducts-archived?page=${page}`);
+      setArchived(res.data.products);
+      setLastPageArchived(res.data.last_page);
+    } catch (err) {
+      console.error("Failed to load archived:", err);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get("/api/fetchproducts");
-        setProducts(response.data.products || []);
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+    setLoading(true);
 
+    Promise.all([
+      fetchInventory(pageInventory),
+      fetchLowStock(pageLowStock),
+      fetchArchived(pageArchived),
+    ]).finally(() => setLoading(false));
+  }, [pageInventory, pageLowStock, pageArchived]);
+
+  // ACTIONS
   const archiveProduct = (id) => {
-    if (confirm("Are you sure you want to archive this product?")) {
-      axios
-        .post(`/api/archive-item/${id}`)
-        .then(() =>
-          setProducts(products.map((p) => (p.id === id ? { ...p, is_archived: 1 } : p)))
-        )
-        .catch((err) => console.error(err));
+    if (confirm("Archive this product?")) {
+      axios.post(`/api/archive-item/${id}`).then(() => {
+        fetchInventory(pageInventory);
+        fetchLowStock(pageLowStock);
+        fetchArchived(pageArchived);
+      });
     }
   };
 
   const unarchiveProduct = (id) => {
     if (confirm("Unarchive this product?")) {
-      axios
-        .post(`/api/unarchive/${id}`)
-        .then(() =>
-          setProducts(products.map((p) => (p.id === id ? { ...p, is_archived: 0 } : p)))
-        )
-        .catch((err) => console.error(err));
+      axios.post(`/api/unarchive/${id}`).then(() => {
+        fetchInventory(pageInventory);
+        fetchLowStock(pageLowStock);
+        fetchArchived(pageArchived);
+      });
     }
   };
 
   const editProduct = (id) => navigate(`/edit-product/${id}`);
 
   const deleteProduct = (id) => {
-    if (confirm("Are you sure you want to delete this product?")) {
-      axios
-        .post(`/api/delete-item/${id}`)
-        .then(() => setProducts(products.filter((p) => p.id !== id)))
-        .catch((err) => console.error(err));
+    if (confirm("Delete this product?")) {
+      axios.post(`/api/delete-item/${id}`).then(() => {
+        fetchInventory(pageInventory);
+        fetchLowStock(pageLowStock);
+        fetchArchived(pageArchived);
+      });
     }
   };
-
-  const categories = [...new Set(products.map((p) => p.category))];
-
-  // 🔥 FILTERS — DO NOT SHOW ARCHIVED ITEMS IN INVENTORY
-  const activeProducts = products.filter((p) => p.is_archived == 0);
-
-  const filteredProducts = activeProducts.filter(
-    (p) => !search || p.name.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const lowStockProducts = filteredProducts.filter(
-    (p) => p.quantity <= 20 && p.is_archived == 0
-  );
-
-  // Archived list
-  const archivedProducts = products.filter((p) => p.is_archived == 1);
 
   if (loading)
     return (
       <AuthenticatedLayout>
-        <div>Loading...</div>
+        <p>Loading...</p>
       </AuthenticatedLayout>
     );
 
@@ -90,8 +118,6 @@ export default function Inventory1() {
             backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            lineHeight: "1.3",
-            fontSize: "3rem",
             marginLeft: "5rem",
             marginTop: "-2rem",
             marginBottom: "-1rem",
@@ -111,37 +137,64 @@ export default function Inventory1() {
           Add Product
         </button>
 
-        {/* ACTIVE PRODUCTS */}
+        {/* INVENTORY */}
         <InventoryTable
-          products={filteredProducts}
           title="Inventory"
+          products={inventory}
           editProduct={editProduct}
           deleteProduct={deleteProduct}
           archiveProduct={archiveProduct}
         />
 
+        {/* PAGINATION — INVENTORY */}
+        <Pagination
+          page={pageInventory}
+          lastPage={lastPageInventory}
+          onPrev={() => setPageInventory((p) => Math.max(1, p - 1))}
+          onNext={() => setPageInventory((p) => Math.min(lastPageInventory, p + 1))}
+        />
+
         {/* LOW STOCK */}
         <InventoryTable
-          products={lowStockProducts}
           title="Products Low In Stock!"
+          products={lowStock}
           editProduct={editProduct}
           deleteProduct={deleteProduct}
           archiveProduct={archiveProduct}
           lowStock
         />
 
-        {/* ARCHIVED PRODUCTS */}
+        {/* PAGINATION — LOW STOCK */}
+        <Pagination
+          page={pageLowStock}
+          lastPage={lastPageLowStock}
+          onPrev={() => setPageLowStock((p) => Math.max(1, p - 1))}
+          onNext={() => setPageLowStock((p) => Math.min(lastPageLowStock, p + 1))}
+        />
+
+        {/* ARCHIVED */}
         <InventoryTable
-          products={archivedProducts}
           title="Archived Products"
+          products={archived}
           unarchiveProduct={unarchiveProduct}
           archived
+        />
+
+        {/* PAGINATION — ARCHIVED */}
+        <Pagination
+          page={pageArchived}
+          lastPage={lastPageArchived}
+          onPrev={() => setPageArchived((p) => Math.max(1, p - 1))}
+          onNext={() => setPageArchived((p) => Math.min(lastPageArchived, p + 1))}
         />
       </div>
     </AuthenticatedLayout>
   );
 }
 
+// -----------------------
+// TABLE COMPONENT
+// -----------------------
 function InventoryTable({
   products,
   title,
@@ -169,10 +222,7 @@ function InventoryTable({
                 "Quantity",
                 "Actions",
               ].map((th) => (
-                <th
-                  key={th}
-                  className="px-3 py-2 text-left text-sm font-semibold"
-                >
+                <th key={th} className="px-3 py-2 text-left text-sm font-semibold">
                   {th}
                 </th>
               ))}
@@ -256,6 +306,9 @@ function InventoryTable({
   );
 }
 
+// -----------------------
+// BUTTON COMPONENT
+// -----------------------
 function ActionButton({ color, hover, children, onClick }) {
   return (
     <button
@@ -267,5 +320,36 @@ function ActionButton({ color, hover, children, onClick }) {
     >
       {children}
     </button>
+  );
+}
+
+// -----------------------
+// PAGINATION COMPONENT
+// -----------------------
+function Pagination({ page, lastPage, onPrev, onNext }) {
+  return (
+    <div className="flex justify-center mt-4 gap-4">
+      <button
+        className={`px-4 py-2 border rounded ${
+          page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"
+        }`}
+        disabled={page === 1}
+        onClick={onPrev}
+      >
+        ⬅ Prev
+      </button>
+
+      <button
+        className={`px-4 py-2 border rounded ${
+          page === lastPage
+            ? "bg-gray-300 cursor-not-allowed"
+            : "bg-white hover:bg-gray-200"
+        }`}
+        disabled={page === lastPage}
+        onClick={onNext}
+      >
+        Next ➡
+      </button>
+    </div>
   );
 }
