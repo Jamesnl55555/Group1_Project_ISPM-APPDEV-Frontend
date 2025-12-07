@@ -27,10 +27,9 @@ export default function Inventory1() {
   const editProduct = (id) => navigate(`/edit-product/${id}`);
   const deleteProduct = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      axios
-        .delete(`/api/delete-item/${id}`)
-        .then(() => setProducts(products.filter((p) => p.id !== id)))
-        .catch((err) => console.error(err));
+      axios.post(`/api/delete-item/${id}`)
+      .then(() => setProducts(products.filter((p) => p.id !== id)))
+      .catch((err) => console.error(err));
     }
   };
 
