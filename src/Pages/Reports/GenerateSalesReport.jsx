@@ -48,7 +48,6 @@ export default function GenerateSalesReportCustom() {
       alert("Please select both start and end dates.");
       return;
     }
-    // Update URL query params
     navigate(`/generate-sales-report/custom?from=${from}&to=${to}`);
   };
 
@@ -105,7 +104,7 @@ export default function GenerateSalesReportCustom() {
             padding: "1.5rem",
             borderRadius: "0.75rem",
             border: "1px solid #d7bfa0",
-            marginBottom: "2rem",
+            marginBottom: "1rem",
           }}
         >
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", marginBottom: "1.5rem" }}>
@@ -161,6 +160,46 @@ export default function GenerateSalesReportCustom() {
               Generate Report
             </button>
           </div>
+        </div>
+
+        {/* NAVIGATION BUTTONS */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginBottom: "1rem" }}>
+          <button
+            onClick={() => navigate("/generate-sales-report/daily")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.375rem",
+              backgroundColor: "#c5a888",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Daily
+          </button>
+          <button
+            onClick={() => navigate("/generate-sales-report/weekly")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.375rem",
+              backgroundColor: "#c5a888",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Weekly
+          </button>
+          <button
+            onClick={() => navigate("/generate-sales-report/monthly")}
+            style={{
+              padding: "0.4rem 1rem",
+              borderRadius: "0.375rem",
+              backgroundColor: "#c5a888",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Monthly
+          </button>
         </div>
 
         {/* REPORT DISPLAY */}
