@@ -7,6 +7,7 @@ export default function Import() {
   const [excelData, setExcelData] = useState([]);
   const [showData, setShowData] = useState(false);
   const [localError, setLocalError] = useState("");
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
   // Handle file selection
@@ -43,6 +44,7 @@ export default function Import() {
     }
 
     setLocalError("");
+    setLoading(true);
 
     try {
       const formData = new FormData();
@@ -53,9 +55,17 @@ export default function Import() {
       });
 
       alert("File uploaded successfully!");
+
+      // CLEAR EVERYTHING AFTER SAVE
+      setData({ excel_file: null });
+      setExcelData([]);
+      setShowData(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error(error);
       setLocalError("Failed to upload file.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -85,21 +95,25 @@ export default function Import() {
     justifyContent: "center",
     transition: "background 0.3s",
     boxShadow: "0 3px 5px rgba(0,0,0,0.25)",
+    minWidth: "100px",
   };
 
   const handleHover = (e) => {
-    e.currentTarget.style.background =
-      "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+    if (!loading) {
+      e.currentTarget.style.background =
+        "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+    }
   };
 
   const handleLeave = (e) => {
-    e.currentTarget.style.background =
-      "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+    if (!loading) {
+      e.currentTarget.style.background =
+        "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+    }
   };
 
   return (
     <div className="space-y-4 w-full">
-
       {/* File input + Save + Preview row */}
       <div
         style={{
@@ -110,7 +124,6 @@ export default function Import() {
           flexWrap: "wrap",
         }}
       >
-
         {/* File Input + Remove Button */}
         <div className="relative" style={{ minWidth: "200px" }}>
           <input
@@ -139,15 +152,20 @@ export default function Import() {
           )}
         </div>
 
-        {/* Save Button (same design from testing) */}
+        {/* Save Button */}
         <button
           type="button"
-          style={customButtonStyle}
+          style={{
+            ...customButtonStyle,
+            opacity: loading ? 0.6 : 1,
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
           onClick={saveFile}
           onMouseEnter={handleHover}
           onMouseLeave={handleLeave}
+          disabled={loading}
         >
-          Save
+          {loading ? "Saving..." : "Save"}
         </button>
 
         {/* Preview Button */}
