@@ -250,16 +250,18 @@ export default function AddProduct() {
               type="submit"
               disabled={processingProduct}
               style={{
-                backgroundColor: "#4b2e17",
+                backgroundColor: processingProduct ? "#a0a0a0" : "#4b2e17",
                 color: "#fff",
                 padding: "0.5rem 1.25rem",
                 borderRadius: "0.25rem",
                 fontWeight: "600",
                 fontSize: "0.875rem",
-                cursor: "pointer",
+                cursor: processingProduct ? "not-allowed" : "pointer",
+                opacity: processingProduct ? 0.6 : 1,
+                transition: "background-color 0.3s, opacity 0.3s",
               }}
             >
-              Add Product
+              {processingProduct ? "Processing..." : "Add Product"}
             </button>
           </div>
         </form>
