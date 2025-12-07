@@ -27,7 +27,7 @@ export default function Inventory1() {
 
   const archiveProduct = (id) => {
     if (confirm("Are you sure you want to archive this product?")) {
-      axios.put(`/api/archive-item/${id}`)
+      axios.post(`/api/archive-item/${id}`)
       .then(() => setProducts(products.filter((p) => p.id !== id)))
       .catch((err) => console.error(err));
     }
