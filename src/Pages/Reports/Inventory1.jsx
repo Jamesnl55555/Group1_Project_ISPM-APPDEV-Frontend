@@ -24,7 +24,7 @@ export default function Inventory1() {
     fetchProducts();
   }, []);
 
-  const edit = (item) => navigate(`/edit-product/${item.id}`, { state: { product: item } });
+  const edit = (item) => navigate(`/edit-product/${item.id}`);
   const del = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
       axios.delete(`/api/delete-item/${id}`)

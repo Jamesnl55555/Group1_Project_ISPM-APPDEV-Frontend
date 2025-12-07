@@ -156,7 +156,7 @@ export default function App() {
           <PrivateRoute><AddProduct /></PrivateRoute>
         } />
 
-        <Route path="/edit-product" element={
+        <Route path="/edit-product/:id" element={
           <PrivateRoute><EditProduct /></PrivateRoute>
         } />
 
