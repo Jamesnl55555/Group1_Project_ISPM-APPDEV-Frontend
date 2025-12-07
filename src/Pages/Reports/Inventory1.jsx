@@ -24,6 +24,14 @@ export default function Inventory1() {
     fetchProducts();
   }, []);
 
+
+  const archiveProduct = (id) => {
+    if (confirm("Are you sure you want to archive this product?")) {
+      axios.post(`/api/archive-item/${id}`)
+      .then(() => setProducts(products.filter((p) => p.id !== id)))
+      .catch((err) => console.error(err));
+    }
+  };
   const editProduct = (id) => navigate(`/edit-product/${id}`);
   const deleteProduct = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
@@ -83,6 +91,7 @@ export default function Inventory1() {
           title="Inventory"
           editProduct={editProduct}
           deleteProduct={deleteProduct}
+          archiveProduct={archiveProduct}
           categories={categories}
         />
 
@@ -91,6 +100,7 @@ export default function Inventory1() {
           title="Products Low In Stock!"
           editProduct={editProduct}
           deleteProduct={deleteProduct}
+          archiveProduct={archiveProduct}
           lowStock
           categories={categories}
         />
@@ -174,7 +184,11 @@ function InventoryTable({
                     >
                       <IconTrash size={16} />
                     </ActionButton>
-                    <ActionButton color="#753500" hover="#532600">
+                    <ActionButton 
+                    color="#753500" 
+                    hover="#532600"
+                    onClick={() => archiveProduct(item.id)}
+                    >
                       <IconEye size={16} />
                     </ActionButton>
                   </td>
