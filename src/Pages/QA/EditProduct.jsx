@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "@/api/axios";
 import { useForm } from "@/hooks/useForm";
@@ -7,6 +7,7 @@ import { useForm } from "@/hooks/useForm";
 export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -20,32 +21,47 @@ export default function EditProduct() {
     file: null,
   });
 
-  // Fetch product on mount
+  const passedProduct = location.state?.product; // get product from navigation state
+
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const listResp = await axios.get("/api/fetchproducts");
-        const found = (listResp.data.products || []).find(
-          (p) => String(p.id) === String(id)
-        );
-        if (found) {
-          form.setData({
-            name: found.name || "",
-            quantity: found.quantity || "",
-            price: found.price || "",
-            category: found.category || "",
-            is_archived: found.is_archived || false,
-            file: null,
-          });
+    if (passedProduct) {
+      // Use passed product if available
+      form.setData({
+        name: passedProduct.name || "",
+        quantity: passedProduct.quantity || "",
+        price: passedProduct.price || "",
+        category: passedProduct.category || "",
+        is_archived: passedProduct.is_archived || false,
+        file: null,
+      });
+      setLoading(false);
+    } else {
+      // Fetch product if not passed
+      const fetchProduct = async () => {
+        try {
+          const listResp = await axios.get("/api/fetchproducts");
+          const found = (listResp.data.products || []).find(
+            (p) => String(p.id) === String(id)
+          );
+          if (found) {
+            form.setData({
+              name: found.name || "",
+              quantity: found.quantity || "",
+              price: found.price || "",
+              category: found.category || "",
+              is_archived: found.is_archived || false,
+              file: null,
+            });
+          }
+        } catch (err) {
+          console.error("Failed to fetch product:", err);
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error("Failed to fetch product:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [id]);
+      };
+      fetchProduct();
+    }
+  }, [id, passedProduct]);
 
   const submitProducts = async (e) => {
     e.preventDefault();

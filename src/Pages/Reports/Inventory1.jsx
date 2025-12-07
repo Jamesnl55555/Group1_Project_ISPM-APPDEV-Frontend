@@ -24,7 +24,7 @@ export default function Inventory1() {
     fetchProducts();
   }, []);
 
-  const edit = (id) => navigate(`/edit-product/${id}`);
+  const edit = (item) => navigate(`/edit-product/${item}`, { state: { product: item } });
   const del = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
       axios.delete(`/api/delete-item/${id}`)
@@ -150,7 +150,7 @@ function InventoryTable({ products, title, edit, del, lowStock = false, search, 
                   <td className="px-3 py-2">₱ {item.price}</td>
                   <td className="px-3 py-2">{item.quantity}</td>
                   <td className="px-3 py-2 flex justify-center gap-2">
-                    <ActionButton color="#44b954" hover="#297233" onClick={() => edit(item.id)}><IconPencil size={16} /></ActionButton>
+                    <ActionButton color="#44b954" hover="#297233" onClick={() => edit(item)}><IconPencil size={16} /></ActionButton>
                     <ActionButton color="#f12323" hover="#9e1818" onClick={() => del(item.id)}><IconTrash size={16} /></ActionButton>
                     <ActionButton color="#753500" hover="#532600"><IconEye size={16} /></ActionButton>
                   </td>
