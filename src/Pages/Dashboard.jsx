@@ -8,6 +8,7 @@ import { MantineProvider } from "@mantine/core";
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [latestTransaction, setLatestTransaction] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -22,7 +23,29 @@ export default function Dashboard() {
       }
     };
 
+    const fetchLatestTransaction = async () => {
+      try {
+        const response = await axios.get("/api/latest-transaction");
+        if (response.data.success) {
+          // Compute total items purchased (sum of quantities)
+          const transaction = response.data.transaction;
+          const items = transaction.variety_of_items || [];
+          const totalItemsPurchased = items.reduce((sum, item) => sum + item.quantity, 0);
+          const numberOfVarieties = items.length;
+
+          setLatestTransaction({
+            ...transaction,
+            total_quantity: totalItemsPurchased,
+            variety_of_items: numberOfVarieties,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching latest transaction:", error);
+      }
+    };
+
     fetchUser();
+    fetchLatestTransaction();
   }, []);
 
   if (loading) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
@@ -120,7 +143,7 @@ export default function Dashboard() {
                 Quick Access
               </h2>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "left", gap: "3rem", textAlign: "center" }}>
-                {[
+                {[ 
                   { img: "/images/6.png", label: "Make\nTransaction", href: "/make-transaction" },
                   { img: "/images/7.png", label: "Transaction\nHistory", href: "/transaction-rec-sec" },
                   { img: "/images/8.png", label: "Add Product", href: "/add-product" },
@@ -193,31 +216,35 @@ export default function Dashboard() {
                 Recent Activity
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
-                {[
-                  { label: "Total Sales", value: "10" },
-                  { label: "Total Cost of Sales", value: "₱700" },
-                  { label: "Customer #", value: "8" },
-                ].map((item) => (
-                  <div
-                    key={item.label}
-                    style={{
-                      background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
-                      textAlign: "center",
-                      height: "10rem",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      borderRadius: "1rem",
-                      border: "1px solid black",
-                      transition: "box-shadow 0.3s",
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "10px 10px 15px rgba(0,0,0,0.3)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-                  >
-                    <h3 style={{ fontSize: "2.25rem", fontWeight: 800, color: "#4b2e17" }}>{item.value}</h3>
-                    <p style={{ fontSize: "1rem", marginTop: "0.75rem", fontWeight: 500, color: "#4b2e17" }}>{item.label}</p>
-                  </div>
-                ))}
+                {latestTransaction ? (
+                  [
+                    { label: "Total Sales", value: latestTransaction.variety_of_items },
+                    { label: "Total Cost of Sales", value: latestTransaction.total_quantity },
+                    { label: "Customer #", value: latestTransaction.id },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      style={{
+                        background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
+                        textAlign: "center",
+                        height: "10rem",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        borderRadius: "1rem",
+                        border: "1px solid black",
+                        transition: "box-shadow 0.3s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "10px 10px 15px rgba(0,0,0,0.3)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
+                    >
+                      <h3 style={{ fontSize: "2.25rem", fontWeight: 800, color: "#4b2e17" }}>{item.value}</h3>
+                      <p style={{ fontSize: "1rem", marginTop: "0.75rem", fontWeight: 500, color: "#4b2e17" }}>{item.label}</p>
+                    </div>
+                  ))
+                ) : (
+                  <p>No recent transactions.</p>
+                )}
               </div>
             </div>
 
