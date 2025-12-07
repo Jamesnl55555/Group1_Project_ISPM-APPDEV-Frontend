@@ -9,7 +9,7 @@ import ResetPassword from "./Pages/Auth/ResetPassword";
 import ConfirmPassword from "./Pages/Auth/ConfirmPassword";
 import VerifyEmail from "./Pages/Auth/VerifyEmail";
 import ConfirmRegistration from "./Pages/Auth/ConfirmRegistration";
-
+import TransactionRecord from "./Pages/TransactionRecord";
 import PrivateRoute from "./Layouts/PrivateRoute";
 
 import Dashboard from "./Pages/Dashboard";
@@ -66,6 +66,10 @@ export default function App() {
 
         <Route path="/securitysettings" element={
           <PrivateRoute><SecuritySettings /></PrivateRoute>
+        } />
+
+        <Route path="/transaction-record" element={
+          <PrivateRoute><TransactionRecord /></PrivateRoute>
         } />
 
         <Route path="/passwordverified" element={
@@ -128,9 +132,7 @@ export default function App() {
 
 
         {/* Transactions */}
-        <Route path="/transaction-rec-section" element={
-          <PrivateRoute><TransactionRecSection /></PrivateRoute>
-        } />
+        
 
         <Route path="/make-transaction" element={
           <PrivateRoute><MakeTransaction /></PrivateRoute>

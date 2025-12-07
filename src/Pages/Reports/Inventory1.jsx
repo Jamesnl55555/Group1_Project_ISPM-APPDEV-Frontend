@@ -24,29 +24,54 @@ export default function Inventory1() {
     fetchProducts();
   }, []);
 
-
   const archiveProduct = (id) => {
     if (confirm("Are you sure you want to archive this product?")) {
-      axios.post(`/api/archive-item/${id}`)
-      .then(() => setProducts(products.filter((p) => p.id !== id)))
-      .catch((err) => console.error(err));
+      axios
+        .post(`/api/archive-item/${id}`)
+        .then(() =>
+          setProducts(products.map((p) => (p.id === id ? { ...p, is_archived: 1 } : p)))
+        )
+        .catch((err) => console.error(err));
     }
   };
+
+  const unarchiveProduct = (id) => {
+    if (confirm("Unarchive this product?")) {
+      axios
+        .post(`/api/unarchive/${id}`)
+        .then(() =>
+          setProducts(products.map((p) => (p.id === id ? { ...p, is_archived: 0 } : p)))
+        )
+        .catch((err) => console.error(err));
+    }
+  };
+
   const editProduct = (id) => navigate(`/edit-product/${id}`);
+
   const deleteProduct = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      axios.post(`/api/delete-item/${id}`)
-      .then(() => setProducts(products.filter((p) => p.id !== id)))
-      .catch((err) => console.error(err));
+      axios
+        .post(`/api/delete-item/${id}`)
+        .then(() => setProducts(products.filter((p) => p.id !== id)))
+        .catch((err) => console.error(err));
     }
   };
 
   const categories = [...new Set(products.map((p) => p.category))];
-  const filteredProducts = products.filter(
-    (p) =>
-      (!search || p.name.toLowerCase().includes(search.toLowerCase()))
+
+  // 🔥 FILTERS — DO NOT SHOW ARCHIVED ITEMS IN INVENTORY
+  const activeProducts = products.filter((p) => p.is_archived == 0);
+
+  const filteredProducts = activeProducts.filter(
+    (p) => !search || p.name.toLowerCase().includes(search.toLowerCase())
   );
-  const lowStockProducts = filteredProducts.filter((p) => p.quantity <= 20);
+
+  const lowStockProducts = filteredProducts.filter(
+    (p) => p.quantity <= 20 && p.is_archived == 0
+  );
+
+  // Archived list
+  const archivedProducts = products.filter((p) => p.is_archived == 1);
 
   if (loading)
     return (
@@ -86,15 +111,16 @@ export default function Inventory1() {
           Add Product
         </button>
 
+        {/* ACTIVE PRODUCTS */}
         <InventoryTable
           products={filteredProducts}
           title="Inventory"
           editProduct={editProduct}
           deleteProduct={deleteProduct}
           archiveProduct={archiveProduct}
-          categories={categories}
         />
 
+        {/* LOW STOCK */}
         <InventoryTable
           products={lowStockProducts}
           title="Products Low In Stock!"
@@ -102,7 +128,14 @@ export default function Inventory1() {
           deleteProduct={deleteProduct}
           archiveProduct={archiveProduct}
           lowStock
-          categories={categories}
+        />
+
+        {/* ARCHIVED PRODUCTS */}
+        <InventoryTable
+          products={archivedProducts}
+          title="Archived Products"
+          unarchiveProduct={unarchiveProduct}
+          archived
         />
       </div>
     </AuthenticatedLayout>
@@ -114,9 +147,10 @@ function InventoryTable({
   title,
   editProduct,
   deleteProduct,
-  lowStock = false,
   archiveProduct,
-  categories,
+  unarchiveProduct,
+  lowStock = false,
+  archived = false,
 }) {
   return (
     <div className="mb-12">
@@ -132,7 +166,7 @@ function InventoryTable({
                 "Category",
                 "Product Name",
                 "Price",
-                "Quantity Available",
+                "Quantity",
                 "Actions",
               ].map((th) => (
                 <th
@@ -144,6 +178,7 @@ function InventoryTable({
               ))}
             </tr>
           </thead>
+
           <tbody>
             {products.length === 0 ? (
               <tr>
@@ -165,33 +200,51 @@ function InventoryTable({
                       onError={(e) => (e.target.style.display = "none")}
                     />
                   </td>
+
                   <td className="px-3 py-2">{item.id}</td>
                   <td className="px-3 py-2">{item.category}</td>
                   <td className="px-3 py-2">{item.name}</td>
                   <td className="px-3 py-2">₱ {item.price}</td>
                   <td className="px-3 py-2">{item.quantity}</td>
+
                   <td className="px-3 py-2 flex justify-center gap-2">
-                    <ActionButton
-                      color="#44b954"
-                      hover="#297233"
-                      onClick={() => editProduct(item.id)}
-                    >
-                      <IconPencil size={16} />
-                    </ActionButton>
-                    <ActionButton
-                      color="#f12323"
-                      hover="#9e1818"
-                      onClick={() => deleteProduct(item.id)}
-                    >
-                      <IconTrash size={16} />
-                    </ActionButton>
-                    <ActionButton 
-                    color="#753500" 
-                    hover="#532600"
-                    onClick={() => archiveProduct(item.id)}
-                    >
-                      <IconEye size={16} />
-                    </ActionButton>
+                    {!archived && (
+                      <>
+                        <ActionButton
+                          color="#44b954"
+                          hover="#297233"
+                          onClick={() => editProduct(item.id)}
+                        >
+                          <IconPencil size={16} />
+                        </ActionButton>
+
+                        <ActionButton
+                          color="#f12323"
+                          hover="#9e1818"
+                          onClick={() => deleteProduct(item.id)}
+                        >
+                          <IconTrash size={16} />
+                        </ActionButton>
+
+                        <ActionButton
+                          color="#753500"
+                          hover="#532600"
+                          onClick={() => archiveProduct(item.id)}
+                        >
+                          <IconEye size={16} />
+                        </ActionButton>
+                      </>
+                    )}
+
+                    {archived && (
+                      <ActionButton
+                        color="#2970ff"
+                        hover="#1e4fb8"
+                        onClick={() => unarchiveProduct(item.id)}
+                      >
+                        Unarchive
+                      </ActionButton>
+                    )}
                   </td>
                 </tr>
               ))
