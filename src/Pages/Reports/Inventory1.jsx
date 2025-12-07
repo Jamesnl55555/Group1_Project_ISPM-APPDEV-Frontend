@@ -115,6 +115,7 @@ function InventoryTable({
   editProduct,
   deleteProduct,
   lowStock = false,
+  archiveProduct,
   categories,
 }) {
   return (
