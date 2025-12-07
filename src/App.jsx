@@ -9,7 +9,7 @@ import ResetPassword from "./Pages/Auth/ResetPassword";
 import ConfirmPassword from "./Pages/Auth/ConfirmPassword";
 import VerifyEmail from "./Pages/Auth/VerifyEmail";
 import ConfirmRegistration from "./Pages/Auth/ConfirmRegistration";
-import TransactionRecord from "./Pages/TransactionRecord";
+import TransactionRecord from "./Pages/Reports/TransactionRecord";
 import PrivateRoute from "./Layouts/PrivateRoute";
 
 import Dashboard from "./Pages/Dashboard";
