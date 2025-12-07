@@ -1,138 +1,200 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
-export default function GenerateSalesReport() {
+export default function GenerateSalesReportCustom() {
   const navigate = useNavigate();
-  const [reportType, setReportType] = useState("");
-  const [fromDate, setFromDate] = useState("");
-  const [toDate, setToDate] = useState("");
-  const [hover, setHover] = useState(false);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
 
-  const routeMap = {
-    Daily: "/generate-sales-report/daily",
-    Weekly: "/generate-sales-report/weekly",
-    Monthly: "/generate-sales-report/monthly",
-    Custom: "/generate-sales-report/custom",
-  };
+  const [from, setFrom] = useState(queryParams.get("from") || "");
+  const [to, setTo] = useState(queryParams.get("to") || "");
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleGenerate = () => {
-    if (!reportType) return;
+  // Fetch the custom report whenever from/to changes
+  useEffect(() => {
+    const fetchCustomReport = async () => {
+      if (!from || !to) return;
 
-    if (reportType === "Custom") {
-      if (!fromDate || !toDate) {
-        alert("Please select both start and end dates for the custom report.");
-        return;
+      setLoading(true);
+      setError("");
+      try {
+        const response = await axios.get("/api/fetch-custom", {
+          params: { from, to },
+        });
+
+        if (response.data.success) {
+          setReportData(response.data.custom_sales);
+        } else {
+          setReportData(null);
+          setError(response.data.message || "No sales records found.");
+        }
+      } catch (err) {
+        setReportData(null);
+        setError("Failed to fetch data. Please try again.");
+      } finally {
+        setLoading(false);
       }
-      navigate(routeMap[reportType] + `?from=${fromDate}&to=${toDate}`);
-    } else {
-      navigate(routeMap[reportType]);
+    };
+
+    fetchCustomReport();
+  }, [from, to]);
+
+  const handleRegenerate = () => {
+    if (!from || !to) {
+      alert("Please select both start and end dates.");
+      return;
     }
+    // Update URL query params
+    navigate(`/generate-sales-report/custom?from=${from}&to=${to}`);
   };
 
   return (
     <AuthenticatedLayout>
-      <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0] shadow-lg">
-        <h1 className="text-2xl font-bold mb-6 text-[#4b2e17]">
-          Select Sales Report Date Range
+      {/* PAGE HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 7rem",
+          marginTop: "-1.5rem",
+          marginBottom: "1rem",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Custom Sales Report
         </h1>
-        <p className="mb-4 text-gray-700">
-          Choose a date range to generate your sales report.
-        </p>
+        <button
+          onClick={() => navigate("/generate-sales-report")}
+          style={{
+            backgroundColor: "#4b2e17",
+            color: "white",
+            padding: "0.5rem 1.5rem",
+            borderRadius: "0.375rem",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            border: "none",
+            cursor: "pointer",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+        >
+          ← Back
+        </button>
+      </div>
 
-        {/* Report Type Selection */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          {["Daily", "Weekly", "Monthly", "Custom"].map((type) => (
-            <label
-              key={type}
-              className={`cursor-pointer border rounded-lg p-4 flex flex-col items-start relative pl-10 transition-all duration-300 ${
-                reportType === type
-                  ? "border-[#4b2e17] bg-[#f3dfc3] shadow-md"
-                  : "border-[#e0d6c4] bg-[#f9f5f0] hover:border-[#c49a6c] hover:bg-[#f5ebdd]"
-              }`}
-            >
-              <input
-                type="radio"
-                name="reportType"
-                value={type}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 opacity-0"
-                checked={reportType === type}
-                onChange={() => setReportType(type)}
-              />
-
-              <span
-                className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border flex items-center justify-center ${
-                  reportType === type
-                    ? "border-[#4b2e17] bg-[#4b2e17]"
-                    : "border-gray-400 bg-white"
-                }`}
-              >
-                {reportType === type && (
-                  <span className="w-2 h-2 bg-white rounded-full"></span>
-                )}
-              </span>
-
-              <span className="font-semibold text-[#4b2e17]">{type}</span>
-              <span className="text-gray-500 text-sm">
-                {type === "Daily" && "Pick a single date"}
-                {type === "Weekly" && "Choose a week"}
-                {type === "Monthly" && "Select a month"}
-                {type === "Custom" && "Select start and end dates"}
-              </span>
-            </label>
-          ))}
-        </div>
-
-        {/* Custom Date Range */}
-        {reportType === "Custom" && (
-          <div className="mb-6 grid grid-cols-2 gap-4">
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* DATE SELECTION CARD */}
+        <div
+          style={{
+            backgroundColor: "#f3e6d9",
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            marginBottom: "2rem",
+          }}
+        >
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2rem", marginBottom: "1.5rem" }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                From
-              </label>
+              <label style={{ display: "block", marginBottom: ".5rem", fontWeight: "600" }}>From:</label>
               <input
                 type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#c5a888] outline-none"
+                value={from}
+                onChange={(e) => setFrom(e.target.value)}
+                style={{
+                  padding: "0.5rem",
+                  width: "100%",
+                  borderRadius: "0.375rem",
+                  border: "1px solid #d7bfa0",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                To
-              </label>
+              <label style={{ display: "block", marginBottom: ".5rem", fontWeight: "600" }}>To:</label>
               <input
                 type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:ring-2 focus:ring-[#c5a888] outline-none"
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                style={{
+                  padding: "0.5rem",
+                  width: "100%",
+                  borderRadius: "0.375rem",
+                  border: "1px solid #d7bfa0",
+                  boxSizing: "border-box",
+                }}
               />
             </div>
           </div>
-        )}
 
-        {/* Buttons */}
-        <div className="flex justify-end gap-4">
-          <button
-            onClick={() => navigate("/sales-report")}
-            className="px-6 py-2 border border-gray-400 rounded-md font-medium text-gray-700 hover:bg-gray-200 hover:text-[#4b2e17] hover:shadow transition-all"
-          >
-            Cancel
-          </button>
+          {/* Generate Button */}
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button
+              onClick={handleRegenerate}
+              style={{
+                padding: "0.5rem 1.5rem",
+                fontWeight: "bold",
+                backgroundColor: "#4b2e17",
+                color: "#fff",
+                borderRadius: "0.375rem",
+                border: "none",
+                cursor: "pointer",
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#39210f")}
+              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+            >
+              Generate Report
+            </button>
+          </div>
+        </div>
 
-          <button
-            className={`px-6 py-2 border border-[#4b2e17] font-bold rounded-md transition-all ${
-              reportType
-                ? "bg-[#4b2e17] text-white hover:bg-[#6b3e1f] shadow-md"
-                : "bg-[#f9f5f0] text-gray-400 cursor-not-allowed"
-            }`}
-            disabled={!reportType}
-            onClick={handleGenerate}
-            onMouseEnter={() => setHover(true)}
-            onMouseLeave={() => setHover(false)}
-          >
-            Generate Report
-          </button>
+        {/* REPORT DISPLAY */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            textAlign: "center",
+          }}
+        >
+          {loading ? (
+            <p>Loading...</p>
+          ) : error ? (
+            <p style={{ color: "red" }}>{error}</p>
+          ) : reportData ? (
+            <>
+              <p>
+                <strong>User:</strong> {reportData.user}
+              </p>
+              <p>
+                <strong>Action:</strong> {reportData.action}
+              </p>
+              <p>
+                <strong>Date Range:</strong> {reportData.from} → {reportData.to}
+              </p>
+              <p style={{ marginTop: "1rem", fontWeight: "bold", color: "green" }}>
+                Total Sales: ₱ {reportData.amount}
+              </p>
+            </>
+          ) : (
+            <p>No sales records found for the selected date range.</p>
+          )}
         </div>
       </div>
     </AuthenticatedLayout>

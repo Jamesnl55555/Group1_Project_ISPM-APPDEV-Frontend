@@ -164,6 +164,7 @@ export default function Register() {
             }}
           />
 
+          {/* SIGN UP BUTTON */}
           <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
             <PrimaryButton
               type="submit"
@@ -178,6 +179,10 @@ export default function Register() {
                 padding: '0.6rem',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 transition: 'background 0.3s',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
               }}
               onMouseEnter={(e) => {
                 if (!loading) e.currentTarget.style.backgroundColor = '#2e1e0fff';
