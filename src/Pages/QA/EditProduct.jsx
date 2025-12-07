@@ -39,11 +39,7 @@ export default function EditProduct() {
       // Fetch product if not passed
       const fetchProduct = async () => {
         try {
-          const listResp = await axios.get("/api/fetchproducts");
-          const found = (listResp.data.products || []).find(
-            (p) => String(p.id) === String(id)
-          );
-          if (found) {
+          const found = await axios.get("/api/fetchproduct");
             form.setData({
               name: found.name || "",
               quantity: found.quantity || "",
@@ -52,7 +48,6 @@ export default function EditProduct() {
               is_archived: found.is_archived || false,
               file: null,
             });
-          }
         } catch (err) {
           console.error("Failed to fetch product:", err);
         } finally {
