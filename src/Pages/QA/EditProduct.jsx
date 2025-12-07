@@ -39,7 +39,7 @@ export default function EditProduct() {
       // Fetch product if not passed
       const fetchProduct = async () => {
         try {
-          const found = await axios.get("/api/fetchproduct");
+          const found = await axios.get(`/api/fetchproduct/${id}`);
             form.setData({
               name: found.name || "",
               quantity: found.quantity || "",
