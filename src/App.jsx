@@ -165,6 +165,9 @@ export default function App() {
         <Route path="/additem" element={
           <PrivateRoute><AddItem /></PrivateRoute>
         } />
+        <Route path="/transaction-rec-sec" element={
+          <PrivateRoute><TransactionRecSection /></PrivateRoute>
+        } />
 
       </Routes>
     </Router>
