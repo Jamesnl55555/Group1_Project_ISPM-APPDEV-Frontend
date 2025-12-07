@@ -27,7 +27,7 @@ export default function Inventory1() {
 
   const archiveProduct = (id) => {
     if (confirm("Are you sure you want to archive this product?")) {
-      axios.post(`/api/archive-item/${id}`)
+      axios.post(`/api/archive-item/${id}`, {id})
       .then(() => setProducts(products.filter((p) => p.id !== id)))
       .catch((err) => console.error(err));
     }
@@ -35,7 +35,7 @@ export default function Inventory1() {
   const editProduct = (id) => navigate(`/edit-product/${id}`);
   const deleteProduct = (id) => {
     if (confirm("Are you sure you want to delete this product?")) {
-      axios.post(`/api/delete-item/${id}`)
+      axios.post(`/api/delete-item/${id}`, {id})
       .then(() => setProducts(products.filter((p) => p.id !== id)))
       .catch((err) => console.error(err));
     }
