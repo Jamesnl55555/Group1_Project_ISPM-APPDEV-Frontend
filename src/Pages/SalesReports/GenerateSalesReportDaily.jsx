@@ -3,7 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-export default function GenerateSalesReportDaily({ user }) {
+export default function GenerateSalesReportDaily() {
   const [dailySales, setDailySales] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,7 +11,7 @@ export default function GenerateSalesReportDaily({ user }) {
     const fetchDaily = async () => {
       try {
         const response = await axios.get("/api/fetch-daily");
-
+        console.log("API response:", response.data);
         if (response.data.success) {
           setDailySales(response.data.daily_sales);
         }
