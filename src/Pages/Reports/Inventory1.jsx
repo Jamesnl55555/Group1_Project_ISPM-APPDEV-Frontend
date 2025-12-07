@@ -10,6 +10,10 @@ import axios from "@/api/axios";
 export default function Inventory1() {
   const navigate = useNavigate();
 
+  const inventoryRef = React.useRef(null);
+  const lowStockRef = React.useRef(null);
+  const archivedRef = React.useRef(null);
+
   const editProduct = (id) => navigate(`/edit-product/${id}`);
 
   return (
@@ -43,29 +47,35 @@ export default function Inventory1() {
 
         {/* INVENTORY TABLE */}
         <InventoryTableWithPagination
+          ref={inventoryRef}
           fetchUrl="/api/fetchproducts"
           title="Inventory"
           editProduct={editProduct}
           archiveProductUrl="/api/archive-item"
           deleteProductUrl="/api/delete-item"
+          onArchive={() => archivedRef.current?.fetchProducts()}
         />
 
         {/* LOW STOCK TABLE */}
         <InventoryTableWithPagination
+          ref={lowStockRef}
           fetchUrl="/api/fetchproducts-lowstock"
           title="Products Low In Stock!"
           editProduct={editProduct}
           archiveProductUrl="/api/archive-item"
           deleteProductUrl="/api/delete-item"
           lowStock
+          onArchive={() => archivedRef.current?.fetchProducts()}
         />
 
         {/* ARCHIVED TABLE */}
         <InventoryTableWithPagination
+          ref={archivedRef}
           fetchUrl="/api/fetchproducts-archived"
           title="Archived Products"
           unarchiveProductUrl="/api/unarchive"
           archived
+          onUnarchive={() => inventoryRef.current?.fetchProducts()}
         />
       </div>
     </AuthenticatedLayout>
@@ -75,169 +85,203 @@ export default function Inventory1() {
 // -----------------------
 // TABLE WITH PAGINATION COMPONENT
 // -----------------------
-function InventoryTableWithPagination({
-  fetchUrl,
-  title,
-  editProduct,
-  archiveProductUrl,
-  deleteProductUrl,
-  unarchiveProductUrl,
-  lowStock = false,
-  archived = false,
-}) {
-  const [products, setProducts] = React.useState([]);
-  const [page, setPage] = React.useState(1);
-  const [lastPage, setLastPage] = React.useState(1);
-  const [loading, setLoading] = React.useState(true);
+const InventoryTableWithPagination = React.forwardRef(
+  (
+    {
+      fetchUrl,
+      title,
+      editProduct,
+      archiveProductUrl,
+      deleteProductUrl,
+      unarchiveProductUrl,
+      lowStock = false,
+      archived = false,
+      onArchive,
+      onUnarchive,
+    },
+    ref
+  ) => {
+    const [products, setProducts] = React.useState([]);
+    const [page, setPage] = React.useState(1);
+    const [lastPage, setLastPage] = React.useState(1);
+    const [loading, setLoading] = React.useState(true);
 
-  const fetchProducts = async (pageNumber = 1) => {
-    try {
-      setLoading(true);
-      const res = await axios.get(`${fetchUrl}?page=${pageNumber}`);
-      setProducts(res.data.products || []);
-      setLastPage(res.data.last_page || 1);
-    } catch (err) {
-      console.error(`Failed to fetch ${title}:`, err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchProducts = async (pageNumber = 1) => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${fetchUrl}?page=${pageNumber}`);
+        setProducts(res.data.products || []);
+        setLastPage(res.data.last_page || 1);
+      } catch (err) {
+        console.error(`Failed to fetch ${title}:`, err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  React.useEffect(() => {
-    fetchProducts(page);
-  }, [page]);
+    // Expose fetchProducts via ref
+    React.useImperativeHandle(ref, () => ({
+      fetchProducts,
+    }));
 
-  // -----------------------
-  // ACTIONS
-  // -----------------------
-  const archiveProduct = (id) => {
-    if (!archiveProductUrl) return;
-    if (confirm("Archive this product?")) {
-      axios.post(`${archiveProductUrl}/${id}`).then(() => fetchProducts(page));
-    }
-  };
+    React.useEffect(() => {
+      fetchProducts(page);
+    }, [page]);
 
-  const unarchiveProduct = (id) => {
-    if (!unarchiveProductUrl) return;
-    if (confirm("Unarchive this product?")) {
-      axios.post(`${unarchiveProductUrl}/${id}`).then(() => fetchProducts(page));
-    }
-  };
+    // -----------------------
+    // ACTIONS
+    // -----------------------
+    const archiveProduct = (id) => {
+      if (!archiveProductUrl) return;
+      if (confirm("Archive this product?")) {
+        axios.post(`${archiveProductUrl}/${id}`).then(() => {
+          fetchProducts(page); // refresh current table
+          onArchive?.();       // refresh archived table
+        });
+      }
+    };
 
-  const deleteProduct = (id) => {
-    if (!deleteProductUrl) return;
-    if (confirm("Delete this product?")) {
-      axios.post(`${deleteProductUrl}/${id}`).then(() => fetchProducts(page));
-    }
-  };
+    const unarchiveProduct = (id) => {
+      if (!unarchiveProductUrl) return;
+      if (confirm("Unarchive this product?")) {
+        axios.post(`${unarchiveProductUrl}/${id}`).then(() => {
+          fetchProducts(page); // refresh archived table
+          onUnarchive?.();     // refresh inventory table
+        });
+      }
+    };
 
-  // -----------------------
-  // RENDER
-  // -----------------------
-  if (loading)
+    const deleteProduct = (id) => {
+      if (!deleteProductUrl) return;
+      if (confirm("Delete this product?")) {
+        axios.post(`${deleteProductUrl}/${id}`).then(() => fetchProducts(page));
+      }
+    };
+
+    // -----------------------
+    // RENDER
+    // -----------------------
+    if (loading)
+      return (
+        <div className="my-8">
+          <h2 className="text-3xl font-bold text-black mb-3">{title}</h2>
+          <p>Loading...</p>
+        </div>
+      );
+
     return (
-      <div className="my-8">
-        <h2 className="text-3xl font-bold text-black mb-3">{title}</h2>
-        <p>Loading...</p>
-      </div>
-    );
+      <div className="mb-12">
+        <h2 className="text-3xl font-bold text-black mb-3 mt-8">{title}</h2>
 
-  return (
-    <div className="mb-12">
-      <h2 className="text-3xl font-bold text-black mb-3 mt-8">{title}</h2>
-
-      <div className="border border-[#4b2e17] bg-white shadow-[5px_5px_0px_gray] p-4 overflow-x-auto w-[68rem]">
-        <table className="min-w-full border-collapse">
-          <thead className="bg-[#d6d6d6] text-black border-b border-[#4b2e17]">
-            <tr>
-              {[
-                "Product Image",
-                "Product #",
-                "Category",
-                "Product Name",
-                "Price",
-                "Quantity",
-                "Actions",
-              ].map((th) => (
-                <th key={th} className="px-3 py-2 text-left text-sm font-semibold">
-                  {th}
-                </th>
-              ))}
-            </tr>
-          </thead>
-
-          <tbody>
-            {products.length === 0 ? (
+        <div className="border border-[#4b2e17] bg-white shadow-[5px_5px_0px_gray] p-4 overflow-x-auto w-[68rem]">
+          <table className="min-w-full border-collapse">
+            <thead className="bg-[#d6d6d6] text-black border-b border-[#4b2e17]">
               <tr>
-                <td colSpan="7" className="text-center py-4">
-                  No products found.
-                </td>
+                {[
+                  "Product Image",
+                  "Product #",
+                  "Category",
+                  "Product Name",
+                  "Price",
+                  "Quantity",
+                  "Actions",
+                ].map((th) => (
+                  <th key={th} className="px-3 py-2 text-left text-sm font-semibold">
+                    {th}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              products.map((item) => (
-                <tr
-                  key={item.id}
-                  className={`${lowStock ? "bg-[#fff4e1]" : "bg-white"} text-sm text-gray-700`}
-                >
-                  <td className="px-3 py-2">
-                    <img
-                      src={`/${item.file_path}`}
-                      alt={item.name}
-                      className="w-12 h-12 rounded-md"
-                      onError={(e) => (e.target.style.display = "none")}
-                    />
-                  </td>
+            </thead>
 
-                  <td className="px-3 py-2">{item.id}</td>
-                  <td className="px-3 py-2">{item.category}</td>
-                  <td className="px-3 py-2">{item.name}</td>
-                  <td className="px-3 py-2">₱ {item.price}</td>
-                  <td className="px-3 py-2">{item.quantity}</td>
-
-                  <td className="px-3 py-2 flex justify-center gap-2">
-                    {!archived && (
-                      <>
-                        {editProduct && (
-                          <ActionButton color="#44b954" hover="#297233" onClick={() => editProduct(item.id)}>
-                            <IconPencil size={16} />
-                          </ActionButton>
-                        )}
-                        {deleteProductUrl && (
-                          <ActionButton color="#f12323" hover="#9e1818" onClick={() => deleteProduct(item.id)}>
-                            <IconTrash size={16} />
-                          </ActionButton>
-                        )}
-                        {archiveProductUrl && (
-                          <ActionButton color="#753500" hover="#532600" onClick={() => archiveProduct(item.id)}>
-                            <IconEye size={16} />
-                          </ActionButton>
-                        )}
-                      </>
-                    )}
-
-                    {archived && unarchiveProductUrl && (
-                      <ActionButton color="#2970ff" hover="#1e4fb8" onClick={() => unarchiveProduct(item.id)}>
-                        Unarchive
-                      </ActionButton>
-                    )}
+            <tbody>
+              {products.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-4">
+                    No products found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : (
+                products.map((item) => (
+                  <tr
+                    key={item.id}
+                    className={`${lowStock ? "bg-[#fff4e1]" : "bg-white"} text-sm text-gray-700`}
+                  >
+                    <td className="px-3 py-2">
+                      <img
+                        src={`/${item.file_path}`}
+                        alt={item.name}
+                        className="w-12 h-12 rounded-md"
+                        onError={(e) => (e.target.style.display = "none")}
+                      />
+                    </td>
 
-      {/* PAGINATION */}
-      <Pagination
-        page={page}
-        lastPage={lastPage}
-        onPrev={() => setPage((p) => Math.max(1, p - 1))}
-        onNext={() => setPage((p) => Math.min(lastPage, p + 1))}
-      />
-    </div>
-  );
-}
+                    <td className="px-3 py-2">{item.id}</td>
+                    <td className="px-3 py-2">{item.category}</td>
+                    <td className="px-3 py-2">{item.name}</td>
+                    <td className="px-3 py-2">₱ {item.price}</td>
+                    <td className="px-3 py-2">{item.quantity}</td>
+
+                    <td className="px-3 py-2 flex justify-center gap-2">
+                      {!archived && (
+                        <>
+                          {editProduct && (
+                            <ActionButton
+                              color="#44b954"
+                              hover="#297233"
+                              onClick={() => editProduct(item.id)}
+                            >
+                              <IconPencil size={16} />
+                            </ActionButton>
+                          )}
+                          {deleteProductUrl && (
+                            <ActionButton
+                              color="#f12323"
+                              hover="#9e1818"
+                              onClick={() => deleteProduct(item.id)}
+                            >
+                              <IconTrash size={16} />
+                            </ActionButton>
+                          )}
+                          {archiveProductUrl && (
+                            <ActionButton
+                              color="#753500"
+                              hover="#532600"
+                              onClick={() => archiveProduct(item.id)}
+                            >
+                              <IconEye size={16} />
+                            </ActionButton>
+                          )}
+                        </>
+                      )}
+
+                      {archived && unarchiveProductUrl && (
+                        <ActionButton
+                          color="#2970ff"
+                          hover="#1e4fb8"
+                          onClick={() => unarchiveProduct(item.id)}
+                        >
+                          Unarchive
+                        </ActionButton>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* PAGINATION */}
+        <Pagination
+          page={page}
+          lastPage={lastPage}
+          onPrev={() => setPage((p) => Math.max(1, p - 1))}
+          onNext={() => setPage((p) => Math.min(lastPage, p + 1))}
+        />
+      </div>
+    );
+  }
+);
 
 // -----------------------
 // BUTTON COMPONENT
