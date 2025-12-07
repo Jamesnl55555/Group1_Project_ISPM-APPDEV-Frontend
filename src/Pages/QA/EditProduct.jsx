@@ -7,7 +7,6 @@ import { useForm } from "@/hooks/useForm";
 export default function EditProduct() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [loading, setLoading] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -21,42 +20,31 @@ export default function EditProduct() {
     file: null,
   });
 
-  const passedProduct = location.state?.product; // get product from navigation state
-
   useEffect(() => {
-    if (passedProduct) {
-      // Use passed product if available
+  const fetchProduct = async () => {
+    try {
+      const resp = await axios.get(`/api/fetchproduct/${id}`);
+      const product = resp.data.product;
+
       form.setData({
-        name: passedProduct.name || "",
-        quantity: passedProduct.quantity || "",
-        price: passedProduct.price || "",
-        category: passedProduct.category || "",
-        is_archived: passedProduct.is_archived || false,
+        name: product.name || "",
+        quantity: product.quantity || "",
+        price: product.price || "",
+        category: product.category || "",
+        is_archived: product.is_archived || false,
         file: null,
       });
+    } catch (err) {
+      console.error("Failed to fetch product:", err);
+    } finally {
       setLoading(false);
-    } else {
-      // Fetch product if not passed
-      const fetchProduct = async () => {
-        try {
-          const found = await axios.get(`/api/fetchproduct/${id}`);
-            form.setData({
-              name: found.name || "",
-              quantity: found.quantity || "",
-              price: found.price || "",
-              category: found.category || "",
-              is_archived: found.is_archived || false,
-              file: null,
-            });
-        } catch (err) {
-          console.error("Failed to fetch product:", err);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchProduct();
     }
-  }, [id, passedProduct]);
+  };
+
+  fetchProduct();
+  }, [id]);
+
+
 
   const submitProducts = async (e) => {
     e.preventDefault();
