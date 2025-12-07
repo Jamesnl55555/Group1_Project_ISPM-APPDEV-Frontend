@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
-export default function GenerateSalesReportWeekly({ user }) {
+export default function GenerateSalesReportWeekly() {
     const [weeklySales, setWeeklySales] = useState([]);
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
