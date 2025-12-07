@@ -72,39 +72,104 @@ export default function EditProduct() {
       </AuthenticatedLayout>
     );
 
+  const inputStyle = {
+    width: "100%",
+    padding: "0.6rem",
+    borderRadius: "0.5rem",
+    border: "1px solid #D1D5DB",
+    fontSize: "0.875rem",
+    color: "#111827",
+    transition: "all 0.2s",
+  };
+
+  const inputContainerStyle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    marginTop: "0.25rem",
+  };
+
+  const labelStyle = {
+    fontWeight: "600",
+    fontSize: "0.875rem",
+    color: "#333",
+  };
+
+  const buttonStyle = {
+    backgroundColor: "#4b2e17",
+    color: "#fff",
+    padding: "0.5rem 1.25rem",
+    borderRadius: "0.25rem",
+    fontWeight: "600",
+    fontSize: "0.875rem",
+    cursor: "pointer",
+    transition: "background 0.2s",
+  };
+
   return (
     <AuthenticatedLayout>
-      <div className="flex justify-center py-12 px-4">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          padding: "3rem 1rem",
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
         <form
           onSubmit={submitProducts}
           encType="multipart/form-data"
-          className="bg-[#fefaf7] border border-gray-300 rounded-2xl shadow-md w-full max-w-2xl"
+          style={{
+            backgroundColor: "#fefaf7",
+            borderRadius: "1rem",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+            width: "100%",
+            maxWidth: "600px",
+            border: "1px solid gray",
+          }}
         >
           {/* Header */}
-          <div className="bg-[#f8ecdf] px-6 py-4 border-b border-gray-300 rounded-t-2xl">
-            <h1 className="text-xl font-bold text-black">Edit Product</h1>
+          <div
+            style={{
+              backgroundColor: "#f8ecdf",
+              padding: "1rem 1.5rem",
+              borderBottom: "1px solid gray",
+              borderTopLeftRadius: "1rem",
+              borderTopRightRadius: "1rem",
+            }}
+          >
+            <h1 style={{ fontSize: "1.25rem", fontWeight: "bold", color: "#000" }}>
+              Edit Product
+            </h1>
           </div>
 
           {/* Form Fields */}
-          <div className="p-6 flex flex-col gap-5">
+          <div style={{ padding: "1.5rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {/* Name + Image */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
-                Edit Product Name
-              </label>
-              <div className="flex items-center gap-2 mt-1">
+              <label style={labelStyle}>Edit Product Name</label>
+              <div style={inputContainerStyle}>
                 <input
                   type="text"
                   value={form.data.name ?? ""}
                   onChange={(e) => form.setData("name", e.target.value)}
-                  className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                  style={inputStyle}
                 />
-                <label className="text-sm bg-gray-200 px-3 py-2 border border-gray-400 rounded cursor-pointer hover:bg-gray-300 transition">
+                <label
+                  style={{
+                    fontSize: "0.875rem",
+                    backgroundColor: "#e2e2e2",
+                    padding: "0.5rem 0.75rem",
+                    border: "1px solid gray",
+                    borderRadius: "0.25rem",
+                    cursor: "pointer",
+                  }}
+                >
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => form.setData("file", e.target.files[0])}
-                    className="hidden"
+                    style={{ display: "none" }}
                   />
                   📷 Change Image
                 </label>
@@ -113,13 +178,14 @@ export default function EditProduct() {
 
             {/* Category */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
-                Add Category
-              </label>
+              <label style={labelStyle}>Add Category</label>
               <select
                 value={form.data.category ?? ""}
                 onChange={(e) => form.setData("category", e.target.value)}
-                className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                style={{
+                  ...inputStyle,
+                  marginTop: "0.25rem",
+                }}
               >
                 <option value="">Select category</option>
                 <option value="chocolate">Chocolate</option>
@@ -130,36 +196,29 @@ export default function EditProduct() {
 
             {/* Quantity */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
-                Indicate Quantity Available
-              </label>
-              <div className="flex items-center gap-2 mt-1">
+              <label style={labelStyle}>Indicate Quantity Available</label>
+              <div style={inputContainerStyle}>
                 <button
                   type="button"
                   onClick={() =>
                     form.setData("quantity", Math.max(0, form.data.quantity - 1))
                   }
-                  className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
+                  style={{ ...buttonStyle, backgroundColor: "#ccc", color: "#000" }}
                 >
                   -
                 </button>
                 <input
                   type="number"
                   value={form.data.quantity ?? 0}
-                  onChange={(e) =>
-                    form.setData("quantity", Number(e.target.value))
-                  }
-                  className="flex-1 border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                  onChange={(e) => form.setData("quantity", Number(e.target.value))}
+                  style={inputStyle}
                 />
                 <button
                   type="button"
                   onClick={() =>
-                    form.setData(
-                      "quantity",
-                      parseInt(form.data.quantity ?? 0) + 1
-                    )
+                    form.setData("quantity", (form.data.quantity ?? 0) + 1)
                   }
-                  className="border border-gray-400 px-3 py-1 rounded hover:bg-gray-200"
+                  style={{ ...buttonStyle, backgroundColor: "#ccc", color: "#000" }}
                 >
                   +
                 </button>
@@ -168,32 +227,35 @@ export default function EditProduct() {
 
             {/* Price */}
             <div>
-              <label className="font-semibold text-sm text-gray-800">
-                Indicate Price
-              </label>
+              <label style={labelStyle}>Indicate Price</label>
               <input
                 type="number"
                 value={form.data.price ?? 0}
                 onChange={(e) => form.setData("price", Number(e.target.value))}
-                className="mt-1 w-full border border-gray-400 rounded px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#4b2e17]"
+                style={{ ...inputStyle, marginTop: "0.25rem" }}
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-end items-center gap-4 px-6 py-4 border-t border-gray-300">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: "1rem",
+              padding: "1rem 1.5rem",
+              borderTop: "1px solid gray",
+            }}
+          >
             <button
               type="button"
               onClick={() => navigate("/inventory1")}
-              className="text-sm font-semibold text-black hover:underline"
+              style={{ fontSize: "0.875rem", fontWeight: "600", color: "#000", cursor: "pointer", textDecoration: "underline", background: "none", border: "none" }}
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={form.processing}
-              className="bg-[#4b2e17] text-white px-5 py-2 rounded font-semibold hover:bg-[#3a2211] transition"
-            >
+            <button type="submit" style={buttonStyle}>
               Save Changes
             </button>
           </div>
@@ -202,10 +264,32 @@ export default function EditProduct() {
 
       {/* SUCCESS MODAL */}
       {showSuccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg text-center w-72">
-            <h1 className="text-2xl font-bold -mt-4">Notice</h1>
-            <p className="mt-6 text-gray-600 text-sm">
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: "18rem",
+              backgroundColor: "#fff",
+              padding: "2rem",
+              textAlign: "center",
+              borderRadius: "0.5rem",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+            }}
+          >
+            <h1 style={{ fontSize: "1.5rem", fontWeight: "bold", marginTop: "-1rem" }}>Notice</h1>
+            <p style={{ marginTop: "2rem", color: "#555", fontSize: "15px" }}>
               Your product has been successfully updated.
             </p>
             <button
@@ -213,7 +297,15 @@ export default function EditProduct() {
                 setShowSuccessModal(false);
                 navigate("/inventory1");
               }}
-              className="mt-6 w-32 px-4 py-2 bg-gray-300 rounded font-semibold hover:bg-gray-400 transition"
+              style={{
+                marginTop: "1.5rem",
+                width: "8rem",
+                padding: "0.5rem",
+                backgroundColor: "#ccc",
+                borderRadius: "0.3rem",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
             >
               Confirm
             </button>
