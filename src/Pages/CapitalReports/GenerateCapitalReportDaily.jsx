@@ -22,6 +22,7 @@ export default function CapitalReportDaily() {
       if (!user) {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
+
       }
 
       const response = await axios.get("/api/capital-daily", {
@@ -30,6 +31,7 @@ export default function CapitalReportDaily() {
 
       if (response.data.success) {
         setRecords(response.data.daily_capital || []);
+        setLoading(false);
       } else {
         setRecords([]);
       }
