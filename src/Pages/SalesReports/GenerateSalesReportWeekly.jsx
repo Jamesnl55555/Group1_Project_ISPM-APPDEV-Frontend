@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axios from "@/api/axios"; 
+import { Link } from "react-router-dom";
+import axios from "@/api/axios";
 
 export default function GenerateSalesReportWeekly() {
   const [weeklySales, setWeeklySales] = useState([]);
@@ -10,21 +11,20 @@ export default function GenerateSalesReportWeekly() {
   useEffect(() => {
     const fetchWeekly = async () => {
       try {
-        // Always get authenticated user first
+        // Get authenticated user first
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
 
-        // Now fetch weekly sales
+        // Fetch weekly sales
         const response = await axios.get("/api/fetch-weekly");
-        console.log("Weekly sales", response.data.weekly_sales);
         if (response.data.success) {
-          setWeeklySales(response.data.weekly_sales);
+          setWeeklySales(Array.isArray(response.data.weekly_sales) ? response.data.weekly_sales : []);
         } else {
           setWeeklySales([]);
         }
       } catch (error) {
         console.error("Error fetching weekly sales:", error);
-        setWeeklySales([]); // fallback
+        setWeeklySales([]);
       } finally {
         setLoading(false);
       }
@@ -33,56 +33,151 @@ export default function GenerateSalesReportWeekly() {
     fetchWeekly();
   }, []);
 
-  // Safe computation of total
-  const overallTotal = weeklySales.reduce(
-    (sum, s) => sum + Number(s.amount || 0),
-    0
-  );
+  const overallTotal = weeklySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
-        <h1 className="text-2xl font-bold mb-6">Weekly Sales Report</h1>
+      {/* PAGE HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingLeft: "7rem",
+          paddingRight: "7rem",
+          marginTop: "-1.5rem",
+          marginBottom: "1rem",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Weekly Sales Report
+        </h1>
 
-        <table className="w-full table-auto border-collapse text-center">
-          <thead>
-            <tr className="bg-[#d6d6d6] text-black">
-              <th className="border px-4 py-2">Week Start</th>
-              <th className="border px-4 py-2">Week End</th>
-              <th className="border px-4 py-2">User</th>
-              <th className="border px-4 py-2">Total Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <Link
+          to="/generate-sales-report"
+          style={{
+            backgroundColor: "#4b2e17",
+            color: "white",
+            padding: "0.5rem 1.5rem",
+            borderRadius: "0.375rem",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            cursor: "pointer",
+            textDecoration: "none",
+            marginTop: "1rem",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+        >
+          ← Back
+        </Link>
+      </div>
+
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* SUMMARY CARD */}
+        <div
+          style={{
+            marginTop: "-3.4rem",
+            backgroundColor: "#f3e6d9",
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            marginBottom: "2rem",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+            <span>Total Sales Used</span>
+            <span>₱ {overallTotal}</span>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Net Profit/Loss</span>
+            <span>₱ {overallTotal}</span>
+          </div>
+        </div>
+
+        {/* TABLE */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            border: "1px solid #d7bfa0",
+            borderRadius: "0.75rem",
+            padding: "1rem",
+            overflowX: "auto",
+            marginBottom: "2rem",
+          }}
+        >
+          <h3
+            style={{
+              fontWeight: "bold",
+              marginBottom: "1rem",
+              color: "#4b2e17",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>Sales Summary</span>
+            <span>Weekly</span>
+          </h3>
+
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+            <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
               <tr>
-                <td colSpan="4" className="text-center py-4">
-                  Loading...
-                </td>
+                <th style={{ padding: ".5rem" }}>Week Start</th>
+                <th style={{ padding: ".5rem" }}>Week End</th>
+                <th style={{ padding: ".5rem" }}>User</th>
+                <th style={{ padding: ".5rem" }}>Total Sales</th>
               </tr>
-            ) : weeklySales.length ? (
-              weeklySales.map((s, index) => (
-                <tr key={index} className="hover:bg-[#f9f5f0]">
-                  <td className="border px-4 py-2">{s.week_start}</td>
-                  <td className="border px-4 py-2">{s.week_end}</td>
-                  <td className="border px-4 py-2">{s.user}</td>
-                  <td className="border px-4 py-2">₱ {s.amount}</td>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="4" style={{ padding: "1rem" }}>Loading...</td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="4" className="text-center py-4 text-gray-600">
-                  No sales records found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : weeklySales.length ? (
+                weeklySales.map((s, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid #f0e4d7", cursor: "default" }}>
+                    <td style={{ padding: ".5rem" }}>{s.week_start}</td>
+                    <td style={{ padding: ".5rem" }}>{s.week_end}</td>
+                    <td style={{ padding: ".5rem" }}>{s.user}</td>
+                    <td style={{ padding: ".5rem" }}>₱ {s.amount}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ padding: "1rem", color: "#444" }}>
+                    No sales records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Total */}
-        <div className="mt-4 flex justify-between bg-[#f1f1f1] p-4 rounded-lg border border-[#d7bfa0]">
-          <span className="font-semibold">Overall Total Sales</span>
-          <span className="font-bold text-green-600">₱ {overallTotal}</span>
+        {/* OVERALL TOTAL */}
+        <div
+          style={{
+            backgroundColor: "#f1f1f1",
+            padding: "1rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>Overall Total Sales</span>
+          <span style={{ color: "green", fontWeight: "bold" }}>₱ {overallTotal}</span>
         </div>
       </div>
     </AuthenticatedLayout>
