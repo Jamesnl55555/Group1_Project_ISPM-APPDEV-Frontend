@@ -6,53 +6,59 @@ import axios from "@/api/axios";
 export default function CapitalReportDaily() {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const selectedDate = queryParams.get("date"); // passed from GenerateCapitalReport daily selection
+  const selectedDate = queryParams.get("date"); // from GenerateCapitalReport
 
   const [records, setRecords] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchDailyCapital = async () => {
-    if (!selectedDate) return;
-
-    try {
-      setLoading(true);
-
-      // Get authenticated user
-      if (!user) {
-        const userRes = await axios.get("/api/user");
-        setUser(userRes.data);
-
-      }
-
-      const response = await axios.get("/api/capital-daily", {
-        params: { date: selectedDate },
-      });
-
-      if (response.data.success) {
-        setRecords(response.data.daily_capital || []);
-        setLoading(false);
-      } else {
-        setRecords([]);
-      }
-    } catch (err) {
-      console.error("Error fetching daily capital:", err);
-      setRecords([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Fetch authenticated user
   useEffect(() => {
-    fetchDailyCapital();
-  }, [selectedDate]);
+    const fetchUser = async () => {
+      try {
+        const res = await axios.get("/api/user");
+        setUser(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
 
+  // Fetch daily capital when user and date are available
+  useEffect(() => {
+    const fetchDailyCapital = async () => {
+      if (!selectedDate || !user) return;
+
+      setLoading(true);
+      try {
+        const response = await axios.get("/api/capital-daily", {
+          params: { date: selectedDate },
+        });
+
+        if (response.data.success) {
+          setRecords(response.data.daily_capital || []);
+        } else {
+          setRecords([]);
+        }
+      } catch (err) {
+        console.error("Error fetching daily capital:", err);
+        setRecords([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDailyCapital();
+  }, [selectedDate, user]);
+
+  // Compute total capital
   const overallTotal = records.reduce((sum, r) => sum + Number(r.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
       {/* PAGE HEADER */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 7rem", marginTop: "-1.5rem", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 4rem", marginTop: "-1.5rem", marginBottom: "1rem" }}>
         <h1 style={{
           fontSize: "3rem",
           fontWeight: 800,
@@ -68,14 +74,14 @@ export default function CapitalReportDaily() {
 
       <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
         {/* SUMMARY CARD */}
-        <div style={{ marginTop: "-3.4rem", backgroundColor: "#f3e6d9", padding: "1.5rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", marginBottom: "2rem" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+        <div style={{ marginTop: "-3rem", backgroundColor: "#f3e6d9", padding: "1.5rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", marginBottom: "2rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem", fontWeight: "bold" }}>
             <span>Total Capital for {selectedDate}</span>
             <span>₱ {overallTotal}</span>
           </div>
         </div>
 
-        {/* TABLE */}
+        {/* CAPITAL TABLE */}
         <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
             <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
@@ -108,9 +114,9 @@ export default function CapitalReportDaily() {
         </div>
 
         {/* OVERALL TOTAL */}
-        <div style={{ backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", display: "flex", justifyContent: "space-between", alignItems: "center", fontWeight: "bold" }}>
           <span>Overall Total Capital</span>
-          <span style={{ color: "green", fontWeight: "bold" }}>₱ {overallTotal}</span>
+          <span style={{ color: "green" }}>₱ {overallTotal}</span>
         </div>
       </div>
     </AuthenticatedLayout>
