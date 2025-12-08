@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axios from "@/api/axios";
 import { Link } from "react-router-dom";
+import axios from "@/api/axios";
 
 export default function GenerateSalesReportMonthly() {
   const [monthlySales, setMonthlySales] = useState([]);
@@ -11,9 +11,11 @@ export default function GenerateSalesReportMonthly() {
   useEffect(() => {
     const fetchMonthly = async () => {
       try {
+        // Fetch authenticated user
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
 
+        // Fetch monthly sales
         const response = await axios.get("/api/fetch-monthly");
         if (response.data.success) {
           setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
@@ -33,15 +35,16 @@ export default function GenerateSalesReportMonthly() {
 
   return (
     <AuthenticatedLayout user={user}>
-      {/* HEADER */}
+      {/* PAGE HEADER */}
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
           paddingLeft: "7rem",
           paddingRight: "7rem",
           marginTop: "-1.5rem",
-          alignItems: "center",
+          marginBottom: "1rem",
         }}
       >
         <h1
@@ -79,9 +82,8 @@ export default function GenerateSalesReportMonthly() {
         </Link>
       </div>
 
-      {/* WRAPPER */}
       <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
-        {/* Summary Card */}
+        {/* SUMMARY CARD */}
         <div
           style={{
             marginTop: "-3.4rem",
@@ -96,7 +98,6 @@ export default function GenerateSalesReportMonthly() {
             <span>Total Sales Used</span>
             <span>₱ {overallTotal}</span>
           </div>
-
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <span>Net Profit/Loss</span>
             <span>₱ {overallTotal}</span>
@@ -135,13 +136,10 @@ export default function GenerateSalesReportMonthly() {
                 <th style={{ padding: ".5rem", width: "33%" }}>Total Sales</th>
               </tr>
             </thead>
-
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="3" style={{ padding: "1rem" }}>
-                    Loading...
-                  </td>
+                  <td colSpan="3" style={{ padding: "1rem" }}>Loading...</td>
                 </tr>
               ) : monthlySales.length ? (
                 monthlySales.map((s, index) => (
