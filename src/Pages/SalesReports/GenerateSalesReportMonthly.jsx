@@ -7,29 +7,41 @@ export default function GenerateSalesReportMonthly() {
   const [monthlySales, setMonthlySales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
 
-  useEffect(() => {
-    const fetchMonthly = async () => {
-      try {
-        // Fetch authenticated user
+  // Fetch user and monthly sales
+  const fetchMonthly = async (pageNumber = 1) => {
+    try {
+      setLoading(true);
+
+      // Fetch authenticated user
+      if (!user) {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
-
-        // Fetch monthly sales
-        const response = await axios.get("/api/fetch-monthly");
-        if (response.data.success) {
-          setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
-        }
-      } catch (error) {
-        console.error("Error fetching monthly sales:", error);
-        setMonthlySales([]);
-      } finally {
-        setLoading(false);
       }
-    };
 
-    fetchMonthly();
-  }, []);
+      // Fetch monthly sales with pagination
+      const response = await axios.get(`/api/fetch-monthly?page=${pageNumber}`);
+      if (response.data.success) {
+        setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
+        setLastPage(response.data.last_page || 1);
+      } else {
+        setMonthlySales([]);
+        setLastPage(1);
+      }
+    } catch (error) {
+      console.error("Error fetching monthly sales:", error);
+      setMonthlySales([]);
+      setLastPage(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonthly(page);
+  }, [page]);
 
   const overallTotal = monthlySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
@@ -52,7 +64,7 @@ export default function GenerateSalesReportMonthly() {
             fontSize: "3rem",
             fontWeight: 800,
             lineHeight: 1.3,
-            WebkitTextStroke: ".8px #000000",
+            WebkitTextStroke: ".8px #000",
             backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -159,6 +171,27 @@ export default function GenerateSalesReportMonthly() {
             </tbody>
           </table>
         </div>
+
+        {/* PAGINATION */}
+        {lastPage > 1 && (
+          <div className="flex justify-center gap-4 my-4">
+            <button
+              className={`px-4 py-2 border rounded ${page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"}`}
+              disabled={page === 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+            >
+              ⬅ Prev
+            </button>
+
+            <button
+              className={`px-4 py-2 border rounded ${page === lastPage ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"}`}
+              disabled={page === lastPage}
+              onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
+            >
+              Next ➡
+            </button>
+          </div>
+        )}
 
         {/* OVERALL TOTAL */}
         <div
