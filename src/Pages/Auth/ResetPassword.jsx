@@ -14,6 +14,7 @@ export default function ResetPassword() {
     const [urlData, setUrlData] = useState({ email: '' });
 
     useEffect(() => {
+        const tokenFromUrl = searchParams.get('token') || '';
         const emailFromUrl = searchParams.get('email') || '';
         setUrlData({ token: tokenFromUrl, email: emailFromUrl });
     }, [searchParams]);
