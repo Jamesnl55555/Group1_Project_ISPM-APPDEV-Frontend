@@ -1,213 +1,191 @@
 import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { useNavigate } from "react-router-dom";
+import axios from "@/api/axios";
 
 export default function GenerateCapitalReport() {
-    const navigate = useNavigate();
-    const [reportType, setReportType] = useState("");
-    const [fromDate, setFromDate] = useState("");
-    const [toDate, setToDate] = useState("");
+  const navigate = useNavigate();
+  const [reportType, setReportType] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [week, setWeek] = useState("");
 
-    const [month, setMonth] = useState("");
-    const [year, setYear] = useState("");
+  const [user, setUser] = useState(null);
 
-    const routeMap = {
-        Daily: "/generate-capital-report/daily",
-        Weekly: "/generate-capital-report/weekly",
-        Monthly: "/generate-capital-report/monthly",
-        Custom: "/generate-capital-report/custom",
-    };
+  const routeMap = {
+    Daily: "/generate-capital-report/daily",
+    Weekly: "/generate-capital-report/weekly",
+    Monthly: "/generate-capital-report/monthly",
+    Custom: "/generate-capital-report/custom",
+  };
 
-    // Pre-fill daily date
-    useEffect(() => {
-        const today = new Date().toISOString().split("T")[0];
-        if (reportType === "Daily") {
-            setFromDate(today);
-            setToDate(today);
-        } else if (reportType !== "Daily") {
-            setFromDate("");
-            setToDate("");
-            setMonth("");
-            setYear("");
-        }
-    }, [reportType]);
+  // Load authenticated user
+  useEffect(() => {
+    axios.get("/api/user").then((res) => setUser(res.data));
+  }, []);
 
-    // Weekly: map date to 7-day week
-    const handleWeeklyChange = (dateStr) => {
-        const date = new Date(dateStr);
-        const day = date.getDate();
-        const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+  // Auto-fill dates for Daily
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    if (reportType === "Daily") {
+      setFromDate(today);
+      setToDate(today);
+    } else {
+      setFromDate("");
+      setToDate("");
+      setMonth("");
+      setYear("");
+      setWeek("");
+    }
+  }, [reportType]);
 
-        let startDay, endDay;
-        if (day <= 7) [startDay, endDay] = [1, 7];
-        else if (day <= 14) [startDay, endDay] = [8, 14];
-        else if (day <= 21) [startDay, endDay] = [15, 21];
-        else [startDay, endDay] = [22, lastDay];
+  // Weekly date calculation
+  const handleWeeklySelection = (selectedWeek, selectedMonth, selectedYear) => {
+    if (!selectedWeek || !selectedMonth || !selectedYear) return;
+    const yearNum = Number(selectedYear);
+    const monthNum = Number(selectedMonth) - 1;
+    const startDay = (selectedWeek - 1) * 7 + 1;
+    const endDay = Math.min(selectedWeek * 7, new Date(yearNum, monthNum + 1, 0).getDate());
+    const startDate = new Date(yearNum, monthNum, startDay);
+    const endDate = new Date(yearNum, monthNum, endDay);
+    setFromDate(startDate.toISOString().split("T")[0]);
+    setToDate(endDate.toISOString().split("T")[0]);
+  };
 
-        setFromDate(new Date(date.getFullYear(), date.getMonth(), startDay).toISOString().split("T")[0]);
-        setToDate(new Date(date.getFullYear(), date.getMonth(), endDay).toISOString().split("T")[0]);
-    };
+  // Monthly date calculation
+  const handleMonthlyChange = (monthValue, yearValue) => {
+    if (!monthValue || !yearValue) return;
+    const firstDay = new Date(yearValue, monthValue - 1, 1).toISOString().split("T")[0];
+    const lastDay = new Date(yearValue, monthValue, 0).toISOString().split("T")[0];
+    setFromDate(firstDay);
+    setToDate(lastDay);
+  };
 
-    // Monthly: map month + year to first/last day
-    const handleMonthlyChange = (monthValue, yearValue) => {
-        if (!monthValue || !yearValue) return;
-        const firstDay = new Date(yearValue, monthValue - 1, 1).toISOString().split("T")[0];
-        const lastDay = new Date(yearValue, monthValue, 0).toISOString().split("T")[0];
-        setFromDate(firstDay);
-        setToDate(lastDay);
-    };
+  const handleGenerate = () => {
+    if (!reportType) return;
+    if (reportType === "Custom" && (!fromDate || !toDate)) {
+      alert("Please select both start and end dates for the custom report.");
+      return;
+    }
+    const query = reportType === "Custom" ? `?from=${fromDate}&to=${toDate}` : "";
+    navigate(routeMap[reportType] + query);
+  };
 
-    const handleGenerate = () => {
-        if (!reportType) return;
+  return (
+    <AuthenticatedLayout user={user}>
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+          <h1 style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }}>
+            Generate Capital Report
+          </h1>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              backgroundColor: "#4b2e17",
+              color: "white",
+              padding: "0.5rem 1.5rem",
+              borderRadius: "0.375rem",
+              fontSize: "1rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+              textDecoration: "none"
+            }}
+            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
+            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+          >
+            ← Back
+          </button>
+        </div>
 
-        if (reportType === "Custom" && (!fromDate || !toDate)) {
-            alert("Please select both start and end dates for the custom report.");
-            return;
-        }
-
-        const query = reportType === "Custom" ? `?from=${fromDate}&to=${toDate}` : "";
-        navigate(routeMap[reportType] + query);
-    };
-
-    return (
-        <AuthenticatedLayout>
-            <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
-                <h1 className="text-2xl font-bold mb-6">Select Capital Report Date Range</h1>
-                <p className="mb-4 text-gray-700">Choose a date range to generate your capital report.</p>
-
-                {/* Report Type Selection */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    {["Daily", "Weekly", "Monthly", "Custom"].map((type) => (
-                        <label
-                            key={type}
-                            className={`cursor-pointer border rounded-lg p-4 flex flex-col items-start relative pl-10 ${
-                                reportType === type
-                                    ? "border-[#4b2e17] bg-[#f3dfc3]"
-                                    : "border-[#e0d6c4] bg-[#f9f5f0]"
-                            }`}
-                        >
-                            <input
-                                type="radio"
-                                name="reportType"
-                                value={type}
-                                className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 opacity-0"
-                                checked={reportType === type}
-                                onChange={() => setReportType(type)}
-                            />
-                            <span
-                                className={`absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border flex items-center justify-center ${
-                                    reportType === type
-                                        ? "border-[#4b2e17] bg-[#4b2e17]"
-                                        : "border-gray-400 bg-white"
-                                }`}
-                            >
-                                {reportType === type && <span className="w-2 h-2 bg-white rounded-full"></span>}
-                            </span>
-                            <span className="font-semibold">{type}</span>
-                            <span className="text-gray-500 text-sm">
-                                {type === "Daily" && "Pick a single date"}
-                                {type === "Weekly" && "Choose a week"}
-                                {type === "Monthly" && "Select a Month"}
-                                {type === "Custom" && "Select start and end dates"}
-                            </span>
-                        </label>
-                    ))}
-                </div>
-
-                {/* Date Inputs */}
-                <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {reportType === "Daily" && (
-                        <input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => {
-                                setFromDate(e.target.value);
-                                setToDate(e.target.value);
-                            }}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
-                    )}
-                    {reportType === "Weekly" && (
-                        <input
-                            type="date"
-                            value={fromDate}
-                            onChange={(e) => handleWeeklyChange(e.target.value)}
-                            className="w-full border border-gray-300 rounded px-3 py-2"
-                        />
-                    )}
-                    {reportType === "Monthly" && (
-                        <>
-                            <select
-                                value={month}
-                                onChange={(e) => {
-                                    setMonth(e.target.value);
-                                    handleMonthlyChange(e.target.value, year);
-                                }}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            >
-                                <option value="">Month</option>
-                                {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => (
-                                    <option key={m} value={m}>
-                                        {m}
-                                    </option>
-                                ))}
-                            </select>
-                            <select
-                                value={year}
-                                onChange={(e) => {
-                                    setYear(e.target.value);
-                                    handleMonthlyChange(month, e.target.value);
-                                }}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            >
-                                <option value="">Year</option>
-                                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
-                                ))}
-                            </select>
-                        </>
-                    )}
-                    {reportType === "Custom" && (
-                        <>
-                            <input
-                                type="date"
-                                value={fromDate}
-                                onChange={(e) => setFromDate(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            />
-                            <input
-                                type="date"
-                                value={toDate}
-                                onChange={(e) => setToDate(e.target.value)}
-                                className="w-full border border-gray-300 rounded px-3 py-2"
-                            />
-                        </>
-                    )}
-                </div>
-
-                {/* Buttons */}
-                <div className="flex justify-end gap-4">
-                    <button
-                        onClick={() => navigate("/sales-report")}
-                        className="px-6 py-2 border border-gray-300 rounded hover:bg-gray-100"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleGenerate}
-                        disabled={!reportType}
-                        className={`px-6 py-2 border font-bold rounded ${
-                            reportType
-                                ? "border-[#4b2e17] bg-[#f9f5f0] hover:bg-[#e8d4b8] transition-colors"
-                                : "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-                        }`}
-                    >
-                        Generate Report
-                    </button>
-                </div>
+        {/* Report Type Selection */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+          {["Daily", "Weekly", "Monthly", "Custom"].map((type) => (
+            <div key={type} style={{
+              padding: "1rem",
+              borderRadius: "0.75rem",
+              cursor: "pointer",
+              border: reportType === type ? "2px solid #4b2e17" : "1px solid #d7bfa0",
+              backgroundColor: reportType === type ? "#f3e6d9" : "#f9f5f0"
+            }} onClick={() => setReportType(type)}>
+              <p style={{ fontWeight: "bold" }}>{type}</p>
+              <p style={{ fontSize: "0.875rem", color: "#555" }}>
+                {type === "Daily" && "Pick a single date"}
+                {type === "Weekly" && "Select week, month, and year"}
+                {type === "Monthly" && "Select a month"}
+                {type === "Custom" && "Select start and end dates"}
+              </p>
             </div>
-        </AuthenticatedLayout>
-    );
+          ))}
+        </div>
+
+        {/* Date Inputs */}
+        <div style={{ display: "grid", gridTemplateColumns: reportType === "Custom" ? "1fr 1fr" : "repeat(3, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
+          {reportType === "Daily" && (
+            <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setToDate(e.target.value); }}
+              style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}
+            />
+          )}
+          {reportType === "Weekly" && (
+            <>
+              <select value={week} onChange={(e) => { setWeek(e.target.value); handleWeeklySelection(e.target.value, month, year); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
+                <option value="">Week</option>
+                {Array.from({ length: 5 }, (_, i) => i + 1).map((w) => <option key={w} value={w}>{w}</option>)}
+              </select>
+              <select value={month} onChange={(e) => { setMonth(e.target.value); handleWeeklySelection(week, e.target.value, year); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
+                <option value="">Month</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+              <select value={year} onChange={(e) => { setYear(e.target.value); handleWeeklySelection(week, month, e.target.value); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
+                <option value="">Year</option>
+                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </>
+          )}
+          {reportType === "Monthly" && (
+            <>
+              <select value={month} onChange={(e) => { setMonth(e.target.value); handleMonthlyChange(e.target.value, year); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
+                <option value="">Month</option>
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <option key={m} value={m}>{m}</option>)}
+              </select>
+              <select value={year} onChange={(e) => { setYear(e.target.value); handleMonthlyChange(month, e.target.value); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
+                <option value="">Year</option>
+                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </>
+          )}
+          {reportType === "Custom" && (
+            <>
+              <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }} />
+              <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }} />
+            </>
+          )}
+        </div>
+
+        {/* Generate Button */}
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button onClick={handleGenerate} disabled={!reportType} style={{
+            padding: "0.5rem 1.5rem",
+            fontWeight: "bold",
+            borderRadius: "0.375rem",
+            border: "1px solid #4b2e17",
+            backgroundColor: reportType ? "#f3e6d9" : "#f9f5f0",
+            cursor: reportType ? "pointer" : "not-allowed"
+          }}>
+            Generate Report
+          </button>
+        </div>
+      </div>
+    </AuthenticatedLayout>
+  );
 }

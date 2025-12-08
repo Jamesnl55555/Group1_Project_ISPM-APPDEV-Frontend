@@ -8,73 +8,109 @@ export default function CapitalReportCustom() {
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const [searchParams] = useSearchParams();
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
     const fetchData = async () => {
-        axios.get("/api/user").then((res) => setUser(res.data));
-        const response = await axios.get(
-            `/api/capital-custom?from=${from}&to=${to}&page=${page}`
-        );
+        if (!from || !to) return;
 
-        setRecords(response.data.custom_capital);
-        setLastPage(response.data.last_page);
+        try {
+            setLoading(true);
+
+            // Fetch authenticated user
+            if (!user) {
+                const userRes = await axios.get("/api/user");
+                setUser(userRes.data);
+            }
+
+            // Fetch custom capital data
+            const response = await axios.get("/api/capital-custom", {
+                params: { start: from, end: to, page }
+            });
+
+            if (response.data.success) {
+                setRecords(response.data.custom_capital || []);
+                setLastPage(response.data.last_page || 1);
+            } else {
+                setRecords([]);
+                setLastPage(1);
+            }
+        } catch (err) {
+            console.error("Error fetching custom capital:", err);
+            setRecords([]);
+            setLastPage(1);
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
         fetchData();
-    }, [page]);
+    }, [from, to, page]);
+
+    const overallTotal = records.reduce((sum, r) => sum + Number(r.amount || 0), 0);
 
     return (
         <AuthenticatedLayout user={user}>
-            <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow border">
-                <h1 className="text-xl font-bold mb-4">Custom Capital Report</h1>
-                <p className="mb-4 text-gray-600">
+            <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+                <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1rem" }}>Custom Capital Report</h1>
+                <p style={{ marginBottom: "1rem", color: "#555" }}>
                     {from} → {to}
                 </p>
 
-                <table className="w-full border-collapse">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="border px-4 py-2">Date</th>
-                            <th className="border px-4 py-2">Amount</th>
-                            <th className="border px-4 py-2">Type</th>
-                            <th className="border px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {records.map((item, index) => (
-                            <tr key={index}>
-                                <td className="border px-4 py-2">{item.date}</td>
-                                <td className="border px-4 py-2">₱{item.amount}</td>
-                                <td className="border px-4 py-2">{item.type}</td>
-                                <td className="border px-4 py-2">{item.action}</td>
+                <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
+                    <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+                        <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
+                            <tr>
+                                <th style={{ padding: ".5rem" }}>Date</th>
+                                <th style={{ padding: ".5rem" }}>Amount</th>
+                                <th style={{ padding: ".5rem" }}>Action</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr>
+                                    <td colSpan="3" style={{ padding: "1rem" }}>Loading...</td>
+                                </tr>
+                            ) : records.length ? (
+                                records.map((item, index) => (
+                                    <tr key={index} style={{ borderBottom: "1px solid #f0e4d7" }}>
+                                        <td style={{ padding: ".5rem" }}>{item.date}</td>
+                                        <td style={{ padding: ".5rem" }}>₱ {item.amount}</td>
+                                        <td style={{ padding: ".5rem" }}>{item.action}</td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="3" style={{ padding: "1rem", color: "#444" }}>
+                                        No capital records found for this date range.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
 
-                <div className="flex justify-between mt-4">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(page - 1)}
-                        className="px-4 py-2 border rounded disabled:opacity-50"
-                    >
-                        Previous
-                    </button>
+                {/* Pagination */}
+                {lastPage > 1 && (
+                    <div style={{ display: "flex", justifyContent: "center", gap: "1rem", marginBottom: "2rem" }}>
+                        <button disabled={page === 1} onClick={() => setPage(p => Math.max(1, p - 1))} style={{ padding: ".5rem 1rem", border: "1px solid #ccc", borderRadius: ".375rem", cursor: page === 1 ? "not-allowed" : "pointer" }}>
+                            ⬅ Prev
+                        </button>
+                        <span style={{ alignSelf: "center" }}>Page {page} of {lastPage}</span>
+                        <button disabled={page === lastPage} onClick={() => setPage(p => Math.min(lastPage, p + 1))} style={{ padding: ".5rem 1rem", border: "1px solid #ccc", borderRadius: ".375rem", cursor: page === lastPage ? "not-allowed" : "pointer" }}>
+                            Next ➡
+                        </button>
+                    </div>
+                )}
 
-                    <span>Page {page} of {lastPage}</span>
-
-                    <button
-                        disabled={page === lastPage}
-                        onClick={() => setPage(page + 1)}
-                        className="px-4 py-2 border rounded disabled:opacity-50"
-                    >
-                        Next
-                    </button>
+                {/* Overall Total */}
+                <div style={{ backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: ".75rem", border: "1px solid #d7bfa0", display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
+                    <span>Overall Total Capital</span>
+                    <span style={{ color: "green" }}>₱ {overallTotal}</span>
                 </div>
             </div>
         </AuthenticatedLayout>

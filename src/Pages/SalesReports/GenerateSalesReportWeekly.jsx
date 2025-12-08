@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "@/api/axios";
 
 export default function GenerateSalesReportWeekly() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const weekStart = queryParams.get("week_start"); // e.g., '2025-12-01'
+  const weekEnd = queryParams.get("week_end"); // e.g., '2025-12-07'
+
   const [weeklySales, setWeeklySales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -14,16 +19,22 @@ export default function GenerateSalesReportWeekly() {
     try {
       setLoading(true);
 
-      // Fetch user if not already loaded
+      // Fetch authenticated user if not loaded
       if (!user) {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
       }
 
-      const response = await axios.get("/api/fetch-weekly", { params: { page: pageNumber } });
+      const response = await axios.get("/api/fetch-weekly", {
+        params: {
+          page: pageNumber,
+          week_start: weekStart,
+          week_end: weekEnd,
+        },
+      });
 
       if (response.data.success) {
-        setWeeklySales(Array.isArray(response.data.weekly_sales) ? response.data.weekly_sales : []);
+        setWeeklySales(response.data.weekly_sales || []);
         setLastPage(response.data.last_page || 1);
         setPage(response.data.current_page || pageNumber);
       } else {
@@ -41,13 +52,12 @@ export default function GenerateSalesReportWeekly() {
 
   useEffect(() => {
     fetchWeekly(page);
-  }, [page]);
+  }, [page, weekStart, weekEnd]);
 
   const overallTotal = weeklySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
-      {/* PAGE HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingLeft: "7rem", paddingRight: "7rem", marginTop: "-1.5rem", marginBottom: "1rem" }}>
         <h1 style={{
           fontSize: "3rem",
@@ -99,16 +109,16 @@ export default function GenerateSalesReportWeekly() {
         <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
           <h3 style={{ fontWeight: "bold", marginBottom: "1rem", color: "#4b2e17", display: "flex", justifyContent: "space-between" }}>
             <span>Sales Summary</span>
-            <span>Weekly</span>
+            <span>{weekStart} → {weekEnd}</span>
           </h3>
 
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
             <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
               <tr>
-                <th style={{ padding: ".5rem" }}>Week Start</th>
-                <th style={{ padding: ".5rem" }}>Week End</th>
+                <th style={{ padding: ".5rem" }}>Date</th>
                 <th style={{ padding: ".5rem" }}>User</th>
-                <th style={{ padding: ".5rem" }}>Total Sales</th>
+                <th style={{ padding: ".5rem" }}>Action</th>
+                <th style={{ padding: ".5rem" }}>Amount</th>
               </tr>
             </thead>
             <tbody>
@@ -119,9 +129,9 @@ export default function GenerateSalesReportWeekly() {
               ) : weeklySales.length ? (
                 weeklySales.map((s, index) => (
                   <tr key={index} style={{ borderBottom: "1px solid #f0e4d7", cursor: "default" }}>
-                    <td style={{ padding: ".5rem" }}>{s.week_start}</td>
-                    <td style={{ padding: ".5rem" }}>{s.week_end}</td>
+                    <td style={{ padding: ".5rem" }}>{s.date}</td>
                     <td style={{ padding: ".5rem" }}>{s.user}</td>
+                    <td style={{ padding: ".5rem" }}>{s.action}</td>
                     <td style={{ padding: ".5rem" }}>₱ {s.amount}</td>
                   </tr>
                 ))
@@ -134,7 +144,7 @@ export default function GenerateSalesReportWeekly() {
           </table>
         </div>
 
-        {/* PAGINATION - only show if multiple pages */}
+        {/* PAGINATION */}
         {lastPage > 1 && (
           <div className="flex justify-center gap-4 mb-4">
             <button

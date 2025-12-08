@@ -1,72 +1,120 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { useLocation } from "react-router-dom";
 import axios from "@/api/axios";
 
 export default function CapitalReportMonthly() {
-    const [records, setRecords] = useState([]);
-    const [page, setPage] = useState(1);
-    const [lastPage, setLastPage] = useState(1);
-    const [user, setUser] = useState(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
 
-    const fetchData = async () => {
-        axios.get("/api/user").then((res) => setUser(res.data));
-        const response = await axios.get(`/api/capital-monthly?page=${page}`);
+  const selectedMonth = queryParams.get("month"); // "01" to "12"
+  const selectedYear = queryParams.get("year");   // e.g., "2025"
 
-        setRecords(response.data.monthly_capital);
-        setLastPage(response.data.last_page);
-    };
+  const [records, setRecords] = useState([]);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchData();
-    }, [page]);
+  const fetchMonthlyCapital = async () => {
+    if (!selectedMonth || !selectedYear) return;
 
-    return (
-        <AuthenticatedLayout user={user}>
-            <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow border">
-                <h1 className="text-xl font-bold mb-4">Monthly Capital Report</h1>
+    try {
+      setLoading(true);
 
-                <table className="w-full border-collapse">
-                    <thead>
-                        <tr className="bg-gray-200">
-                            <th className="border px-4 py-2">Year</th>
-                            <th className="border px-4 py-2">Month</th>
-                            <th className="border px-4 py-2">Amount</th>
-                            <th className="border px-4 py-2">Action</th>
-                        </tr>
-                    </thead>
+      // Fetch user
+      if (!user) {
+        const userRes = await axios.get("/api/user");
+        setUser(userRes.data);
+      }
 
-                    <tbody>
-                        {records.map((item, index) => (
-                            <tr key={index}>
-                                <td className="border px-4 py-2">{item.year}</td>
-                                <td className="border px-4 py-2">{item.month}</td>
-                                <td className="border px-4 py-2">₱{item.amount}</td>
-                                <td className="border px-4 py-2">{item.action}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+      const response = await axios.get("/api/capital-monthly", {
+        params: { month: selectedMonth, year: selectedYear },
+      });
 
-                <div className="flex justify-between mt-4">
-                    <button
-                        disabled={page === 1}
-                        onClick={() => setPage(page - 1)}
-                        className="px-4 py-2 border rounded disabled:opacity-50"
-                    >
-                        Previous
-                    </button>
+      if (response.data.success) {
+        setRecords(response.data.monthly_capital || []);
+      } else {
+        setRecords([]);
+      }
+    } catch (err) {
+      console.error("Error fetching monthly capital:", err);
+      setRecords([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                    <span>Page {page} of {lastPage}</span>
+  useEffect(() => {
+    fetchMonthlyCapital();
+  }, [selectedMonth, selectedYear]);
 
-                    <button
-                        disabled={page === lastPage}
-                        onClick={() => setPage(page + 1)}
-                        className="px-4 py-2 border rounded disabled:opacity-50"
-                    >
-                        Next
-                    </button>
-                </div>
-            </div>
-        </AuthenticatedLayout>
-    );
+  const overallTotal = records.reduce((sum, r) => sum + Number(r.amount || 0), 0);
+
+  return (
+    <AuthenticatedLayout user={user}>
+      {/* PAGE HEADER */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 7rem", marginTop: "-1.5rem", marginBottom: "1rem" }}>
+        <h1 style={{
+          fontSize: "3rem",
+          fontWeight: 800,
+          lineHeight: 1.3,
+          WebkitTextStroke: ".8px #000",
+          backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
+        }}>
+          Monthly Capital Report
+        </h1>
+      </div>
+
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* SUMMARY CARD */}
+        <div style={{ marginTop: "-3.4rem", backgroundColor: "#f3e6d9", padding: "1.5rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", marginBottom: "2rem" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+            <span>Total Capital for {selectedYear}-{selectedMonth}</span>
+            <span>₱ {overallTotal}</span>
+          </div>
+        </div>
+
+        {/* TABLE */}
+        <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+            <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
+              <tr>
+                <th style={{ padding: ".5rem" }}>Year</th>
+                <th style={{ padding: ".5rem" }}>Month</th>
+                <th style={{ padding: ".5rem" }}>Amount</th>
+                <th style={{ padding: ".5rem" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="4" style={{ padding: "1rem" }}>Loading...</td>
+                </tr>
+              ) : records.length ? (
+                records.map((item, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid #f0e4d7" }}>
+                    <td style={{ padding: ".5rem" }}>{item.year}</td>
+                    <td style={{ padding: ".5rem" }}>{item.month}</td>
+                    <td style={{ padding: ".5rem" }}>₱ {item.amount}</td>
+                    <td style={{ padding: ".5rem" }}>{item.action}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ padding: "1rem", color: "#444" }}>No capital records found for this month.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* OVERALL TOTAL */}
+        <div style={{ backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>Overall Total Capital</span>
+          <span style={{ color: "green", fontWeight: "bold" }}>₱ {overallTotal}</span>
+        </div>
+      </div>
+    </AuthenticatedLayout>
+  );
 }

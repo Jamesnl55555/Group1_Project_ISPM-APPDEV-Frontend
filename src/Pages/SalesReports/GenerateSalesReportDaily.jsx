@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "@/api/axios";
 
 export default function GenerateSalesReportDaily() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const selectedDate = queryParams.get("date"); // <-- Get date from query
+
   const [dailySales, setDailySales] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
@@ -14,14 +18,17 @@ export default function GenerateSalesReportDaily() {
     try {
       setLoading(true);
 
-      // Fetch authenticated user once
+      // Fetch authenticated user
       if (!user) {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
       }
 
-      // Fetch paginated daily sales
-      const res = await axios.get(`/api/fetch-daily?page=${pageNumber}`);
+      // Fetch daily sales for the selected day
+      const res = await axios.get(`/api/fetch-daily?page=${pageNumber}`, {
+        params: { date: selectedDate },
+      });
+
       if (res.data.success) {
         setDailySales(res.data.daily_sales || []);
         setLastPage(res.data.last_page || 1);
@@ -39,9 +46,8 @@ export default function GenerateSalesReportDaily() {
 
   useEffect(() => {
     fetchDaily(page);
-  }, [page]);
+  }, [page, selectedDate]);
 
-  // Format date as "MMM DD, YYYY"
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -97,7 +103,7 @@ export default function GenerateSalesReportDaily() {
         <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
           <h3 style={{ fontWeight: "bold", marginBottom: "1rem", color: "#4b2e17", display: "flex", justifyContent: "space-between" }}>
             <span>Sales Summary</span>
-            <span>Daily</span>
+            <span>{formatDate(selectedDate)}</span>
           </h3>
 
           <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
