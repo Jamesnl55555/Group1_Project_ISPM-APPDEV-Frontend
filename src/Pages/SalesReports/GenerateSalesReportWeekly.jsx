@@ -37,7 +37,7 @@ export default function GenerateSalesReportWeekly() {
 
   // Safe computation of total
   const overallTotal = weeklySales.reduce(
-    (sum, s) => sum + Number(s.total_amount || 0),
+    (sum, s) => sum + Number(s.amount || 0),
     0
   );
 
