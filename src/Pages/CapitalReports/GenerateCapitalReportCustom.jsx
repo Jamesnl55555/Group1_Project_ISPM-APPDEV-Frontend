@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axios from "axios";
+import axios from "@/api/axios";
 import { useSearchParams } from "react-router-dom";
 
 export default function CapitalReportCustom() {

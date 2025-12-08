@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import axios from "axios";
+import axios from "@/api/axios";
 
 export default function CapitalReportWeekly() {
     const [records, setRecords] = useState([]);
