@@ -8,7 +8,9 @@ import { MantineProvider } from "@mantine/core";
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [latestTransaction, setLatestTransaction] = useState(null);
+  const [user_name, setfetchedUser] = useState(null);
+  const [total_amount, setTotalAmount] = useState(null);
+  const [total_quantity, setTotalQuantity] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -28,7 +30,9 @@ export default function Dashboard() {
         const response = await axios.get("/api/latest-transaction");
         if (response.data.success) {
           const transaction = response.data.transaction;
-          setLatestTransaction({transaction,});
+          setTotalQuantity(response.data.total_quantity);
+          setTotalAmount(response.data.total_amount);
+          setfetchedUser(response.data.user_name);
         }
       } catch (error) {
         console.error("Error fetching latest transaction:", error);
@@ -209,9 +213,9 @@ export default function Dashboard() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
                 {latestTransaction ? (
                   [
-                    { label: "Total Sales", value: latestTransaction.total_quantity },
-                    { label: "Total Cost of Sales", value: latestTransaction.total_amount },
-                    { label: "Customer #", value: latestTransaction.user_name },
+                    { label: "Total Sales", value: total_quantity },
+                    { label: "Total Cost of Sales", value: total_amount },
+                    { label: "Cashier", value: user_name },
                   ].map((item) => (
                     <div
                       key={item.label}
