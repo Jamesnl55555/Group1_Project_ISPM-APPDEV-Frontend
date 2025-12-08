@@ -1,8 +1,7 @@
+import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "@/api/axios";
-
+import { useNavigate } from "react-router-dom";
 
 export default function TransactionRecord() {
   const navigate = useNavigate();
@@ -10,129 +9,154 @@ export default function TransactionRecord() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
+  const perPage = 10;
+
+  const fetchTransactions = async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await axios.get("/api/fetchtransactions", {
+        params: { page, per_page: perPage },
+      });
+      setTransactions(response.data.transactions);
+      setCurrentPage(response.data.current_page);
+      setLastPage(response.data.last_page);
+    } catch (err) {
+      console.error("Failed to fetch transactions:", err);
+      setTransactions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const response = await axios.get('/api/fetchtransactions');
-        setTransactions(response.data.transactions);
-      } catch (err) {
-        console.error('Failed to fetch transactions:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchTransactions();
-  }, []);
+    fetchTransactions(currentPage);
+  }, [currentPage]);
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < lastPage) setCurrentPage((prev) => prev + 1);
+  };
 
   return (
     <AuthenticatedLayout>
-      <div className="p-6">
-  {/* Header with title and back button aligned in one row */}
-  <div
-    className="flex items-center justify-between mb-6"
-    style={{ paddingLeft: "8rem", paddingRight: "8rem", marginTop:"-2rem" }}
-  >
-    <h1 className="text-3xl font-bold text-black">
-      Transaction Records List
-    </h1>
-    <button
-      onClick={() => navigate("/dashboard")}
-      className="bg-[#4b2e17] text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-[#6b3e1f] transition shadow-md"
-    >
-      ← Back
-    </button>
-  </div>
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+          <h1 style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }}>
+            Transaction Records
+          </h1>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              backgroundColor: "#4b2e17",
+              color: "white",
+              padding: "0.5rem 1.5rem",
+              borderRadius: "0.375rem",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            ← Back
+          </button>
+        </div>
 
+        {/* Search */}
+        <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+          <input
+            type="text"
+            placeholder="Search Transaction #"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{
+              flex: 1,
+              padding: "0.5rem",
+              borderRadius: "0.375rem",
+              border: "1px solid #d7bfa0",
+            }}
+          />
+        </div>
 
-
-        
-
-        {/* Search Section */}
-        <div className="border border-black shadow-[5px_5px_0px_gray] bg-white max-w-5xl mx-auto p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-4">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-[#4b2e17] mb-1">
-                Search for Transaction:
-              </label>
-              <input
-                type="text"
-                placeholder="Input Transaction Number"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full border border-gray-400 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#c5a888] outline-none"
-              />
-            </div>
-
-            <div className="flex-1 mt-3 sm:mt-0">
-              <label className="block text-sm font-medium text-[#4b2e17] mb-1">
-                Date:
-              </label>
-              <input
-                type="date"
-                className="w-full border border-gray-400 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#c5a888] outline-none"
-              />
-            </div>
-          </div>
-
-          {/* Transaction Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border border-gray-700 px-3 py-2">
-                    Transaction Number
-                  </th>
-                  <th className="border border-gray-700 px-3 py-2">
-                    Date and Time
-                  </th>
-                  <th className="border border-gray-700 px-3 py-2">
-                    Total Amount
-                  </th>
-                  <th className="border border-gray-700 px-3 py-2"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.length ? (
-                  transactions.map((t, i) => (
-                    <tr
-                      key={i}
-                      className={`${
-                        i % 2 === 0 ? "bg-[#fffaf6]" : "bg-[#f6ebdf]"
-                      } hover:bg-[#f9f5f0] transition`}
-                    >
-                      <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        #{t.id.toString().padStart(10, "0")}
+        {/* Table */}
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+            <thead style={{ backgroundColor: "#f3e6d9" }}>
+              <tr>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Transaction #</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Date & Time</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Total Amount</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan="4" style={{ padding: "1rem" }}>Loading...</td></tr>
+              ) : transactions.length ? (
+                transactions
+                  .filter((t) => t.id.toString().includes(search))
+                  .map((t, idx) => (
+                    <tr key={idx} style={{ backgroundColor: idx % 2 === 0 ? "#fffaf6" : "#f6ebdf" }}>
+                      <td style={{ padding: ".5rem" }}>#{t.id.toString().padStart(10, "0")}</td>
+                      <td style={{ padding: ".5rem" }}>{new Date(t.created_at).toLocaleString()}</td>
+                      <td style={{ padding: ".5rem" }}>₱ {t.total_amount}</td>
+                      <td style={{ padding: ".5rem" }}>
+                        <button
+                          onClick={() => navigate(`/transactions/${t.id}`)}
+                          style={{
+                            backgroundColor: "#4b2e17",
+                            color: "white",
+                            padding: "0.25rem 0.75rem",
+                            borderRadius: "0.375rem",
+                            fontSize: "0.75rem",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Show More
+                        </button>
                       </td>
-                      <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        {new Date(t.created_at).toLocaleString()}
-                      </td>
-                      <td className="border border-gray-400 px-3 py-2 text-[#2e1a0e]">
-                        ₱ {t.total_amount}
-                      </td>
-                      <td className="border border-gray-400 px-3 py-2 text-center">
-  <button
-    onClick={() => navigate(`/transactions/${t.id}`)}
-    className="bg-[#4b2e17] text-white px-3 py-1.5 rounded-md text-xs font-semibold hover:bg-[#6b3e1f] transition"
-  >
-    Show More
-  </button>
-</td>
-
                     </tr>
                   ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan="5"
-                      className="text-center py-4 text-[#4b2e17] font-medium"
-                    >
-                      No transaction records found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              ) : (
+                <tr><td colSpan="4" style={{ padding: "1rem", color: "#444" }}>No transaction records found.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        <div style={{ display: "flex", justifyContent: "center", marginTop: "1rem", gap: "1rem" }}>
+          <button onClick={handlePrevPage} disabled={currentPage === 1} style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: currentPage === 1 ? "#ccc" : "#4b2e17",
+            color: "white",
+            borderRadius: "0.375rem",
+            cursor: currentPage === 1 ? "not-allowed" : "pointer"
+          }}>
+            Previous
+          </button>
+          <span style={{ alignSelf: "center" }}>Page {currentPage} of {lastPage}</span>
+          <button onClick={handleNextPage} disabled={currentPage === lastPage} style={{
+            padding: "0.5rem 1rem",
+            backgroundColor: currentPage === lastPage ? "#ccc" : "#4b2e17",
+            color: "white",
+            borderRadius: "0.375rem",
+            cursor: currentPage === lastPage ? "not-allowed" : "pointer"
+          }}>
+            Next
+          </button>
         </div>
       </div>
     </AuthenticatedLayout>
