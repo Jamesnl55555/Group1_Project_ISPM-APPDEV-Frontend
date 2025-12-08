@@ -68,7 +68,7 @@ export default function GenerateSalesReportWeekly() {
                   <td className="border px-4 py-2">{s.week_start}</td>
                   <td className="border px-4 py-2">{s.week_end}</td>
                   <td className="border px-4 py-2">{s.user}</td>
-                  <td className="border px-4 py-2">₱ {s.total_amount}</td>
+                  <td className="border px-4 py-2">₱ {s.amount}</td>
                 </tr>
               ))
             ) : (
