@@ -77,7 +77,7 @@ export default function App() {
         } />
 
         <Route path="/profile" element={
-          <PrivateRoute><SecuritySettings /></PrivateRoute>
+          <PrivateRoute><Edit /></PrivateRoute>
         } />
 
 
