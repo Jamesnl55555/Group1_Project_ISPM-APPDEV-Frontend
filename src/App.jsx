@@ -11,6 +11,7 @@ import VerifyEmail from "./Pages/Auth/VerifyEmail";
 import ConfirmRegistration from "./Pages/Auth/ConfirmRegistration";
 import TransactionRecord from "./Pages/Reports/TransactionRecord";
 import PrivateRoute from "./Layouts/PrivateRoute";
+import SecuritySettings from ".Pages/Profile/SecuritySettings";
 
 import Dashboard from "./Pages/Dashboard";
 import SecuritySettings from "./Pages/Profile/SecuritySettings";
@@ -77,7 +78,7 @@ export default function App() {
         } />
 
         <Route path="/profile" element={
-          <PrivateRoute><Edit /></PrivateRoute>
+          <PrivateRoute><SecuritySettings /></PrivateRoute>
         } />
 
 

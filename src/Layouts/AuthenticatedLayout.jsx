@@ -91,8 +91,9 @@ export default function AuthenticatedLayout({ header, children }) {
           {/* LINKS */}
           <nav style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: ".5rem", fontSize: "1rem" }}>
             {[{ href: "/dashboard", label: "Dashboard" },
-              { href: "/inventory1", label: "Products" },
+              { href: "/profile", label: "Profile" },
               { href: "/transaction-record", label: "Transactions" },
+              { href: "/inventory1", label: "Inventory" },
               { href: "/sales-report", label: "Reports" }].map((link) => (
               <a
                 key={link.href}
