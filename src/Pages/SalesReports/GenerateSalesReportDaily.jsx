@@ -14,7 +14,7 @@ export default function GenerateSalesReportDaily() {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
         const response = await axios.get("/api/fetch-daily");
-        console.log("API response:", response.data);
+        console.log("API response:", response.data.daily_sales);
         if (response.data.success) {
           setDailySales(response.data.daily_sales || []);
         }
