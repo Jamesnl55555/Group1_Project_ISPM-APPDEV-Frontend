@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "@/api/axios";
+import { Link } from "react-router-dom";
 
 export default function GenerateSalesReportMonthly() {
   const [monthlySales, setMonthlySales] = useState([]);
@@ -13,16 +14,13 @@ export default function GenerateSalesReportMonthly() {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
 
-        // Fetch monthly sales
         const response = await axios.get("/api/fetch-monthly");
-        console.log(response.data.monthly_sales)
-        
         if (response.data.success) {
           setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
         }
       } catch (error) {
         console.error("Error fetching monthly sales:", error);
-        setMonthlySales([]); // fallback in case of error
+        setMonthlySales([]);
       } finally {
         setLoading(false);
       }
@@ -31,51 +29,153 @@ export default function GenerateSalesReportMonthly() {
     fetchMonthly();
   }, []);
 
-  // Compute overall total safely
   const overallTotal = monthlySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
-        <h1 className="text-2xl font-bold mb-6">Monthly Sales Report</h1>
+      {/* HEADER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingLeft: "7rem",
+          paddingRight: "7rem",
+          marginTop: "-1.5rem",
+          alignItems: "center",
+        }}
+      >
+        <h1
+          style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          Monthly Sales Report
+        </h1>
 
-        <table className="w-full table-auto border-collapse text-center">
-          <thead>
-            <tr className="bg-[#d6d6d6] text-black">
-              <th className="border px-4 py-2">Month</th>
-              <th className="border px-4 py-2">User</th>
-              <th className="border px-4 py-2">Total Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+        <Link
+          to="/generate-sales-report"
+          style={{
+            backgroundColor: "#4b2e17",
+            color: "white",
+            padding: "0.5rem 1.5em",
+            borderRadius: "0.375rem",
+            fontSize: "1rem",
+            fontWeight: "bold",
+            cursor: "pointer",
+            textDecoration: "none",
+            marginTop: "1rem",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+        >
+          ← Back
+        </Link>
+      </div>
+
+      {/* WRAPPER */}
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* Summary Card */}
+        <div
+          style={{
+            marginTop: "-3.4rem",
+            backgroundColor: "#f3e6d9",
+            padding: "1.5rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            marginBottom: "2rem",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
+            <span>Total Sales Used</span>
+            <span>₱ {overallTotal}</span>
+          </div>
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span>Net Profit/Loss</span>
+            <span>₱ {overallTotal}</span>
+          </div>
+        </div>
+
+        {/* TABLE */}
+        <div
+          style={{
+            backgroundColor: "#fff",
+            border: "1px solid #d7bfa0",
+            borderRadius: "0.75rem",
+            padding: "1rem",
+            overflowX: "auto",
+            marginBottom: "2rem",
+          }}
+        >
+          <h3
+            style={{
+              fontWeight: "bold",
+              marginBottom: "1rem",
+              color: "#4b2e17",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span>Sales Summary</span>
+            <span>Monthly</span>
+          </h3>
+
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+            <thead style={{ backgroundColor: "#f3e6d9", color: "#4b2e17" }}>
               <tr>
-                <td colSpan="3" className="text-center py-4">
-                  Loading...
-                </td>
+                <th style={{ padding: ".5rem", width: "33%" }}>Month</th>
+                <th style={{ padding: ".5rem", width: "33%" }}>User</th>
+                <th style={{ padding: ".5rem", width: "33%" }}>Total Sales</th>
               </tr>
-            ) : monthlySales.length ? (
-              monthlySales.map((s, index) => (
-                <tr key={index} className="hover:bg-[#f9f5f0]">
-                  <td className="border px-4 py-2">{s.month}</td>
-                  <td className="border px-4 py-2">{s.user}</td>
-                  <td className="border px-4 py-2">₱ {s.amount}</td>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="3" style={{ padding: "1rem" }}>
+                    Loading...
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="3" className="text-center py-4 text-gray-600">
-                  No sales records found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : monthlySales.length ? (
+                monthlySales.map((s, index) => (
+                  <tr key={index} style={{ borderBottom: "1px solid #f0e4d7" }}>
+                    <td style={{ padding: ".5rem" }}>{s.month}</td>
+                    <td style={{ padding: ".5rem" }}>{s.user}</td>
+                    <td style={{ padding: ".5rem" }}>₱ {s.amount}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" style={{ padding: "1rem", color: "#444" }}>
+                    No sales records found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        {/* Overall Total */}
-        <div className="mt-4 flex justify-between bg-[#f1f1f1] p-4 rounded-lg border border-[#d7bfa0]">
-          <span className="font-semibold">Overall Total Sales</span>
-          <span className="font-bold text-green-600">₱ {overallTotal}</span>
+        {/* OVERALL TOTAL */}
+        <div
+          style={{
+            backgroundColor: "#f1f1f1",
+            padding: "1rem",
+            borderRadius: "0.75rem",
+            border: "1px solid #d7bfa0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <span>Overall Total Sales</span>
+          <span style={{ color: "green", fontWeight: "bold" }}>₱ {overallTotal}</span>
         </div>
       </div>
     </AuthenticatedLayout>
