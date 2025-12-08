@@ -17,35 +17,49 @@ export default function Inventory1() {
   const editProduct = (id) => navigate(`/edit-product/${id}`);
 
   return (
-    <AuthenticatedLayout
-      header={
+    <AuthenticatedLayout>
+      <div style={{ padding: "2rem", maxWidth: "90rem", margin: "0 auto", marginTop: "-5rem" }}>
+        {/* Header */}
         <h1
-          className="text-4xl font-extrabold text-[#4b2e17] drop-shadow-sm"
           style={{
+            fontSize: "3rem",
+            fontWeight: "800",
+            lineHeight: 1.3,
             WebkitTextStroke: ".8px #000",
             backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
-            marginLeft: "5rem",
-            marginTop: "-2rem",
-            marginBottom: "-1rem",
+            marginBottom: "1rem",
           }}
         >
           Inventory Management
         </h1>
-      }
-    >
-      <div style={{ marginLeft: "7rem" }}>
+
+        {/* Add Product Button */}
         <button
           onClick={() => navigate("/add-product")}
-          className="w-full sm:w-[68rem] bg-[#fff2e0] border border-black font-semibold text-black text-2xl py-3 text-left pl-6
-                     hover:bg-[#e8d4b8] transition-all duration-200"
-          style={{ maxWidth: "68rem", marginTop: "-10px" }}
+          style={{
+            display: "block",
+            textAlign: "left",
+            border: "1px solid #5c5c5c",
+            color: "#000",
+            fontWeight: "bold",
+            padding: "12px 32px",
+            backgroundColor: "#f9f5f0",
+            width: "100%",
+            maxWidth: "68rem",
+            fontSize: "24px",
+            cursor: "pointer",
+            marginBottom: "2rem",
+            transition: "background-color 0.2s",
+          }}
+          onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#e8d4b8")}
+          onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#f9f5f0")}
         >
           Add Product
         </button>
 
-        {/* INVENTORY TABLE */}
+        {/* Inventory Table */}
         <InventoryTableWithPagination
           ref={inventoryRef}
           fetchUrl="/api/fetchproducts"
@@ -56,11 +70,11 @@ export default function Inventory1() {
           onArchive={() => archivedRef.current?.fetchProducts()}
         />
 
-        {/* LOW STOCK TABLE */}
+        {/* Low Stock Table */}
         <InventoryTableWithPagination
           ref={lowStockRef}
           fetchUrl="/api/fetchproducts-lowstock"
-          title="Products Low In Stock!"
+          title="Products Low in Stock!"
           editProduct={editProduct}
           archiveProductUrl="/api/archive-item"
           deleteProductUrl="/api/delete-item"
@@ -68,7 +82,7 @@ export default function Inventory1() {
           onArchive={() => archivedRef.current?.fetchProducts()}
         />
 
-        {/* ARCHIVED TABLE */}
+        {/* Archived Table */}
         <InventoryTableWithPagination
           ref={archivedRef}
           fetchUrl="/api/fetchproducts-archived"
@@ -119,24 +133,18 @@ const InventoryTableWithPagination = React.forwardRef(
       }
     };
 
-    // Expose fetchProducts via ref
-    React.useImperativeHandle(ref, () => ({
-      fetchProducts,
-    }));
+    React.useImperativeHandle(ref, () => ({ fetchProducts }));
 
     React.useEffect(() => {
       fetchProducts(page);
     }, [page]);
 
-    // -----------------------
-    // ACTIONS
-    // -----------------------
     const archiveProduct = (id) => {
       if (!archiveProductUrl) return;
       if (confirm("Archive this product?")) {
         axios.post(`${archiveProductUrl}/${id}`).then(() => {
-          fetchProducts(page); // refresh current table
-          onArchive?.();       // refresh archived table
+          fetchProducts(page);
+          onArchive?.();
         });
       }
     };
@@ -145,8 +153,8 @@ const InventoryTableWithPagination = React.forwardRef(
       if (!unarchiveProductUrl) return;
       if (confirm("Unarchive this product?")) {
         axios.post(`${unarchiveProductUrl}/${id}`).then(() => {
-          fetchProducts(page); // refresh archived table
-          onUnarchive?.();     // refresh inventory table
+          fetchProducts(page);
+          onUnarchive?.();
         });
       }
     };
@@ -158,111 +166,64 @@ const InventoryTableWithPagination = React.forwardRef(
       }
     };
 
-    // -----------------------
-    // RENDER
-    // -----------------------
     if (loading)
       return (
         <div className="my-8">
-          <h2 className="text-3xl font-bold text-black mb-3">{title}</h2>
+          <h2 style={{ fontWeight: "bold", fontSize: "1.5rem" }}>{title}</h2>
           <p>Loading...</p>
         </div>
       );
 
     return (
       <div className="mb-12">
-        <h2 className="text-3xl font-bold text-black mb-3 mt-8">{title}</h2>
-
-        <div className="border border-[#4b2e17] bg-white shadow-[5px_5px_0px_gray] p-4 overflow-x-auto w-[68rem]">
-          <table className="min-w-full border-collapse">
-            <thead className="bg-[#d6d6d6] text-black border-b border-[#4b2e17]">
-              <tr>
-                {[
-                  "Product Image",
-                  "Product #",
-                  "Category",
-                  "Product Name",
-                  "Price",
-                  "Quantity",
-                  "Actions",
-                ].map((th) => (
-                  <th key={th} className="px-3 py-2 text-left text-sm font-semibold">
-                    {th}
-                  </th>
-                ))}
+        <h2 style={{ fontWeight: "bold", fontSize: "1.5rem", marginBottom: "0.5rem" }}>{title}</h2>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.95rem" }}>
+            <thead>
+              <tr style={{ backgroundColor: "#d6b385", color: "#3b1f0d" }}>
+                {["Product Image", "Product #", "Category", "Product Name", "Price", "Quantity", "Actions"].map(
+                  (th) => (
+                    <th key={th} style={{ border: "1px solid #6b3e1f", padding: "0.75rem", textAlign: "center", fontWeight: "700" }}>
+                      {th}
+                    </th>
+                  )
+                )}
               </tr>
             </thead>
-
             <tbody>
               {products.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="text-center py-4">
+                  <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
                     No products found.
                   </td>
                 </tr>
               ) : (
                 products.map((item) => (
-                  <tr
-                    key={item.id}
-                    className={`${lowStock ? "bg-[#fff4e1]" : "bg-white"} text-sm text-gray-700`}
-                  >
-                    <td className="px-3 py-2">
+                  <tr key={item.id} style={{ backgroundColor: lowStock ? "#fff4e1" : "#f9f5f0" }}>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>
                       <img
                         src={`/${item.file_path}`}
                         alt={item.name}
-                        className="w-12 h-12 rounded-md"
+                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
                         onError={(e) => (e.target.style.display = "none")}
                       />
                     </td>
-
-                    <td className="px-3 py-2">{item.id}</td>
-                    <td className="px-3 py-2">{item.category}</td>
-                    <td className="px-3 py-2">{item.name}</td>
-                    <td className="px-3 py-2">₱ {item.price}</td>
-                    <td className="px-3 py-2">{item.quantity}</td>
-
-                    <td className="px-3 py-2 flex justify-center gap-2">
-                      {!archived && (
-                        <>
-                          {editProduct && (
-                            <ActionButton
-                              color="#44b954"
-                              hover="#297233"
-                              onClick={() => editProduct(item.id)}
-                            >
-                              <IconPencil size={16} />
-                            </ActionButton>
-                          )}
-                          {deleteProductUrl && (
-                            <ActionButton
-                              color="#f12323"
-                              hover="#9e1818"
-                              onClick={() => deleteProduct(item.id)}
-                            >
-                              <IconTrash size={16} />
-                            </ActionButton>
-                          )}
-                          {archiveProductUrl && (
-                            <ActionButton
-                              color="#753500"
-                              hover="#532600"
-                              onClick={() => archiveProduct(item.id)}
-                            >
-                              <IconEye size={16} />
-                            </ActionButton>
-                          )}
-                        </>
-                      )}
-
-                      {archived && unarchiveProductUrl && (
-                        <ActionButton
-                          color="#2970ff"
-                          hover="#1e4fb8"
-                          onClick={() => unarchiveProduct(item.id)}
-                        >
-                          Unarchive
-                        </ActionButton>
-                      )}
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.id}</td>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.category}</td>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.name}</td>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>₱ {item.price}</td>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.quantity}</td>
+                    <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>
+                      <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem" }}>
+                        {!archived && (
+                          <>
+                            {editProduct && <ActionButton color="#44b954" hover="#297233" onClick={() => editProduct(item.id)}><IconPencil size={16} /></ActionButton>}
+                            {deleteProductUrl && <ActionButton color="#f12323" hover="#9e1818" onClick={() => deleteProduct(item.id)}><IconTrash size={16} /></ActionButton>}
+                            {archiveProductUrl && <ActionButton color="#753500" hover="#532600" onClick={() => archiveProduct(item.id)}><IconEye size={16} /></ActionButton>}
+                          </>
+                        )}
+                        {archived && unarchiveProductUrl && <ActionButton color="#2970ff" hover="#1e4fb8" onClick={() => unarchiveProduct(item.id)}>Unarchive</ActionButton>}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -272,12 +233,7 @@ const InventoryTableWithPagination = React.forwardRef(
         </div>
 
         {/* PAGINATION */}
-        <Pagination
-          page={page}
-          lastPage={lastPage}
-          onPrev={() => setPage((p) => Math.max(1, p - 1))}
-          onNext={() => setPage((p) => Math.min(lastPage, p + 1))}
-        />
+        <Pagination page={page} lastPage={lastPage} onPrev={() => setPage((p) => Math.max(1, p - 1))} onNext={() => setPage((p) => Math.min(lastPage, p + 1))} />
       </div>
     );
   }
@@ -290,8 +246,7 @@ function ActionButton({ color, hover, children, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="p-1 rounded transition-colors flex items-center justify-center"
-      style={{ backgroundColor: color, color: "#fff" }}
+      style={{ backgroundColor: color, color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", padding: "0.4rem 0.6rem", display: "flex", alignItems: "center", justifyContent: "center", transition: "background-color 0.2s" }}
       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = hover)}
       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = color)}
     >
@@ -307,21 +262,14 @@ function Pagination({ page, lastPage, onPrev, onNext }) {
   return (
     <div className="flex justify-center mt-4 gap-4">
       <button
-        className={`px-4 py-2 border rounded ${
-          page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"
-        }`}
+        className={`px-4 py-2 border rounded ${page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"}`}
         disabled={page === 1}
         onClick={onPrev}
       >
         ⬅ Prev
       </button>
-
       <button
-        className={`px-4 py-2 border rounded ${
-          page === lastPage
-            ? "bg-gray-300 cursor-not-allowed"
-            : "bg-white hover:bg-gray-200"
-        }`}
+        className={`px-4 py-2 border rounded ${page === lastPage ? "bg-gray-300 cursor-not-allowed" : "bg-white hover:bg-gray-200"}`}
         disabled={page === lastPage}
         onClick={onNext}
       >
