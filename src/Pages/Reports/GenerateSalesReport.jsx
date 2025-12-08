@@ -78,7 +78,7 @@ export default function GenerateSalesReportCustom() {
           Custom Sales Report
         </h1>
         <button
-          onClick={() => navigate("/generate-sales-report")}
+          onClick={() => navigate("/sales-report")}
           style={{
             backgroundColor: "#4b2e17",
             color: "white",
