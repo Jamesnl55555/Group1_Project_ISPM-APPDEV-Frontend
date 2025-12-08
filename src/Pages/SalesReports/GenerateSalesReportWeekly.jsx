@@ -16,9 +16,8 @@ export default function GenerateSalesReportWeekly() {
 
         // Now fetch weekly sales
         const response = await axios.get("/api/fetch-weekly");
-        console.log(response.data.weekly_sales)
+        console.log("Weekly sales", response.data.weekly_sales);
         if (response.data.success) {
-          // Ensure it's always an array
           setWeeklySales(response.data.weekly_sales);
         } else {
           setWeeklySales([]);
