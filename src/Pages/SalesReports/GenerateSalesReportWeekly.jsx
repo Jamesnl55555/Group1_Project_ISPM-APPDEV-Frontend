@@ -3,21 +3,33 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
 export default function GenerateSalesReportWeekly() {
-    const [weeklySales, setWeeklySales] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(null);
-    useEffect(() => {
+  const [weeklySales, setWeeklySales] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
     const fetchWeekly = async () => {
       try {
-        const response = await axios.get("/api/fetch-weekly");
+        // Always get authenticated user first
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
+
+        // Now fetch weekly sales
+        const response = await axios.get("/api/fetch-weekly");
+
         if (response.data.success) {
-          setWeeklySales(response.data.weekly_sales);
-          setUser(userRes.data);
+          // Ensure it's always an array
+          const weeklyData = Array.isArray(response.data.weekly_sales)
+            ? response.data.weekly_sales
+            : [];
+
+          setWeeklySales(weeklyData);
+        } else {
+          setWeeklySales([]);
         }
       } catch (error) {
         console.error("Error fetching weekly sales:", error);
+        setWeeklySales([]); // fallback
       } finally {
         setLoading(false);
       }
@@ -26,9 +38,9 @@ export default function GenerateSalesReportWeekly() {
     fetchWeekly();
   }, []);
 
-  // Compute overall total
+  // Safe computation of total
   const overallTotal = weeklySales.reduce(
-    (sum, s) => sum + Number(s.amount),
+    (sum, s) => sum + Number(s.amount || 0),
     0
   );
 
@@ -72,7 +84,7 @@ export default function GenerateSalesReportWeekly() {
           </tbody>
         </table>
 
-        {/* Overall Total */}
+        {/* Total */}
         <div className="mt-4 flex justify-between bg-[#f1f1f1] p-4 rounded-lg border border-[#d7bfa0]">
           <span className="font-semibold">Overall Total Sales</span>
           <span className="font-bold text-green-600">₱ {overallTotal}</span>

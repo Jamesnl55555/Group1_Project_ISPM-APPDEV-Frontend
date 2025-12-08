@@ -3,21 +3,27 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "axios";
 
 export default function GenerateSalesReportMonthly() {
-    const [monthlySales, setMonthlySales] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [user, setUser] = useState(null);
-    useEffect(() => {
+  const [monthlySales, setMonthlySales] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
     const fetchMonthly = async () => {
       try {
+        // Fetch authenticated user first
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
+
+        // Fetch monthly sales
         const response = await axios.get("/api/fetch-monthly");
 
+        // Make sure daily_sales is always an array
         if (response.data.success) {
-          setMonthlySales(response.data.monthly_sales);
+          setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
         }
       } catch (error) {
         console.error("Error fetching monthly sales:", error);
+        setMonthlySales([]); // fallback in case of error
       } finally {
         setLoading(false);
       }
@@ -26,11 +32,8 @@ export default function GenerateSalesReportMonthly() {
     fetchMonthly();
   }, []);
 
-  // Compute overall total
-  const overallTotal = monthlySales.reduce(
-    (sum, s) => sum + Number(s.amount),
-    0
-  );
+  // Compute overall total safely
+  const overallTotal = monthlySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
