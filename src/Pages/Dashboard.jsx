@@ -27,17 +27,8 @@ export default function Dashboard() {
       try {
         const response = await axios.get("/api/latest-transaction");
         if (response.data.success) {
-          // Compute total items purchased (sum of quantities)
           const transaction = response.data.transaction;
-          const items = transaction.variety_of_items || [];
-          const totalItemsPurchased = items.reduce((sum, item) => sum + item.quantity, 0);
-          const numberOfVarieties = items.length;
-
-          setLatestTransaction({
-            ...transaction,
-            total_quantity: totalItemsPurchased,
-            variety_of_items: numberOfVarieties,
-          });
+          setLatestTransaction({transaction,});
         }
       } catch (error) {
         console.error("Error fetching latest transaction:", error);
@@ -218,9 +209,9 @@ export default function Dashboard() {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
                 {latestTransaction ? (
                   [
-                    { label: "Total Sales", value: latestTransaction.variety_of_items },
-                    { label: "Total Cost of Sales", value: latestTransaction.total_quantity },
-                    { label: "Customer #", value: latestTransaction.id },
+                    { label: "Total Sales", value: latestTransaction.total_quantity },
+                    { label: "Total Cost of Sales", value: latestTransaction.total_amount },
+                    { label: "Customer #", value: latestTransaction.user_name },
                   ].map((item) => (
                     <div
                       key={item.label}
