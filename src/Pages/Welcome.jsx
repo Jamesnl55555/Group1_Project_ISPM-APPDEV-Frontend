@@ -64,8 +64,8 @@ export default function Welcome() {
             padding: "0 1rem",
           }}
         >
-          Bringing you quality chocolates at an <br />
-          affordable price, always near your place.
+          "Bringing you quality chocolates at an <br />
+          affordable price, always near your place."
         </p>
       </div>
 
