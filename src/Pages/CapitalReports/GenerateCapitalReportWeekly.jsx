@@ -9,7 +9,7 @@ export default function CapitalReportWeekly() {
     const [user, useState] = useState(null);
 
     const fetchData = async () => {
-        const response = await axios.get(`/capital-weekly?page=${page}`);
+        const response = await axios.get(`/api/capital-weekly?page=${page}`);
 
         setRecords(response.data.weekly_capital);
         setLastPage(response.data.last_page);

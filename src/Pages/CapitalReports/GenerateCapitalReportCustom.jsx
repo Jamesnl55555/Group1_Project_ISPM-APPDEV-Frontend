@@ -16,7 +16,7 @@ export default function CapitalReportCustom() {
     const fetchData = async () => {
         axios.get("/api/user").then((res) => setUser(res.data));
         const response = await axios.get(
-            `/capital-custom?from=${from}&to=${to}&page=${page}`
+            `/api/capital-custom?from=${from}&to=${to}&page=${page}`
         );
 
         setRecords(response.data.custom_capital);
@@ -28,7 +28,7 @@ export default function CapitalReportCustom() {
     }, [page]);
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout user={user}>
             <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow border">
                 <h1 className="text-xl font-bold mb-4">Custom Capital Report</h1>
                 <p className="mb-4 text-gray-600">
