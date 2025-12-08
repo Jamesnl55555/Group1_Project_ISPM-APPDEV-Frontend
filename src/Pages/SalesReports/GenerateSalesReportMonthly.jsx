@@ -10,14 +10,13 @@ export default function GenerateSalesReportMonthly() {
   useEffect(() => {
     const fetchMonthly = async () => {
       try {
-        // Fetch authenticated user first
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
 
         // Fetch monthly sales
         const response = await axios.get("/api/fetch-monthly");
-
-        // Make sure daily_sales is always an array
+        console.log(response.data.monthly_sales)
+        
         if (response.data.success) {
           setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
         }
