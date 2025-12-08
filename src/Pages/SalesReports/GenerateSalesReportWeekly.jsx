@@ -10,36 +10,37 @@ export default function GenerateSalesReportWeekly() {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
 
-  useEffect(() => {
-    const fetchWeekly = async () => {
-      try {
-        setLoading(true);
+  const fetchWeekly = async (pageNumber = 1) => {
+    try {
+      setLoading(true);
 
-        // Fetch authenticated user if not yet
-        if (!user) {
-          const userRes = await axios.get("/api/user");
-          setUser(userRes.data);
-        }
+      // Fetch user if not already loaded
+      if (!user) {
+        const userRes = await axios.get("/api/user");
+        setUser(userRes.data);
+      }
 
-        // Fetch weekly sales with pagination
-        const response = await axios.get("/api/fetch-weekly", { params: { page } });
-        if (response.data.success) {
-          setWeeklySales(Array.isArray(response.data.weekly_sales) ? response.data.weekly_sales : []);
-          setLastPage(response.data.last_page || 1);
-        } else {
-          setWeeklySales([]);
-          setLastPage(1);
-        }
-      } catch (error) {
-        console.error("Error fetching weekly sales:", error);
+      const response = await axios.get("/api/fetch-weekly", { params: { page: pageNumber } });
+
+      if (response.data.success) {
+        setWeeklySales(Array.isArray(response.data.weekly_sales) ? response.data.weekly_sales : []);
+        setLastPage(response.data.last_page || 1);
+        setPage(response.data.current_page || pageNumber);
+      } else {
         setWeeklySales([]);
         setLastPage(1);
-      } finally {
-        setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching weekly sales:", error);
+      setWeeklySales([]);
+      setLastPage(1);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchWeekly();
+  useEffect(() => {
+    fetchWeekly(page);
   }, [page]);
 
   const overallTotal = weeklySales.reduce((sum, s) => sum + Number(s.amount || 0), 0);
@@ -47,28 +48,16 @@ export default function GenerateSalesReportWeekly() {
   return (
     <AuthenticatedLayout user={user}>
       {/* PAGE HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          paddingLeft: "7rem",
-          paddingRight: "7rem",
-          marginTop: "-1.5rem",
-          marginBottom: "1rem",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "3rem",
-            fontWeight: 800,
-            lineHeight: 1.3,
-            WebkitTextStroke: ".8px #000",
-            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-          }}
-        >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingLeft: "7rem", paddingRight: "7rem", marginTop: "-1.5rem", marginBottom: "1rem" }}>
+        <h1 style={{
+          fontSize: "3rem",
+          fontWeight: 800,
+          lineHeight: 1.3,
+          WebkitTextStroke: ".8px #000",
+          backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
+        }}>
           Weekly Sales Report
         </h1>
 
@@ -84,7 +73,7 @@ export default function GenerateSalesReportWeekly() {
             cursor: "pointer",
             textDecoration: "none",
             marginTop: "1rem",
-            transition: "all 0.2s",
+            transition: "all 0.2s"
           }}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
@@ -95,16 +84,7 @@ export default function GenerateSalesReportWeekly() {
 
       <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
         {/* SUMMARY CARD */}
-        <div
-          style={{
-            marginTop: "-3.4rem",
-            backgroundColor: "#f3e6d9",
-            padding: "1.5rem",
-            borderRadius: "0.75rem",
-            border: "1px solid #d7bfa0",
-            marginBottom: "2rem",
-          }}
-        >
+        <div style={{ marginTop: "-3.4rem", backgroundColor: "#f3e6d9", padding: "1.5rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", marginBottom: "2rem" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "1rem" }}>
             <span>Total Sales Used</span>
             <span>₱ {overallTotal}</span>
@@ -116,25 +96,8 @@ export default function GenerateSalesReportWeekly() {
         </div>
 
         {/* TABLE */}
-        <div
-          style={{
-            backgroundColor: "#fff",
-            border: "1px solid #d7bfa0",
-            borderRadius: "0.75rem",
-            padding: "1rem",
-            overflowX: "auto",
-            marginBottom: "2rem",
-          }}
-        >
-          <h3
-            style={{
-              fontWeight: "bold",
-              marginBottom: "1rem",
-              color: "#4b2e17",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
+        <div style={{ backgroundColor: "#fff", border: "1px solid #d7bfa0", borderRadius: "0.75rem", padding: "1rem", overflowX: "auto", marginBottom: "2rem" }}>
+          <h3 style={{ fontWeight: "bold", marginBottom: "1rem", color: "#4b2e17", display: "flex", justifyContent: "space-between" }}>
             <span>Sales Summary</span>
             <span>Weekly</span>
           </h3>
@@ -164,9 +127,7 @@ export default function GenerateSalesReportWeekly() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" style={{ padding: "1rem", color: "#444" }}>
-                    No sales records found.
-                  </td>
+                  <td colSpan="4" style={{ padding: "1rem", color: "#444" }}>No sales records found.</td>
                 </tr>
               )}
             </tbody>
@@ -195,17 +156,7 @@ export default function GenerateSalesReportWeekly() {
         )}
 
         {/* OVERALL TOTAL */}
-        <div
-          style={{
-            backgroundColor: "#f1f1f1",
-            padding: "1rem",
-            borderRadius: "0.75rem",
-            border: "1px solid #d7bfa0",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: "0.75rem", border: "1px solid #d7bfa0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>Overall Total Sales</span>
           <span style={{ color: "green", fontWeight: "bold" }}>₱ {overallTotal}</span>
         </div>
