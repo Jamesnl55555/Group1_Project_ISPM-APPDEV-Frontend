@@ -12,15 +12,17 @@ export default function GenerateSalesReportMonthly() {
       try {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
+
+        // Fetch monthly sales
         const response = await axios.get("/api/fetch-monthly");
         console.log(response.data.monthly_sales)
-
+        
         if (response.data.success) {
-          setMonthlySales(response.data.monthly_sales);
+          setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
         }
       } catch (error) {
         console.error("Error fetching monthly sales:", error);
-        setMonthlySales([]);
+        setMonthlySales([]); // fallback in case of error
       } finally {
         setLoading(false);
       }
