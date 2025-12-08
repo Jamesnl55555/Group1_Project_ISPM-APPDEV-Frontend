@@ -37,7 +37,7 @@ export default function GenerateSalesReportWeekly() {
 
   // Safe computation of total
   const overallTotal = weeklySales.reduce(
-    (sum, s) => sum + Number(s.amount || 0),
+    (sum, s) => sum + Number(s.total_amount || 0),
     0
   );
 
@@ -68,7 +68,7 @@ export default function GenerateSalesReportWeekly() {
                   <td className="border px-4 py-2">{s.week_start}</td>
                   <td className="border px-4 py-2">{s.week_end}</td>
                   <td className="border px-4 py-2">{s.user}</td>
-                  <td className="border px-4 py-2">₱ {s.amount}</td>
+                  <td className="border px-4 py-2">₱ {s.total_amount}</td>
                 </tr>
               ))
             ) : (
