@@ -7,12 +7,14 @@ export default function CapitalReportCustom() {
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [user, setUser] = useState(null);
 
     const [searchParams] = useSearchParams();
     const from = searchParams.get("from");
     const to = searchParams.get("to");
 
     const fetchData = async () => {
+        axios.get("/api/user").then((res) => setUser(res.data));
         const response = await axios.get(
             `/capital-custom?from=${from}&to=${to}&page=${page}`
         );

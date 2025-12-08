@@ -6,8 +6,10 @@ export default function CapitalReportMonthly() {
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
-
+    const [user, setUser] = useState(null);
+    
     const fetchData = async () => {
+        axios.get("/api/user").then((res) => setUser(res.data));
         const response = await axios.get(`/capital-monthly?page=${page}`);
 
         setRecords(response.data.monthly_capital);

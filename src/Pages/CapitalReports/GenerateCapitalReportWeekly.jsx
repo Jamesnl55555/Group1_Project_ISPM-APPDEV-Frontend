@@ -6,6 +6,7 @@ export default function CapitalReportWeekly() {
     const [records, setRecords] = useState([]);
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
+    const [user, useState] = useState(null);
 
     const fetchData = async () => {
         const response = await axios.get(`/capital-weekly?page=${page}`);
@@ -19,7 +20,7 @@ export default function CapitalReportWeekly() {
     }, [page]);
 
     return (
-        <AuthenticatedLayout>
+        <AuthenticatedLayout user={user}>
             <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow border">
                 <h1 className="text-xl font-bold mb-4">Weekly Capital Report</h1>
 
