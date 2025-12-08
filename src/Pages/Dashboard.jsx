@@ -144,8 +144,8 @@ export default function Dashboard() {
               </h2>
               <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "left", gap: "3rem", textAlign: "center" }}>
                 {[ 
-                  { img: "/images/6.png", label: "Make\nTransaction", href: "/make-transaction" },
-                  { img: "/images/7.png", label: "Transaction\nHistory", href: "/transaction-rec-sec" },
+                  { img: "/images/6.png", label: "Make\nTransaction", href: "/create-transaction" },
+                  { img: "/images/7.png", label: "Transaction\nHistory", href: "/transaction-record" },
                   { img: "/images/8.png", label: "Add Product", href: "/add-product" },
                   { img: "/images/9.png", label: "Generate\nReport", href: "/sales-report" },
                 ].map((item) => (
