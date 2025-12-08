@@ -15,7 +15,7 @@ export default function GenerateSalesReportMonthly() {
     try {
       setLoading(true);
 
-      // Fetch authenticated user
+      // Fetch authenticated user if not already
       if (!user) {
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
@@ -26,6 +26,7 @@ export default function GenerateSalesReportMonthly() {
       if (response.data.success) {
         setMonthlySales(Array.isArray(response.data.monthly_sales) ? response.data.monthly_sales : []);
         setLastPage(response.data.last_page || 1);
+        setPage(response.data.current_page || 1);
       } else {
         setMonthlySales([]);
         setLastPage(1);
