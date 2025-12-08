@@ -1,39 +1,69 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import axios from "axios";
 
-export default function GenerateCapitalReportMonthly() {
+export default function CapitalReportMonthly() {
+    const [records, setRecords] = useState([]);
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
+
+    const fetchData = async () => {
+        const response = await axios.get(`/capital-monthly?page=${page}`);
+
+        setRecords(response.data.monthly_capital);
+        setLastPage(response.data.last_page);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, [page]);
+
     return (
         <AuthenticatedLayout>
+            <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow border">
+                <h1 className="text-xl font-bold mb-4">Monthly Capital Report</h1>
 
-            <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
-                <h1 className="text-2xl font-bold mb-6">Monthly Capital Report</h1>
-
-                <table className="w-full table-auto border-collapse">
+                <table className="w-full border-collapse">
                     <thead>
-                        <tr className="bg-[#d6d6d6] text-black">
-                            <th className="border px-4 py-2">Transaction #</th>
-                            <th className="border px-4 py-2">Date</th>
-                            <th className="border px-4 py-2">Total Sales</th>
+                        <tr className="bg-gray-200">
+                            <th className="border px-4 py-2">Year</th>
+                            <th className="border px-4 py-2">Month</th>
+                            <th className="border px-4 py-2">Amount</th>
+                            <th className="border px-4 py-2">Action</th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {transactions.length ? (
-                            transactions.map((t) => (
-                                <tr key={t.id} className="hover:bg-[#f9f5f0] text-center">
-                                    <td className="border px-4 py-2">#{t.id}</td>
-                                    <td className="border px-4 py-2">{t.created_at}</td>
-                                    <td className="border px-4 py-2">₱ {t.amount}</td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="3" className="text-center py-4 text-gray-600">
-                                    No sales records found.
-                                </td>
+                        {records.map((item, index) => (
+                            <tr key={index}>
+                                <td className="border px-4 py-2">{item.year}</td>
+                                <td className="border px-4 py-2">{item.month}</td>
+                                <td className="border px-4 py-2">₱{item.amount}</td>
+                                <td className="border px-4 py-2">{item.action}</td>
                             </tr>
-                        )}
+                        ))}
                     </tbody>
                 </table>
+
+                <div className="flex justify-between mt-4">
+                    <button
+                        disabled={page === 1}
+                        onClick={() => setPage(page - 1)}
+                        className="px-4 py-2 border rounded disabled:opacity-50"
+                    >
+                        Previous
+                    </button>
+
+                    <span>Page {page} of {lastPage}</span>
+
+                    <button
+                        disabled={page === lastPage}
+                        onClick={() => setPage(page + 1)}
+                        className="px-4 py-2 border rounded disabled:opacity-50"
+                    >
+                        Next
+                    </button>
+                </div>
             </div>
         </AuthenticatedLayout>
     );
