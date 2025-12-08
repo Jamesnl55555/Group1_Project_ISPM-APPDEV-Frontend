@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import axios from "@/api/axios"; // Use your axios instance with token
 
 export default function GenerateSalesReportDaily() {
   const [dailySales, setDailySales] = useState([]);
@@ -11,15 +11,22 @@ export default function GenerateSalesReportDaily() {
   useEffect(() => {
     const fetchDaily = async () => {
       try {
+        // Fetch authenticated user
         const userRes = await axios.get("/api/user");
         setUser(userRes.data);
+
+        // Fetch daily sales
         const response = await axios.get("/api/fetch-daily");
-        console.log("API response:", response.data.daily_sales);
+        console.log("API response:", response.data);
+
         if (response.data.success) {
-          setDailySales(response.data.daily_sales || []);
+          setDailySales(response.data.daily_sales || []); // fallback to []
+        } else {
+          setDailySales([]);
         }
       } catch (error) {
         console.error("Error fetching daily sales:", error);
+        setDailySales([]);
       } finally {
         setLoading(false);
       }
@@ -86,14 +93,20 @@ export default function GenerateSalesReportDaily() {
             marginTop: "1rem",
             transition: "all 0.2s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#2c1b0e")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "#2c1b0e")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "#4b2e17")
+          }
         >
           ← Back
         </Link>
       </div>
 
-      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+      <div
+        style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}
+      >
         {/* SUMMARY CARD */}
         <div
           style={{
