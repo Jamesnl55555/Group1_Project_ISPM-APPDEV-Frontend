@@ -19,6 +19,7 @@ export default function GenerateSalesReportWeekly() {
 
         if (response.data.success) {
           // Ensure it's always an array
+          console.log(response.data.weekly_sales)
           setWeeklySales(response.data.weekly_sales);
         } else {
           setWeeklySales([]);
