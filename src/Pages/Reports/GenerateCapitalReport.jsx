@@ -65,11 +65,39 @@ export default function GenerateCapitalReport() {
 
   const handleGenerate = () => {
     if (!reportType) return;
-    if (reportType === "Custom" && (!fromDate || !toDate)) {
-      alert("Please select both start and end dates for the custom report.");
-      return;
+
+    let query = "";
+
+    switch (reportType) {
+      case "Daily":
+        if (!fromDate) {
+          alert("Please select a date for the daily report.");
+          return;
+        }
+        query = `?date=${fromDate}`;
+        break;
+
+      case "Weekly":
+      case "Monthly":
+        if (!fromDate || !toDate) {
+          alert("Please select a valid month/week for the report.");
+          return;
+        }
+        query = `?from=${fromDate}&to=${toDate}`;
+        break;
+
+      case "Custom":
+        if (!fromDate || !toDate) {
+          alert("Please select both start and end dates for the custom report.");
+          return;
+        }
+        query = `?from=${fromDate}&to=${toDate}`;
+        break;
+
+      default:
+        break;
     }
-    const query = reportType === "Custom" ? `?from=${fromDate}&to=${toDate}` : "";
+
     navigate(routeMap[reportType] + query);
   };
 
@@ -132,10 +160,14 @@ export default function GenerateCapitalReport() {
         {/* Date Inputs */}
         <div style={{ display: "grid", gridTemplateColumns: reportType === "Custom" ? "1fr 1fr" : "repeat(3, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
           {reportType === "Daily" && (
-            <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setToDate(e.target.value); }}
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => { setFromDate(e.target.value); setToDate(e.target.value); }}
               style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}
             />
           )}
+
           {reportType === "Weekly" && (
             <>
               <select value={week} onChange={(e) => { setWeek(e.target.value); handleWeeklySelection(e.target.value, month, year); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
@@ -152,6 +184,7 @@ export default function GenerateCapitalReport() {
               </select>
             </>
           )}
+
           {reportType === "Monthly" && (
             <>
               <select value={month} onChange={(e) => { setMonth(e.target.value); handleMonthlyChange(e.target.value, year); }} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
@@ -164,6 +197,7 @@ export default function GenerateCapitalReport() {
               </select>
             </>
           )}
+
           {reportType === "Custom" && (
             <>
               <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }} />
@@ -174,14 +208,18 @@ export default function GenerateCapitalReport() {
 
         {/* Generate Button */}
         <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <button onClick={handleGenerate} disabled={!reportType} style={{
-            padding: "0.5rem 1.5rem",
-            fontWeight: "bold",
-            borderRadius: "0.375rem",
-            border: "1px solid #4b2e17",
-            backgroundColor: reportType ? "#f3e6d9" : "#f9f5f0",
-            cursor: reportType ? "pointer" : "not-allowed"
-          }}>
+          <button
+            onClick={handleGenerate}
+            disabled={!reportType}
+            style={{
+              padding: "0.5rem 1.5rem",
+              fontWeight: "bold",
+              borderRadius: "0.375rem",
+              border: "1px solid #4b2e17",
+              backgroundColor: reportType ? "#f3e6d9" : "#f9f5f0",
+              cursor: reportType ? "pointer" : "not-allowed"
+            }}
+          >
             Generate Report
           </button>
         </div>
