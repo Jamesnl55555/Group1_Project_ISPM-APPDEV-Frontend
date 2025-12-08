@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import axios from "@/api/axios";
+import { useNavigate } from "react-router-dom";
 
-export default function GenerateSalesReportMonthly() {
+export default function GenerateSalesReport() {
+  const navigate = useNavigate();
   const [reportType, setReportType] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -13,60 +15,74 @@ export default function GenerateSalesReportMonthly() {
   const [monthlySales, setMonthlySales] = useState([]);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [error, setError] = useState("");
 
-  // Fetch user info
+  const routeMap = {
+    Daily: "/generate-sales-report/daily",
+    Weekly: "/generate-sales-report/weekly",
+    Monthly: "/generate-sales-report/monthly",
+    Custom: "/generate-sales-report/custom",
+  };
+
+  // Fetch authenticated user
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userRes = await axios.get("/api/user");
-        setUser(userRes.data);
-      } catch (err) {
-        console.error("Failed to fetch user", err);
-      }
-    };
-    fetchUser();
+    axios.get("/api/user").then((res) => setUser(res.data));
   }, []);
 
-  // Compute date range for weekly selection
+  // Auto-fill dates for Daily
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    if (reportType === "Daily") {
+      setFromDate(today);
+      setToDate(today);
+    } else {
+      setFromDate("");
+      setToDate("");
+      setMonth("");
+      setYear("");
+      setWeek("");
+    }
+  }, [reportType]);
+
+  // Weekly date calculation
   const handleWeeklySelection = (selectedWeek, selectedMonth, selectedYear) => {
     if (!selectedWeek || !selectedMonth || !selectedYear) return;
-
     const yearNum = Number(selectedYear);
     const monthNum = Number(selectedMonth) - 1;
-
     const startDay = (selectedWeek - 1) * 7 + 1;
-    const endDay = selectedWeek * 7;
-    const lastDayOfMonth = new Date(yearNum, monthNum + 1, 0).getDate();
-    const safeEndDay = Math.min(endDay, lastDayOfMonth);
-
+    const endDay = Math.min(selectedWeek * 7, new Date(yearNum, monthNum + 1, 0).getDate());
     const startDate = new Date(yearNum, monthNum, startDay);
-    const endDate = new Date(yearNum, monthNum, safeEndDay);
-
+    const endDate = new Date(yearNum, monthNum, endDay);
     setFromDate(startDate.toISOString().split("T")[0]);
     setToDate(endDate.toISOString().split("T")[0]);
   };
 
-  // Compute date range for monthly selection
-  const handleMonthlySelection = (selectedMonth, selectedYear) => {
-    if (!selectedMonth || !selectedYear) return;
-
-    const firstDay = new Date(selectedYear, selectedMonth - 1, 1).toISOString().split("T")[0];
-    const lastDay = new Date(selectedYear, selectedMonth, 0).toISOString().split("T")[0];
-
+  // Monthly date calculation
+  const handleMonthlyChange = (monthValue, yearValue) => {
+    if (!monthValue || !yearValue) return;
+    const firstDay = new Date(yearValue, monthValue - 1, 1).toISOString().split("T")[0];
+    const lastDay = new Date(yearValue, monthValue, 0).toISOString().split("T")[0];
     setFromDate(firstDay);
     setToDate(lastDay);
   };
 
+  const handleGenerate = () => {
+    if (!reportType) return;
+    if (reportType === "Custom" && (!fromDate || !toDate)) {
+      alert("Please select both start and end dates for the custom report.");
+      return;
+    }
+    const query = reportType === "Custom" ? `?from=${fromDate}&to=${toDate}` : "";
+    navigate(routeMap[reportType] + query);
+  };
+
   // Fetch sales data whenever date range changes
   useEffect(() => {
-    const fetchMonthly = async () => {
+    const fetchSales = async () => {
       if (!fromDate || !toDate) return;
 
       setLoading(true);
-      setError("");
       try {
-        const response = await axios.get("/api/fetch-custom", {
+        const response = await axios.get("/api/fetch-custom-sales", {
           params: { from: fromDate, to: toDate },
         });
 
@@ -74,217 +90,170 @@ export default function GenerateSalesReportMonthly() {
           setMonthlySales(Array.isArray(response.data.custom_sales) ? response.data.custom_sales : []);
         } else {
           setMonthlySales([]);
-          setError(response.data.message || "No sales records found.");
         }
       } catch (err) {
-        console.error("Error fetching monthly sales:", err);
+        console.error("Error fetching sales:", err);
         setMonthlySales([]);
-        setError("Failed to fetch data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
-    fetchMonthly();
+    fetchSales();
   }, [fromDate, toDate]);
 
-  // Compute total
   const overallTotal = monthlySales.reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
   return (
     <AuthenticatedLayout user={user}>
-      <div className="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl border border-[#d7bfa0]">
-        <h1 className="text-2xl font-bold mb-6">Monthly Sales Report</h1>
+      <div style={{ maxWidth: "68rem", margin: "2.5rem auto", fontFamily: "sans-serif" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
+          <h1 style={{
+            fontSize: "3rem",
+            fontWeight: 800,
+            lineHeight: 1.3,
+            WebkitTextStroke: ".8px #000",
+            backgroundImage: "linear-gradient(to bottom, #ec8845ff, #3b1f0d)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent"
+          }}>
+            Generate Sales Report
+          </h1>
+          <button
+            onClick={() => navigate("/dashboard")}
+            style={{
+              backgroundColor: "#4b2e17",
+              color: "white",
+              padding: "0.5rem 1.5rem",
+              borderRadius: "0.375rem",
+              fontWeight: "bold",
+              cursor: "pointer"
+            }}
+          >
+            ← Back
+          </button>
+        </div>
 
         {/* Report Type Selection */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
           {["Daily", "Weekly", "Monthly", "Custom"].map((type) => (
-            <button
-              key={type}
-              onClick={() => {
-                setReportType(type);
-                setFromDate("");
-                setToDate("");
-                setMonth("");
-                setYear("");
-                setWeek("");
-              }}
-              className={`p-4 rounded font-semibold ${
-                reportType === type ? "bg-[#f3e6d9] border-[#4b2e17]" : "bg-[#c5a888]"
-              }`}
-            >
-              {type}
-            </button>
+            <div key={type} style={{
+              padding: "1rem",
+              borderRadius: "0.75rem",
+              cursor: "pointer",
+              border: reportType === type ? "2px solid #4b2e17" : "1px solid #d7bfa0",
+              backgroundColor: reportType === type ? "#f3e6d9" : "#f9f5f0"
+            }} onClick={() => setReportType(type)}>
+              <p style={{ fontWeight: "bold" }}>{type}</p>
+              <p style={{ fontSize: "0.875rem", color: "#555" }}>
+                {type === "Daily" && "Pick a single date"}
+                {type === "Weekly" && "Select week, month, and year"}
+                {type === "Monthly" && "Select a month"}
+                {type === "Custom" && "Select start and end dates"}
+              </p>
+            </div>
           ))}
         </div>
 
         {/* Date Inputs */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <div style={{ display: "grid", gridTemplateColumns: reportType === "Custom" ? "1fr 1fr" : "repeat(3, 1fr)", gap: "1rem", marginBottom: "2rem" }}>
           {reportType === "Daily" && (
-            <input
-              type="date"
-              value={fromDate}
-              onChange={(e) => {
-                setFromDate(e.target.value);
-                setToDate(e.target.value);
-              }}
-              className="border px-3 py-2 rounded"
+            <input type="date" value={fromDate} onChange={(e) => { setFromDate(e.target.value); setToDate(e.target.value); }}
+              style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}
             />
           )}
-
           {reportType === "Weekly" && (
             <>
-              <select
-                value={week}
-                onChange={(e) => {
-                  setWeek(e.target.value);
-                  handleWeeklySelection(e.target.value, month, year);
-                }}
-                className="border px-3 py-2 rounded"
-              >
+              <select value={week} onChange={(e) => { setWeek(e.target.value); handleWeeklySelection(e.target.value, month, year); }}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
                 <option value="">Week</option>
-                <option value="1">Week 1</option>
-                <option value="2">Week 2</option>
-                <option value="3">Week 3</option>
-                <option value="4">Week 4</option>
-                <option value="5">Week 5</option>
+                {Array.from({ length: 5 }, (_, i) => i + 1).map((w) => <option key={w} value={w}>{w}</option>)}
               </select>
-
-              <select
-                value={month}
-                onChange={(e) => {
-                  setMonth(e.target.value);
-                  handleWeeklySelection(week, e.target.value, year);
-                }}
-                className="border px-3 py-2 rounded"
-              >
+              <select value={month} onChange={(e) => { setMonth(e.target.value); handleWeeklySelection(week, e.target.value, year); }}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
                 <option value="">Month</option>
-                {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
-
-              <select
-                value={year}
-                onChange={(e) => {
-                  setYear(e.target.value);
-                  handleWeeklySelection(week, month, e.target.value);
-                }}
-                className="border px-3 py-2 rounded"
-              >
+              <select value={year} onChange={(e) => { setYear(e.target.value); handleWeeklySelection(week, month, e.target.value); }}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
                 <option value="">Year</option>
-                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
+                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             </>
           )}
-
           {reportType === "Monthly" && (
             <>
-              <select
-                value={month}
-                onChange={(e) => {
-                  setMonth(e.target.value);
-                  handleMonthlySelection(e.target.value, year);
-                }}
-                className="border px-3 py-2 rounded"
-              >
+              <select value={month} onChange={(e) => { setMonth(e.target.value); handleMonthlyChange(e.target.value, year); }}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
                 <option value="">Month</option>
-                {Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, "0")).map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
-
-              <select
-                value={year}
-                onChange={(e) => {
-                  setYear(e.target.value);
-                  handleMonthlySelection(month, e.target.value);
-                }}
-                className="border px-3 py-2 rounded"
-              >
+              <select value={year} onChange={(e) => { setYear(e.target.value); handleMonthlyChange(month, e.target.value); }}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }}>
                 <option value="">Year</option>
-                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
+                {Array.from({ length: 11 }, (_, i) => 2020 + i).map((y) => <option key={y} value={y}>{y}</option>)}
               </select>
             </>
           )}
-
           {reportType === "Custom" && (
             <>
-              <input
-                type="date"
-                value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
-                className="border px-3 py-2 rounded"
-              />
-              <input
-                type="date"
-                value={toDate}
-                onChange={(e) => setToDate(e.target.value)}
-                className="border px-3 py-2 rounded"
-              />
+              <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }} />
+              <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)}
+                style={{ padding: "0.5rem", borderRadius: "0.375rem", border: "1px solid #d7bfa0" }} />
             </>
           )}
         </div>
 
         {/* Generate Button */}
-        <div className="flex justify-end mb-6">
-          <button
-            onClick={() => {}}
-            className="px-6 py-2 font-bold rounded bg-[#4b2e17] text-white hover:bg-[#39210f]"
-          >
+        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "2rem" }}>
+          <button onClick={handleGenerate} disabled={!reportType}
+            style={{
+              padding: "0.5rem 1.5rem",
+              fontWeight: "bold",
+              borderRadius: "0.375rem",
+              border: "1px solid #4b2e17",
+              backgroundColor: reportType ? "#f3e6d9" : "#f9f5f0",
+              cursor: reportType ? "pointer" : "not-allowed"
+            }}>
             Generate Report
           </button>
         </div>
 
         {/* Sales Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full table-auto border-collapse text-center">
-            <thead>
-              <tr className="bg-[#d6d6d6] text-black">
-                <th className="border px-4 py-2">Date</th>
-                <th className="border px-4 py-2">User</th>
-                <th className="border px-4 py-2">Action</th>
-                <th className="border px-4 py-2">Amount</th>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "center" }}>
+            <thead style={{ backgroundColor: "#f3e6d9" }}>
+              <tr>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Date</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>User</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Action</th>
+                <th style={{ border: "1px solid #d7bfa0", padding: ".5rem" }}>Amount</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan="4" className="py-4">Loading...</td>
-                </tr>
+                <tr><td colSpan="4" style={{ padding: "1rem" }}>Loading...</td></tr>
               ) : monthlySales.length ? (
                 monthlySales.map((t, idx) => (
-                  <tr key={idx} className="hover:bg-[#f9f5f0]">
-                    <td className="border px-4 py-2">{t.created_at}</td>
-                    <td className="border px-4 py-2">{t.user}</td>
-                    <td className="border px-4 py-2">{t.action}</td>
-                    <td className="border px-4 py-2">₱ {t.amount}</td>
+                  <tr key={idx} style={{ borderBottom: "1px solid #f0e4d7" }}>
+                    <td style={{ padding: ".5rem" }}>{t.created_at}</td>
+                    <td style={{ padding: ".5rem" }}>{t.user}</td>
+                    <td style={{ padding: ".5rem" }}>{t.action}</td>
+                    <td style={{ padding: ".5rem" }}>₱ {t.amount}</td>
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan="4" className="py-4 text-gray-600">No sales records found.</td>
-                </tr>
+                <tr><td colSpan="4" style={{ padding: "1rem", color: "#444" }}>No sales records found.</td></tr>
               )}
             </tbody>
           </table>
         </div>
 
         {/* Overall Total */}
-        <div className="mt-4 flex justify-between bg-[#f1f1f1] p-4 rounded-lg border border-[#d7bfa0] font-bold">
+        <div style={{ marginTop: "1rem", display: "flex", justifyContent: "space-between", backgroundColor: "#f1f1f1", padding: "1rem", borderRadius: ".75rem", border: "1px solid #d7bfa0", fontWeight: "bold" }}>
           <span>Overall Total Sales</span>
-          <span className="text-green-600">₱ {overallTotal}</span>
+          <span style={{ color: "green" }}>₱ {overallTotal}</span>
         </div>
       </div>
     </AuthenticatedLayout>
