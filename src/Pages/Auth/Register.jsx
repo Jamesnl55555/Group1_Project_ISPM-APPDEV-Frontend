@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import { IconUser, IconMail, IconLock } from "@tabler/icons-react";
 
 export default function Register() {
   const [data, setData] = useState({
@@ -69,10 +70,24 @@ export default function Register() {
     },
   });
 
+  const iconForField = (field) => {
+    switch (field) {
+      case "name":
+        return <IconUser size={18} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: errors[field] ? 'red' : '#555' }} />;
+      case "email":
+        return <IconMail size={18} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: errors[field] ? 'red' : '#555' }} />;
+      case "password":
+      case "password_confirmation":
+        return <IconLock size={18} style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', color: errors[field] ? 'red' : '#555' }} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div
       style={{
-        minHeight: '95vh',
+        minHeight: '90vh',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -80,221 +95,161 @@ export default function Register() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         fontFamily: 'Poppins, sans-serif',
-        padding: '1rem',
+        padding: '2rem',
+        position: 'relative',
       }}
     >
+      <img
+        src="/images/2.png"
+        alt="Logo"
+        style={{
+          width: '12rem',
+          height: 'auto',
+          position: 'absolute',
+          top: '1rem',
+          left: '1rem',
+        }}
+      />
+
       <div
         style={{
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
           width: '100%',
           maxWidth: '400px',
+          backgroundColor: 'rgba(255,255,255,0.98)',
+          borderRadius: '12px',
+          boxShadow: '4px 8px 10px rgba(34,34,34,0.6)',
+          padding: '3rem 2rem 2rem 2rem',
+          textAlign: 'left',
         }}
       >
-        {/* Logo */}
-        <img
-          src="/images/2.png"
-          alt="Logo"
+        <h2
           style={{
-            width: '70%',
-            height: 'auto',
-            objectFit: 'contain',
-            marginBottom: '-41rem',
-            zIndex: 2,
-          }}
-        />
-
-        {/* Card */}
-        <div
-          style={{
-            width: '100%',
-            maxWidth: '400px',
-            maxHeight: 'auto',
-            marginTop: '35rem',
-            backgroundColor: 'rgba(255,255,255,0.98)',
-            borderRadius: '12px',
-            boxShadow: '4px 8px 10px rgba(34,34,34,0.6)',
-            padding: '3rem 2rem 2rem 2rem',
-            textAlign: 'left',
+            fontSize: '2rem',
+            fontWeight: '700',
+            marginTop: '-.5rem',
+            marginBottom: '1.5rem',
+            textAlign: 'center',
+            textShadow: '0 2px 4px rgba(0,0,0,0.25)',
           }}
         >
-          <h2
-            style={{
-              fontWeight: '700',
-              color: '#000',
-              fontSize: '1.8rem',
-              letterSpacing: '0.5px',
-              marginBottom: '2rem',
-              marginTop: '4rem',
-              textAlign: 'center',
-              textShadow: '0 2px 4px rgba(0,0,0,0.25)',
-            }}
-          >
-            SIGN UP
-          </h2>
+          SIGN UP
+        </h2>
 
-          {errors.general && (
-            <div style={{ color: 'red', marginBottom: '1rem' }}>{errors.general}</div>
-          )}
+        {errors.general && (
+          <div style={{ color: 'red', marginBottom: '1rem' }}>{errors.general}</div>
+        )}
 
-          <form onSubmit={submit}>
-            {/* Username */}
-            <div style={{ marginBottom: '1rem' }}>
-              <InputLabel htmlFor="name" value="Username" />
-              <TextInput
-                id="name"
-                name="name"
-                value={data.name}
-                onChange={(e) => setDataField('name', e.target.value)}
-                {...inputHandlers('name')}
-                style={{
-                  marginTop: '0.25rem',
-                  width: '95%',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.name ? 'red' : '#D1D5DB'}`,
-                  padding: '0.5rem',
-                  backgroundColor: getBackgroundColor('name'),
-                  transition: 'all 0.2s',
-                }}
-              />
-              <InputError message={errors.name} />
-            </div>
+        <form onSubmit={submit}>
+          {['name', 'email', 'password', 'password_confirmation'].map((field) => {
+            const isPassword = field === 'password';
+            const isConfirm = field === 'password_confirmation';
+            const labelText =
+              field === 'name'
+                ? 'Username'
+                : field === 'password_confirmation'
+                ? 'Confirm Password'
+                : field.charAt(0).toUpperCase() + field.slice(1);
 
-            {/* Email */}
-            <div style={{ marginBottom: '1rem' }}>
-              <InputLabel htmlFor="email" value="Email" />
-              <TextInput
-                id="email"
-                type="email"
-                name="email"
-                value={data.email}
-                onChange={(e) => setDataField('email', e.target.value)}
-                {...inputHandlers('email')}
-                style={{
-                  marginTop: '0.25rem',
-                  width: '95%',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.email ? 'red' : '#D1D5DB'}`,
-                  padding: '0.5rem',
-                  backgroundColor: getBackgroundColor('email'),
-                  transition: 'all 0.2s',
-                }}
-              />
-              <InputError message={errors.email} />
-            </div>
+            return (
+              <div key={field} style={{ marginBottom: '1rem', position: 'relative' }}>
+                <InputLabel htmlFor={field} value={labelText} />
 
-            {/* Password */}
-            <div style={{ marginBottom: '1rem' }}>
-              <InputLabel htmlFor="password" value="Password" />
-              <TextInput
-                id="password"
-                type="password"
-                name="password"
-                value={data.password}
-                onChange={(e) => setDataField('password', e.target.value)}
-                {...inputHandlers('password')}
-                style={{
-                  marginTop: '0.25rem',
-                  width: '95%',
-                  borderRadius: '6px',
-                  border: `1px solid ${errors.password ? 'red' : '#D1D5DB'}`,
-                  padding: '0.5rem',
-                  backgroundColor: getBackgroundColor('password'),
-                  transition: 'all 0.2s',
-                }}
-              />
-              <InputError message={errors.password} />
-            </div>
+                <div style={{ position: 'relative' }}>
+                  {iconForField(field)}
 
-            {/* Confirm Password */}
-            <div style={{ marginBottom: '1rem' }}>
-              <InputLabel htmlFor="password_confirmation" value="Confirm Password" />
-              <TextInput
-                id="password_confirmation"
-                type="password"
-                name="password_confirmation"
-                value={data.password_confirmation}
-                onChange={(e) => setDataField('password_confirmation', e.target.value)}
-                {...inputHandlers('password_confirmation')}
-                style={{
-                  marginTop: '0.25rem',
-                  width: '95%',
-                  borderRadius: '6px',
-                  border: `1px solid ${
-                    errors.password_confirmation ? 'red' : '#D1D5DB'
-                  }`,
-                  padding: '0.5rem',
-                  backgroundColor: getBackgroundColor('password_confirmation'),
-                  transition: 'all 0.2s',
-                }}
-              />
-              <InputError message={errors.password_confirmation} />
-            </div>
+                  <TextInput
+                    id={field}
+                    type={isPassword || isConfirm ? 'password' : 'text'}
+                    value={data[field]}
+                    onChange={(e) => setDataField(field, e.target.value)}
+                    {...inputHandlers(field)}
+                    style={{
+                      width: '100%',
+                      paddingLeft: '2rem',
+                      paddingRight: isPassword || isConfirm ? '2.5rem' : '0.5rem',
+                      borderRadius: '4px',
+                      border: `1px solid ${errors[field] ? 'red' : '#D1D5DB'}`,
+                      backgroundColor: getBackgroundColor(field),
+                      color: errors[field] ? 'red' : '#111827',
+                      transition: 'all 0.2s',
+                    }}
+                  />
+                  <InputError message={errors[field]} />
+                </div>
+              </div>
+            );
+          })}
 
-            {/* Remember Me */}
-            <div
+          {/* Remember Me */}
+          <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem', color: 'gray' }}>
+            <input
+              type="checkbox"
+              checked={data.remember}
+              onChange={(e) => setDataField('remember', e.target.checked)}
+              style={{ accentColor: '#ffffffff', cursor: 'pointer' }}
+            />
+            <label
               style={{
-                marginTop: '0.8rem',
-                display: 'flex',
-                alignItems: 'center',
-                color: 'gray',
+                marginLeft: '0.25rem',
                 fontSize: '0.6rem',
+                fontWeight: 700,
+                color: '#8d8d8dff',
               }}
             >
-              <input
-                type="checkbox"
-                checked={data.remember}
-                onChange={(e) => setDataField('remember', e.target.checked)}
-                style={{ accentColor: '#fff', cursor: 'pointer' }}
-              />
-              <label style={{ marginLeft: '0.25rem' }}>Remember Me</label>
-            </div>
+              Remember Me
+            </label>
+          </div>
 
-            {/* Submit Button */}
-            <div style={{ textAlign: 'center', marginTop: '2rem', display: "flex", justifyContent: "center" }}>
-              <PrimaryButton
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: '120px',
-                  padding: '0.6rem',
-                  fontWeight: 600,
-                  fontSize: '1rem',
-                  color: '#fff',
-                  background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: loading ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
-                  transition: '0.3s',
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading)
-                    e.currentTarget.style.background = 'linear-gradient(to bottom, #3e2b1c, #2e1c0f)';
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading)
-                    e.currentTarget.style.background = 'linear-gradient(to bottom, #4a2f26, #2f1c14)';
-                }}
-              >
-                SIGN UP
-              </PrimaryButton>
-            </div>
+          {/* Submit Button */}
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1.5rem' }}>
+            <PrimaryButton
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                maxWidth: '150px',
+                padding: '0.6rem',
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: '#fff',
+                background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                transition: 'background 0.3s',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+              }}
+              onMouseEnter={(e) => {
+                if (!loading)
+                  e.currentTarget.style.background = 'linear-gradient(to bottom, #3e2b1c, #2e1c0f)';
+              }}
+              onMouseLeave={(e) => {
+                if (!loading)
+                  e.currentTarget.style.background = 'linear-gradient(to bottom, #4a2f26, #2f1c14)';
+              }}
+            >
+              SIGN UP
+            </PrimaryButton>
+          </div>
 
-            {/* Log In Link */}
-            <p style={{ marginTop: '1rem', fontSize: '0.875rem', color: '#4B5563', textAlign: 'center' }}>
-              Already have an account?{' '}
-              <Link
-                to="/login"
-                style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
-              >
-                Log In
-              </Link>
-            </p>
-          </form>
-        </div>
+          {/* Log In Link */}
+          <p
+            style={{
+              marginTop: '1rem',
+              fontSize: '0.7rem',
+              color: '#919cafff',
+              textAlign: 'center',
+            }}
+          >
+            Already have an account?{' '}
+            <Link
+              to="/login"
+              style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
+            >
+              Log In
+            </Link>
+          </p>
+        </form>
       </div>
 
       {/* Modal */}
