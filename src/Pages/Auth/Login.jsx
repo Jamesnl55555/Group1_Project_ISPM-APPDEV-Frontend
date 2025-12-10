@@ -215,18 +215,24 @@ export default function Login() {
 
             {/* SUBMIT BUTTON */}
             <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-              <PrimaryButton
+            <PrimaryButton
                 type="submit"
                 disabled={loading}
-                className="w-32 py-2"
+                className="" // remove any inherited classes
                 style={{
-                  background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
-                  fontSize: '1rem',
-                  fontWeight: 600,
+                width: '120px',
+                padding: '0.6rem',
+                fontSize: '1rem',
+                fontWeight: 600,
+                color: '#fff',
+                background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
                 }}
-              >
+            >
                 SIGN IN
-              </PrimaryButton>
+            </PrimaryButton>
             </div>
 
             {/* REGISTER LINK */}
