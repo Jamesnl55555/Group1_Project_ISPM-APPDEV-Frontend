@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import InputError from '@/Component/InputError';
+import InputError from '@/Components/InputError';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
