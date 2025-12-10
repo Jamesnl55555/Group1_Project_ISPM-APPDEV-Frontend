@@ -282,7 +282,7 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
+                        <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center", textAlign: "center" }}>
                             <PrimaryButton
                                 type="submit"
                                 disabled={loading}
@@ -296,7 +296,6 @@ export default function Login() {
                                     border: "none",
                                     borderRadius: "6px",
                                     cursor: "pointer",
-                                    textAlign: "center",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
