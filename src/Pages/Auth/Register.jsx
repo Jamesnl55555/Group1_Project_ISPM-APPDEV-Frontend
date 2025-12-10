@@ -76,8 +76,7 @@ export default function Register() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         fontFamily: 'Poppins, sans-serif',
-        padding: 0,
-        overflow: 'hidden',
+        padding: '2rem',
         position: 'relative',
       }}
     >
