@@ -312,6 +312,23 @@ export default function Login() {
                                 SIGN IN
                             </PrimaryButton>
                         </div>
+                        {/* Log In Link */}
+                        <p
+                        style={{
+                            marginTop: '1rem',
+                            fontSize: '0.7rem',
+                            color: '#919cafff',
+                            textAlign: 'center',
+                        }}
+                        >
+                        Already have an account?{' '}
+                        <Link
+                            to="/login"
+                            style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
+                        >
+                            Log In
+                        </Link>
+                    </p>
                     </form>
                 </div>
             </div>
