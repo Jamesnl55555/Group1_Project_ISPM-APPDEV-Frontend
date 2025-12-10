@@ -1,266 +1,336 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "@/api/axios";
-
-import InputError from "../../Components/InputError";
-import PrimaryButton from "../../Components/PrimaryButton";
-
-import { IconMail, IconLock, IconEye, IconEyeOff } from "@tabler/icons-react";
+import axios from '@/api/axios';
+import TextInput from '../../Components/TextInput';
+import InputLabel from '../../Components/InputLabel';
+import InputError from '../../Components/InputError';
+import PrimaryButton from '../../Components/PrimaryButton';
+import Checkbox from '../../Components/Checkbox';
 
 export default function Login() {
-  const [data, setData] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+    const [data, setData] = useState({ email: "", password: "", remember: false });
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
+    
+    const submit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setErrors({});
+        setShowModal(false);
 
-  const handleChange = (field) => (e) => {
-    setData({ ...data, [field]: e.target.value });
-    setErrors((prev) => ({ ...prev, [field]: "" }));
-  };
+        try {
+            const response = await axios.post("/api/login", data);
+            if (response.data?.token) {
+                localStorage.setItem('auth_token', response.data.token);
+            }
+            navigate("/dashboard");
+        } catch (err) {
+            if (err.response?.status === 401) {
+                setShowModal(true);
+            } else if (err.response?.data?.errors) {
+                setErrors(err.response.data.errors);
+            } else {
+                setErrors({ general: err.response?.data?.message || "Something went wrong" });
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrors({});
+    const inputBaseStyle = {
+        marginTop: "0.25rem",
+        borderRadius: "6px",
+        border: "1px solid #D1D5DB",
+        padding: "0.5rem",
+        transition: "all 0.2s",
+        color: "#111827",
+    };
 
-    try {
-      const response = await axios.post("/api/login", data);
+    const handleInputFocus = (e) => {
+        e.target.style.borderColor = "#563d28";
+        e.target.style.backgroundColor = "#fff4e5ff";
+        e.target.placeholder = "";
+    };
 
-      if (response.data?.token) {
-        localStorage.setItem("auth_token", response.data.token);
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      if (err.response?.data?.errors) {
-        setErrors(err.response.data.errors);
-      } else {
-        setErrors({ general: "Invalid credentials" });
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleInputBlur = (e, value, placeholder) => {
+        e.target.style.borderColor = "#D1D5DB";
+        e.target.style.backgroundColor = value ? "#fff4e5ff" : "#ffffff";
+        e.target.placeholder = value ? "" : placeholder;
+    };
 
-  // MATCH REGISTER EXACTLY
-  const inputStyle = (field) => ({
-    width: "90%",
-    padding: "0.5rem 2.5rem 0.5rem 2.5rem", // EXACT MATCH
-    borderRadius: "4px",
-    border: `1px solid ${errors[field] ? "red" : "#D1D5DB"}`,
-    backgroundColor: errors[field]
-      ? "#ffe5e5"
-      : data[field]
-      ? "#fff4e5ff"
-      : "#ffffff",
-    color: errors[field] ? "red" : "#111827",
-    transition: "all 0.2s",
-    fontSize: "0.9rem",
-  });
+    const handleInputHover = (e) => {
+        e.target.style.borderColor = "#563d28";
+        e.target.style.backgroundColor = "#fff4e5ff";
+    };
 
-  const handleFocus = (e) => {
-    e.target.style.borderColor = "#563d28";
-    e.target.style.backgroundColor = "#fff4e5ff";
-  };
+    const handleInputHoverLeave = (e, value, hasError) => {
+        e.target.style.borderColor = hasError ? "red" : "#D1D5DB";
+        e.target.style.backgroundColor = hasError ? "#ffe5e5" : value ? "#fff4e5ff" : "#ffffff";
+    };
 
-  const handleBlur = (e, field) => {
-    e.target.style.borderColor = errors[field] ? "red" : "#D1D5DB";
-    e.target.style.backgroundColor = errors[field]
-      ? "#ffe5e5"
-      : data[field]
-      ? "#fff4e5ff"
-      : "#ffffff";
-  };
-
-  const handleHover = (e) => {
-    e.target.style.borderColor = "#563d28";
-    e.target.style.backgroundColor = "#fff4e5ff";
-  };
-
-  const handleHoverLeave = (e, field) => {
-    e.target.style.borderColor = errors[field] ? "red" : "#D1D5DB";
-    e.target.style.backgroundColor = errors[field]
-      ? "#ffe5e5"
-      : data[field]
-      ? "#fff4e5ff"
-      : "#ffffff";
-  };
-
-  return (
-    <div
-      style={{
-        backgroundImage: "url('/images/1.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        minHeight: "90vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        fontFamily: "Poppins, sans-serif",
-        padding: "2rem",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          maxWidth: "400px",
-          backgroundColor: "rgba(255,255,255,0.98)",
-          borderRadius: "12px",
-          boxShadow: "4px 8px 20px rgba(0,0,0,0.4)",
-          padding: "3rem 2rem",
-        }}
-      >
-        <h2
-          style={{
-            textAlign: "center",
-            fontSize: "2rem",
-            fontWeight: 700,
-            marginBottom: "1.5rem",
-          }}
-        >
-          LOG IN
-        </h2>
-
-        <form onSubmit={handleSubmit}>
-          {/* EMAIL */}
-          <div style={{ marginBottom: "1rem", position: "relative" }}>
-            <label htmlFor="email" style={{ fontWeight: 550, color: "#3b3b3bff" }}>
-              Email
-            </label>
-
-            <div style={{ position: "relative" }}>
-              <div
-                style={{
-                  position: "absolute",
-                  left: "8px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: errors.email ? "red" : "#555",
-                }}
-              >
-                <IconMail size={18} />
-              </div>
-
-              <input
-                id="email"
-                type="email"
-                value={data.email}
-                placeholder="Email"
-                onChange={handleChange("email")}
-                style={inputStyle("email")}
-                onFocus={handleFocus}
-                onBlur={(e) => handleBlur(e, "email")}
-                onMouseEnter={handleHover}
-                onMouseLeave={(e) => handleHoverLeave(e, "email")}
-              />
-            </div>
-
-            <InputError message={errors.email} />
-          </div>
-
-          {/* PASSWORD */}
-          <div style={{ marginBottom: "1rem", position: "relative" }}>
-            <label
-              htmlFor="password"
-              style={{ fontWeight: 550, color: "#3b3b3bff" }}
-            >
-              Password
-            </label>
-
-            <div style={{ position: "relative" }}>
-              {/* LEFT LOCK ICON */}
-              <div
-                style={{
-                  position: "absolute",
-                  left: "8px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  color: errors.password ? "red" : "#555",
-                }}
-              >
-                <IconLock size={18} />
-              </div>
-
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={data.password}
-                placeholder="Password"
-                onChange={handleChange("password")}
-                style={inputStyle("password")}
-                onFocus={handleFocus}
-                onBlur={(e) => handleBlur(e, "password")}
-                onMouseEnter={handleHover}
-                onMouseLeave={(e) => handleHoverLeave(e, "password")}
-              />
-
-              {/* RIGHT EYE ICON */}
-              <div
-                onClick={() => setShowPassword((prev) => !prev)}
-                style={{
-                  position: "absolute",
-                  right: "8px",
-                  top: "55%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                  color: errors.password ? "red" : "#555",
-                  opacity: 0.7,
-                }}
-              >
-                {showPassword ? <IconEyeOff size={18} /> : <IconEye size={18} />}
-              </div>
-            </div>
-
-            <InputError message={errors.password} />
-          </div>
-
-          {/* BUTTON */}
-          <div style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
-            <PrimaryButton
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                maxWidth: "150px",
-                padding: "0.6rem",
-                fontSize: "1rem",
-                fontWeight: 600,
-                color: "#fff",
-                background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-              }}
-            >
-              SIGN IN
-            </PrimaryButton>
-          </div>
-
-          {/* SWITCH TO REGISTER */}
-          <p
+    return (
+        <div
             style={{
-              marginTop: "1rem",
-              fontSize: "0.7rem",
-              color: "#919cafff",
-              textAlign: "center",
+                backgroundImage: "url('/images/1.png')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                minHeight: "90vh",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                fontFamily: "Poppins, sans-serif",
+                flexDirection: "column",
+                padding: "2rem",
             }}
-          >
-            Don’t have an account?{" "}
-            <Link
-              to="/register"
-              style={{
-                color: "#2563EB",
-                fontWeight: 500,
-                textDecoration: "underline",
-              }}
+        >
+            {showModal && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 1000,
+                    }}
+                    onClick={() => setShowModal(false)}
+                >
+                    <div
+                        style={{
+                            backgroundColor: "#fff",
+                            padding: "2rem",
+                            borderRadius: "12px",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
+                            minWidth: "300px",
+                            textAlign: "center",
+                            cursor: "default",
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <h3 style={{ color: "#b91c1c", marginBottom: "1rem" }}>Invalid Credentials</h3>
+                        <p>Please check your email and password and try again.</p>
+                        <PrimaryButton
+                            type="button"
+                            onClick={() => setShowModal(false)}
+                            style={{
+                                marginTop: "1rem",
+                                width: "100px",
+                                background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
+                            }}
+                        >
+                            OK
+                        </PrimaryButton>
+                    </div>
+                </div>
+            )}
+
+            <div
+                style={{
+                    position: "relative",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                    maxWidth: "400px",
+                }}
             >
-              Register
-            </Link>
-          </p>
-        </form>
-      </div>
-    </div>
-  );
+                <img
+                    src="/images/2.png"
+                    alt="Logo"
+                    style={{
+                        width: "50rem",
+                        height: "15rem",
+                        objectFit: "contain",
+                        zIndex: 2,
+                        marginBottom: "-90px",
+                    }}
+                />
+
+                <div
+                    style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.98)",
+                        borderRadius: "12px",
+                        boxShadow: "4px 8px 20px rgba(0, 0, 0, 0.4)",
+                        padding: "3.5rem 2rem 1.5rem 2rem",
+                        width: "24rem",
+                        marginTop: "-2rem",
+                        zIndex: 1,
+                        textAlign: "left",
+                        borderBottom: "2px solid rgba(0, 0, 0, .8)",
+                        height: "auto",
+                    }}
+                >
+                    <h2
+                        style={{
+                            fontWeight: "700",
+                            color: "#000",
+                            fontSize: "2rem",
+                            letterSpacing: "0.5px",
+                            marginBottom: "2rem",
+                            marginTop: "4rem",
+                            textAlign: "center",
+                            textShadow: "0 2px 4px rgba(0,0,0,0.25)",
+                        }}
+                    >
+                        LOG IN
+                    </h2>
+
+                    <form onSubmit={submit}>
+                        <div>
+                            <InputLabel htmlFor="email" value="Email" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
+                            <div style={{ position: 'relative', width: "100%" }}>
+                            <TextInput
+                                id="email"
+                                type="email"
+                                name="email"
+                                value={data.email}
+                                placeholder="Email"
+                                autoComplete="Email"
+                                onChange={(e) => {
+                                    setData({ ...data, email: e.target.value });
+                                    setErrors((prev) => ({ ...prev, email: "" }));
+                                }}
+                                style={{
+                                    ...inputBaseStyle,
+                                    width: "100%",
+                                    borderColor: errors.email ? "red" : undefined,
+                                    backgroundColor: errors.email
+                                        ? "#ffe5e5"
+                                        : data.email
+                                        ? "#fff4e5ff"
+                                        : "#ffffff",
+                                    color: errors.email ? "red" : "#111827",
+                                }}
+                                onFocus={handleInputFocus}
+                                onBlur={(e) => handleInputBlur(e, data.email, "Email")}
+                                onMouseEnter={handleInputHover}
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.email, !!errors.email)}
+                            />
+                            </div>
+                            <InputError message={errors.email} />
+                        </div>
+
+                        <div style={{ marginTop: "1rem" }}>
+                            <InputLabel htmlFor="password" value="Password" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
+                            <div style={{ position: 'relative', width: "100%" }}>
+                            <TextInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                value={data.password}
+                                placeholder="Password"
+                                autoComplete="current-password"
+                                onChange={(e) => {
+                                    setData({ ...data, password: e.target.value });
+                                    setErrors((prev) => ({ ...prev, password: "" }));
+                                }}
+                                style={{
+                                    width: "100%",
+                                    ...inputBaseStyle,
+                                    borderColor: errors.password ? "red" : undefined,
+                                    backgroundColor: errors.password
+                                        ? "#ffe5e5"
+                                        : data.password
+                                        ? "#fff4e5ff"
+                                        : "#ffffff",
+                                    color: errors.password ? "red" : "#111827",
+                                }}
+                                onFocus={handleInputFocus}
+                                onBlur={(e) => handleInputBlur(e, data.password, "Password")}
+                                onMouseEnter={handleInputHover}
+                                onMouseLeave={(e) => handleInputHoverLeave(e, data.password, !!errors.password)}
+                            />
+                            </div>
+                            <InputError message={errors.password} />
+                        </div>
+
+                        <div
+                            style={{
+                                marginTop: "0.8rem",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                fontSize: "0.6rem",
+                                color: "#4B5563",
+                                marginLeft: "1rem",
+                            }}
+                        >
+                            <label style={{ display: "flex", alignItems: "center", gap: "0.15rem" }}>
+                                <Checkbox
+                                    checked={data.remember}
+                                    onChange={(e) => setData({ ...data, remember: e.target.checked })}
+                                    style={{ accentColor: "#4d2603ff" }}
+                                />
+                                Remember Me
+                            </label>
+
+                            <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                                <Link
+                                    to="/forgot-password"
+                                    style={{ color: "#000000", fontWeight: 700, textDecoration: "none", marginRight: "2rem", fontSize: "0.6rem" }}
+                                >
+                                    Forgot Password?
+                                </Link>
+                            </div>
+                        </div>
+
+                        <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center", textAlign: "center" }}>
+                            <PrimaryButton
+                                type="submit"
+                                disabled={loading}
+                                style={{
+                                    width: "120px",
+                                    padding: "0.6rem",
+                                    fontSize: "1rem",
+                                    fontWeight: 600,
+                                    color: "#fff",
+                                    background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
+                                    border: "none",
+                                    borderRadius: "6px",
+                                    cursor: "pointer",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    transition: "background 0.3s",
+                                    boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+                                }}
+                                onMouseEnter={(e) => {
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #3e2b1c, #2e1c0f)";
+                                }}
+                                onMouseLeave={(e) => {
+                                    e.currentTarget.style.background = "linear-gradient(to bottom, #4a2f26, #2f1c14)";
+                                }}
+                            >
+                                SIGN IN
+                            </PrimaryButton>
+                        </div>
+                        {/* Log In Link */}
+                        <p
+                        style={{
+                            marginTop: '1rem',
+                            fontSize: '0.7rem',
+                            color: '#919cafff',
+                            textAlign: 'center',
+                        }}
+                        >
+                        Already have an account?{' '}
+                        <Link
+                            to="/register"
+                            style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
+                        >
+                            Register
+                        </Link>
+                    </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 }
