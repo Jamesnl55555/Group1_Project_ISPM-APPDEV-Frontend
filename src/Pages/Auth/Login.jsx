@@ -42,7 +42,7 @@ export default function Login() {
 
     const inputBaseStyle = {
         marginTop: "0.25rem",
-        width: "22.5rem",
+        width: "100%",
         borderRadius: "6px",
         border: "1px solid #D1D5DB",
         padding: "0.5rem",
@@ -186,6 +186,7 @@ export default function Login() {
                     <form onSubmit={submit}>
                         <div>
                             <InputLabel htmlFor="email" value="Email" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
+                            <div style={{ position: 'relative', width: "100%" }}>
                             <TextInput
                                 id="email"
                                 type="email"
@@ -212,6 +213,7 @@ export default function Login() {
                                 onMouseEnter={handleInputHover}
                                 onMouseLeave={(e) => handleInputHoverLeave(e, data.email, !!errors.email)}
                             />
+                            </div>
                             <InputError message={errors.email} />
                         </div>
 
