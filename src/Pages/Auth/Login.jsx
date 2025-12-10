@@ -4,7 +4,6 @@ import axios from 'axios';
 import InputError from '@/Component/InputError';
 import Checkbox from '@/Components/Checkbox';
 import TextInput from '@/Components/TextInput';
-import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 
