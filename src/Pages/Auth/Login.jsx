@@ -42,7 +42,6 @@ export default function Login() {
 
     const inputBaseStyle = {
         marginTop: "0.25rem",
-        width: "100%",
         borderRadius: "6px",
         border: "1px solid #D1D5DB",
         padding: "0.5rem",
@@ -200,6 +199,7 @@ export default function Login() {
                                 }}
                                 style={{
                                     ...inputBaseStyle,
+                                    width: "100%",
                                     borderColor: errors.email ? "red" : undefined,
                                     backgroundColor: errors.email
                                         ? "#ffe5e5"
@@ -219,6 +219,7 @@ export default function Login() {
 
                         <div style={{ marginTop: "1rem" }}>
                             <InputLabel htmlFor="password" value="Password" style={{ fontWeight: "550", color: "#3b3b3bff" }} />
+                            <div style={{ position: 'relative', width: "100%" }}>
                             <TextInput
                                 id="password"
                                 type="password"
@@ -231,6 +232,7 @@ export default function Login() {
                                     setErrors((prev) => ({ ...prev, password: "" }));
                                 }}
                                 style={{
+                                    width: "100%",
                                     ...inputBaseStyle,
                                     borderColor: errors.password ? "red" : undefined,
                                     backgroundColor: errors.password
@@ -245,6 +247,7 @@ export default function Login() {
                                 onMouseEnter={handleInputHover}
                                 onMouseLeave={(e) => handleInputHoverLeave(e, data.password, !!errors.password)}
                             />
+                            </div>
                             <InputError message={errors.password} />
                         </div>
 
