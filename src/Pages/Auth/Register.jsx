@@ -153,10 +153,8 @@ export default function Register() {
             return (
               <div key={field} style={{ marginBottom: '1rem', position: 'relative' }}>
                 <InputLabel htmlFor={field} value={labelText} />
-
                 <div style={{ position: 'relative', width: "100%" }}>
                   {iconForField(field)}
-
                   <TextInput
                     id={field}
                     type={isPassword || isConfirm ? 'password' : 'text'}
@@ -175,8 +173,8 @@ export default function Register() {
                       transition: 'all 0.2s',
                     }}
                   />
-                  <InputError message={errors[field]} />
                 </div>
+                <InputError message={errors[field]} />
               </div>
             );
           })}
