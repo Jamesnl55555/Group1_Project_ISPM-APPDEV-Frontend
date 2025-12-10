@@ -154,7 +154,7 @@ export default function Register() {
               <div key={field} style={{ marginBottom: '1rem', position: 'relative' }}>
                 <InputLabel htmlFor={field} value={labelText} />
 
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', width: "100%" }}>
                   {iconForField(field)}
 
                   <TextInput
