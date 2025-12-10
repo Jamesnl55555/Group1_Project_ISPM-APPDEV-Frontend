@@ -253,7 +253,7 @@ export default function Register() {
             </div>
 
             {/* Submit Button */}
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <div style={{ textAlign: 'center', marginTop: '2rem', textAlign: "center" }}>
               <PrimaryButton
                 type="submit"
                 disabled={loading}
