@@ -165,6 +165,7 @@ export default function Register() {
                     {...inputHandlers(field)}
                     style={{
                       width: '100%',
+                      boxSizing: 'border-box',
                       paddingLeft: '2rem',
                       paddingRight: isPassword || isConfirm ? '2.5rem' : '0.5rem',
                       borderRadius: '4px',
