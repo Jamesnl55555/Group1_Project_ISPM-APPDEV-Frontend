@@ -217,11 +217,36 @@ export default function Login() {
             </div>
 
             {/* SIGN IN BUTTON */}
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-              <PrimaryButton type="submit" disabled={loading}>
+           <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <PrimaryButton
+                type="submit"
+                disabled={loading}
+                style={{
+                width: '120px',
+                padding: '0.6rem',
+                fontWeight: 600,
+                fontSize: '1rem',
+                color: '#fff',
+                background: 'linear-gradient(to bottom, #4a2f26, #2f1c14)',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
+                transition: '0.3s',
+                }}
+                onMouseEnter={(e) =>
+                (e.currentTarget.style.background =
+                    'linear-gradient(to bottom, #3e2b1c, #2e1c0f)')
+                }
+                onMouseLeave={(e) =>
+                (e.currentTarget.style.background =
+                    'linear-gradient(to bottom, #4a2f26, #2f1c14)')
+                }
+            >
                 {loading ? 'Signing In...' : 'SIGN IN'}
-              </PrimaryButton>
+            </PrimaryButton>
             </div>
+
           </form>
         </div>
       </div>
