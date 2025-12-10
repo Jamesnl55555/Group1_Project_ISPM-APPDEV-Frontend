@@ -8,7 +8,8 @@ export default function AddItem() {
   const form = useForm({ cart: [] });
   const [quantities, setQuantities] = useState({});
 
-  const fetchProducts = async () => {
+  useEffect(() => {
+    const fetchProducts = async () => {
       try {
         const resp = await axios.get("/api/fetchproducts");
         setProducts(resp.data.products || []);
@@ -16,8 +17,6 @@ export default function AddItem() {
         console.error("Failed to fetch products for AddItem:", err);
       }
     };
-
-  useEffect(() => {
     fetchProducts();
   }, []);
 
@@ -64,13 +63,9 @@ export default function AddItem() {
 
     form.post("/api/checkout", {
       data: payload,
-      onSuccess: () => {
-      clearCart();
-      fetchProducts();
-      },
+      onSuccess: () => clearCart(),
       onError: (errors) => console.error("Checkout failed:", errors),
     });
-
   };
 
   const handleQuantityChange = (productId, value) => {
