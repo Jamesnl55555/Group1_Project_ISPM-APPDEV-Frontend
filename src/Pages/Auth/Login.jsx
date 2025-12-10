@@ -76,7 +76,8 @@ export default function Login() {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         fontFamily: 'Poppins, sans-serif',
-        padding: '2rem',
+        padding: 0,
+        overflow: 'hidden',
         position: 'relative',
       }}
     >
