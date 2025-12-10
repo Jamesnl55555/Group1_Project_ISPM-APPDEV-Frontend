@@ -155,6 +155,7 @@ export default function Login() {
                 placeholder="Password"
                 style={{
                   marginTop: "0.25rem",
+                  width: "100%",
                   borderColor: errors.password ? "red" : "#D1D5DB",
                   backgroundColor: errors.password ? "#ffe5e5" : data.password ? "#fff4e5ff" : "#ffffff",
                 }}
