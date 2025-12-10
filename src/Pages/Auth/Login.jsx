@@ -125,7 +125,7 @@ export default function Login() {
             {/* EMAIL */}
             <div style={{ marginBottom: '1rem', position: 'relative', width: '22.5rem' }}>
               <InputLabel htmlFor="email" value="E-mail" />
-              <div style={{ position: 'relative', width: '24.5rem' }}>
+              <div style={{ position: 'relative' }}>
                 <TextInput
                   id="email"
                   type="email"
@@ -138,8 +138,7 @@ export default function Login() {
                     padding: '0.5rem 2.5rem',
                     border: `1px solid ${errors.email ? 'red' : '#D1D5DB'}`,
                     backgroundColor: errors.email ? '#ffe5e5' : data.email ? '#fff4e5ff' : '#ffffff',
-                    boxSizing: 'border-box'
-                    }}
+                  }}
                 />
                 <InputError message={errors.email} />
               </div>
