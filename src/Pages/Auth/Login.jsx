@@ -233,6 +233,11 @@ export default function Login() {
                 cursor: 'pointer',
                 boxShadow: '0 4px 6px rgba(0,0,0,0.2)',
                 transition: '0.3s',
+                display: 'flex', 
+                justifyContent: 'center',
+                alignItems: 'center',      
+                textAlign: 'center',       
+                lineHeight: 1.2 
                 }}
                 onMouseEnter={(e) =>
                 (e.currentTarget.style.background =
