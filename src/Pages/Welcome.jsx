@@ -47,6 +47,8 @@ export default function Welcome() {
             maxWidth: "450px",
             minWidth: "200px",
             marginTop: "3rem",
+            width: "384px",
+            marginTop: "-3rem",
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
