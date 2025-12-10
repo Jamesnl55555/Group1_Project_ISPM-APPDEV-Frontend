@@ -159,7 +159,7 @@ export default function Register() {
                     id={field}
                     type={isPassword || isConfirm ? 'password' : 'text'}
                     value={data[field]}
-                    placeholder={field}
+                    placeholder={labelText}
                     onChange={(e) => setDataField(field, e.target.value)}
                     {...inputHandlers(field)}
                     style={{
