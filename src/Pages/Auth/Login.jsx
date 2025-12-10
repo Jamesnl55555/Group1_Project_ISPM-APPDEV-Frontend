@@ -195,10 +195,14 @@ export default function Login() {
             </div>
 
             {/* Button */}
-            <div style={{ textAlign: "center", marginTop: "2rem" }}>
-              <PrimaryButton type="submit" disabled={loading}>
+            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+            <PrimaryButton
+                type="submit"
+                disabled={loading}
+                className="w-[120px] bg-gradient-to-b from-[#4a2f26] to-[#2f1c14] hover:from-[#3e2b1c] hover:to-[#2e1c0f]"
+            >
                 SIGN IN
-              </PrimaryButton>
+            </PrimaryButton>
             </div>
 
             <p style={{ marginTop: "1rem", fontSize: "0.875rem", textAlign: "center", color: "#4B5563" }}>
