@@ -1,7 +1,7 @@
 import { forwardRef, useState, useRef, useImperativeHandle } from 'react';
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-export default forwardRef(function TextInput({ type = 'text', className = '', leftIcon = null, ...props }, ref) {
+export default forwardRef(function TextInput({ type = 'text', className = '', ...props }, ref) {
   const localRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
 
