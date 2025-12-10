@@ -123,7 +123,7 @@ export default function Login() {
 
           <form onSubmit={submit}>
             {/* EMAIL */}
-            <div style={{ marginBottom: '1rem', position: 'relative', width: '22.5rem' }}>
+            <div style={{ marginBottom: '1rem', position: 'relative', width: '24.5rem' }}>
               <InputLabel htmlFor="email" value="E-mail" />
               <div style={{ position: 'relative', width: '24.5rem' }}>
                 <TextInput
