@@ -16,6 +16,11 @@ export default function Login() {
 
   const navigate = useNavigate();
 
+  const setDataField = (field, value) => {
+    setData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
+  };
+
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -41,326 +46,274 @@ export default function Login() {
     }
   };
 
-  const inputBaseStyle = {
-    marginTop: "0.25rem",
-    borderRadius: "6px",
-    border: "1px solid #D1D5DB",
-    padding: "0.5rem",
-    transition: "all 0.2s",
-    color: "#111827",
-    width: "100%",
-    boxSizing: "border-box", // FIXES overflow
-  };
+  const getBackgroundColor = (field) =>
+    errors[field] ? "#ffe5e5" : data[field] ? "#fff4e5ff" : "#ffffff";
 
-  const handleInputFocus = (e) => {
-    e.target.style.borderColor = "#563d28";
-    e.target.style.backgroundColor = "#fff4e5ff";
-    e.target.placeholder = "";
-  };
+  const inputHandlers = (field) => ({
+    onFocus: (e) => {
+      e.target.style.borderColor = "#563d28";
+      e.target.style.backgroundColor = "#fff4e5ff";
+    },
+    onBlur: (e) => {
+      e.target.style.borderColor = errors[field] ? "red" : "#D1D5DB";
+      e.target.style.backgroundColor = getBackgroundColor(field);
+      e.target.style.color = errors[field] ? "red" : "#111827";
+    },
+    onMouseEnter: (e) => {
+      if (document.activeElement !== e.target) {
+        e.target.style.borderColor = "#563d28";
+        e.target.style.backgroundColor = "#fff4e5ff";
+      }
+    },
+    onMouseLeave: (e) => {
+      if (document.activeElement !== e.target) {
+        e.target.style.borderColor = errors[field] ? "red" : "#D1D5DB";
+        e.target.style.backgroundColor = getBackgroundColor(field);
+      }
+    },
+  });
 
-  const handleInputBlur = (e, value, placeholder) => {
-    e.target.style.borderColor = "#D1D5DB";
-    e.target.style.backgroundColor = value ? "#fff4e5ff" : "#ffffff";
-    e.target.placeholder = value ? "" : placeholder;
-  };
-
-  const handleInputHover = (e) => {
-    e.target.style.borderColor = "#563d28";
-    e.target.style.backgroundColor = "#fff4e5ff";
-  };
-
-  const handleInputHoverLeave = (e, value, hasError) => {
-    e.target.style.borderColor = hasError ? "red" : "#D1D5DB";
-    e.target.style.backgroundColor = hasError ? "#ffe5e5" : value ? "#fff4e5ff" : "#ffffff";
+  const iconForField = (field) => {
+    switch (field) {
+      case "email":
+        return (
+          <IconMail
+            size={18}
+            style={{
+              position: "absolute",
+              left: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: errors[field] ? "red" : "#555",
+            }}
+          />
+        );
+      case "password":
+        return (
+          <IconLock
+            size={18}
+            style={{
+              position: "absolute",
+              left: "8px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              color: errors[field] ? "red" : "#555",
+            }}
+          />
+        );
+      default:
+        return null;
+    }
   };
 
   return (
     <div
       style={{
-        backgroundImage: "url('/images/1.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
         minHeight: "90vh",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        backgroundImage: "url('/images/1.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         fontFamily: "Poppins, sans-serif",
-        flexDirection: "column",
         padding: "2rem",
+        flexDirection: "column",
       }}
     >
+      {/* Logo stays large as in original */}
+      <img
+        src="/images/2.png"
+        alt="Logo"
+        style={{
+          width: "50rem",
+          height: "15rem",
+          objectFit: "contain",
+          zIndex: 2,
+          marginBottom: "-90px",
+        }}
+      />
+
+      {/* Form Container */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "400px",
+          backgroundColor: "rgba(255,255,255,0.98)",
+          borderRadius: "12px",
+          boxShadow: "4px 8px 20px rgba(0, 0, 0, 0.4)",
+          padding: "3rem 2rem 2rem 2rem",
+          textAlign: "left",
+          zIndex: 1,
+          borderBottom: "2px solid rgba(0,0,0,0.8)",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "2rem",
+            fontWeight: "700",
+            marginTop: "1rem",
+            marginBottom: "2rem",
+            textAlign: "center",
+            textShadow: "0 2px 4px rgba(0,0,0,0.25)",
+          }}
+        >
+          SIGN IN
+        </h2>
+
+        {errors.general && (
+          <div style={{ color: "red", marginBottom: "1rem" }}>{errors.general}</div>
+        )}
+
+        <form onSubmit={submit}>
+          {["email", "password"].map((field) => {
+            const labelText = field.charAt(0).toUpperCase() + field.slice(1);
+            const isPassword = field === "password";
+
+            return (
+              <div key={field} style={{ marginBottom: "1rem", position: "relative" }}>
+                <InputLabel htmlFor={field} value={labelText} />
+                <div style={{ position: "relative", width: "100%" }}>
+                  {iconForField(field)}
+                  <TextInput
+                    id={field}
+                    type={isPassword ? "password" : "text"}
+                    value={data[field]}
+                    onChange={(e) => setDataField(field, e.target.value)}
+                    {...inputHandlers(field)}
+                    style={{
+                      width: "100%",
+                      boxSizing: "border-box",
+                      paddingLeft: "2rem",
+                      borderRadius: "4px",
+                      border: `1px solid ${errors[field] ? "red" : "#D1D5DB"}`,
+                      backgroundColor: getBackgroundColor(field),
+                      color: errors[field] ? "red" : "#111827",
+                      transition: "all 0.2s",
+                      height: "2.5rem",
+                    }}
+                  />
+                </div>
+                <InputError message={errors[field]} />
+              </div>
+            );
+          })}
+
+          {/* Remember Me */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "1rem",
+              color: "gray",
+            }}
+          >
+            <Checkbox
+              checked={data.remember}
+              onChange={(e) => setDataField("remember", e.target.checked)}
+              style={{ accentColor: "#4a2f26", cursor: "pointer" }}
+            />
+            <label
+              style={{
+                marginLeft: "0.25rem",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                color: "#8d8d8dff",
+              }}
+            >
+              Remember Me
+            </label>
+          </div>
+
+          {/* Submit Button */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: "1.5rem" }}>
+            <PrimaryButton
+              type="submit"
+              disabled={loading}
+              style={{
+                width: "150px",
+                padding: "0.6rem 0",
+                fontSize: "1rem",
+                fontWeight: 600,
+                color: "#fff",
+                background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                textAlign: "center",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+              }}
+            >
+              SIGN IN
+            </PrimaryButton>
+          </div>
+
+          {/* Register Link */}
+          <p
+            style={{
+              marginTop: "1rem",
+              fontSize: "0.7rem",
+              color: "#919cafff",
+              textAlign: "center",
+            }}
+          >
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              style={{ color: "#2563EB", fontWeight: "500", textDecoration: "underline" }}
+            >
+              Register
+            </Link>
+          </p>
+        </form>
+      </div>
+
       {/* Invalid Credentials Modal */}
       {showModal && (
         <div
           style={{
             position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
+            inset: 0,
             backgroundColor: "rgba(0,0,0,0.5)",
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
-            zIndex: 1000,
+            justifyContent: "center",
+            zIndex: 9999,
           }}
           onClick={() => setShowModal(false)}
         >
           <div
             style={{
-              backgroundColor: "#fff",
+              background: "white",
               padding: "2rem",
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-              minWidth: "300px",
+              borderRadius: "1rem",
               textAlign: "center",
-              cursor: "default",
+              width: "90%",
+              maxWidth: "380px",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.3)",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ color: "#b91c1c", marginBottom: "1rem" }}>Invalid Credentials</h3>
+            <h3 style={{ fontSize: "1.5rem", marginBottom: "0.5rem", color: "#b91c1c" }}>
+              Invalid Credentials
+            </h3>
             <p>Please check your email and password and try again.</p>
             <PrimaryButton
-              type="button"
               onClick={() => setShowModal(false)}
               style={{
-                marginTop: "1rem",
-                width: "100px",
-                background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
+                padding: "0.6rem 1.2rem",
+                borderRadius: "6px",
+                background: "#422912",
+                color: "white",
+                cursor: "pointer",
+                fontWeight: 600,
               }}
             >
-              OK
+              Close
             </PrimaryButton>
           </div>
         </div>
       )}
-
-      {/* Layout wrapper */}
-      <div
-        style={{
-          position: "relative",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-          maxWidth: "400px",
-        }}
-      >
-        <img
-          src="/images/2.png"
-          alt="Logo"
-          style={{
-            width: "50rem",
-            height: "15rem",
-            objectFit: "contain",
-            zIndex: 2,
-            marginBottom: "-90px",
-          }}
-        />
-
-        <div
-          style={{
-            backgroundColor: "rgba(255, 255, 255, 0.98)",
-            borderRadius: "12px",
-            boxShadow: "4px 8px 20px rgba(0, 0, 0, 0.4)",
-            padding: "3.5rem 2rem 1.5rem 2rem",
-            width: "24rem",
-            marginTop: "-2rem",
-            zIndex: 1,
-            textAlign: "left",
-            borderBottom: "2px solid rgba(0, 0, 0, .8)",
-            height: "auto",
-          }}
-        >
-          <h2
-            style={{
-              fontWeight: "700",
-              color: "#000",
-              fontSize: "2rem",
-              letterSpacing: "0.5px",
-              marginBottom: "2rem",
-              marginTop: "4rem",
-              textAlign: "center",
-              textShadow: "0 2px 4px rgba(0,0,0,0.25)",
-            }}
-          >
-            LOG IN
-          </h2>
-
-          {/* FORM */}
-          <form onSubmit={submit}>
-
-            {/* EMAIL */}
-            <div>
-              <InputLabel htmlFor="email" value="Email" style={{ fontWeight: 550, color: "#3b3b3bff" }} />
-              <div style={{ position: "relative" }}>
-                <IconMail
-                  size={18}
-                  style={{
-                    position: "absolute",
-                    left: "8px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: errors.email ? "red" : "#555",
-                  }}
-                />
-                <TextInput
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={data.email}
-                  placeholder="Email"
-                  autoComplete="email"
-                  onChange={(e) => {
-                    setData({ ...data, email: e.target.value });
-                    setErrors((prev) => ({ ...prev, email: "" }));
-                  }}
-                  style={{
-                    ...inputBaseStyle,
-                    paddingLeft: "2.2rem",
-                    borderColor: errors.email ? "red" : undefined,
-                    backgroundColor: errors.email
-                      ? "#ffe5e5"
-                      : data.email
-                      ? "#fff4e5ff"
-                      : "#ffffff",
-                    color: errors.email ? "red" : "#111827",
-                  }}
-                  onFocus={handleInputFocus}
-                  onBlur={(e) => handleInputBlur(e, data.email, "Email")}
-                  onMouseEnter={handleInputHover}
-                  onMouseLeave={(e) => handleInputHoverLeave(e, data.email, !!errors.email)}
-                />
-              </div>
-              <InputError message={errors.email} />
-            </div>
-
-            {/* PASSWORD */}
-            <div style={{ marginTop: "1rem" }}>
-              <InputLabel htmlFor="password" value="Password" style={{ fontWeight: 550, color: "#3b3b3bff" }} />
-
-              <div style={{ position: "relative" }}>
-                <IconLock
-                  size={18}
-                  style={{
-                    position: "absolute",
-                    left: "8px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    color: errors.password ? "red" : "#555",
-                  }}
-                />
-
-                <TextInput
-                  id="password"
-                  type="password"
-                  name="password"
-                  value={data.password}
-                  placeholder="Password"
-                  autoComplete="current-password"
-                  onChange={(e) => {
-                    setData({ ...data, password: e.target.value });
-                    setErrors((prev) => ({ ...prev, password: "" }));
-                  }}
-                  style={{
-                    ...inputBaseStyle,
-                    paddingLeft: "2.2rem",
-                    borderColor: errors.password ? "red" : undefined,
-                    backgroundColor: errors.password
-                      ? "#ffe5e5"
-                      : data.password
-                      ? "#fff4e5ff"
-                      : "#ffffff",
-                    color: errors.password ? "red" : "#111827",
-                  }}
-                  onFocus={handleInputFocus}
-                  onBlur={(e) => handleInputBlur(e, data.password, "Password")}
-                  onMouseEnter={handleInputHover}
-                  onMouseLeave={(e) => handleInputHoverLeave(e, data.password, !!errors.password)}
-                />
-              </div>
-
-              <InputError message={errors.password} />
-            </div>
-
-            {/* REMEMBER + FORGOT PASSWORD */}
-            <div
-              style={{
-                marginTop: "0.8rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                fontSize: "0.6rem",
-                color: "#4B5563",
-                marginLeft: "1rem",
-              }}
-            >
-              <label style={{ display: "flex", alignItems: "center", gap: "0.15rem" }}>
-                <Checkbox
-                  checked={data.remember}
-                  onChange={(e) => setData({ ...data, remember: e.target.checked })}
-                  style={{ accentColor: "#4d2603ff" }}
-                />
-                Remember Me
-              </label>
-
-              <Link
-                to="/forgot-password"
-                style={{
-                  color: "#000000",
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  marginRight: "2rem",
-                  fontSize: "0.6rem",
-                }}
-              >
-                Forgot Password?
-              </Link>
-            </div>
-
-            {/* BUTTON */}
-            <div style={{ marginTop: "1.5rem", display: "flex", justifyContent: "center" }}>
-              <PrimaryButton
-                type="submit"
-                disabled={loading}
-                style={{
-                  width: "120px",
-                  padding: "0.6rem",
-                  fontSize: "1rem",
-                  fontWeight: 600,
-                  color: "#fff",
-                  background: "linear-gradient(to bottom, #4a2f26, #2f1c14)",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  transition: "background 0.3s",
-                  boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-                }}
-              >
-                SIGN IN
-              </PrimaryButton>
-            </div>
-
-            {/* REGISTER LINK */}
-            <p
-              style={{
-                marginTop: "1rem",
-                fontSize: "0.7rem",
-                color: "#919cafff",
-                textAlign: "center",
-              }}
-            >
-              Don't have an account?{" "}
-              <Link
-                to="/register"
-                style={{ color: "#2563EB", fontWeight: "500", textDecoration: "underline" }}
-              >
-                Register
-              </Link>
-            </p>
-          </form>
-        </div>
-      </div>
     </div>
   );
 }
