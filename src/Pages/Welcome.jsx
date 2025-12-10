@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 
 export default function Welcome() {
   return (
@@ -37,7 +37,6 @@ export default function Welcome() {
           position: "relative",
           zIndex: 20,
           textAlign: "center",
-          padding: "0 1rem",
         }}
       >
         <img
@@ -54,16 +53,14 @@ export default function Welcome() {
             filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))",
           }}
         />
-
         <p
           style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: "1.7rem",
-            fontWeight: 1000,
-            lineHeight: "1.1",
+            fontSize: "2rem",
+            fontWeight: 800,
+            lineHeight: "1.2",
             marginTop: "1rem",
             color: "#3d1c00",
-            WebkitTextStroke: ".3px white",
+            WebkitTextStroke: ".2px white",
             WebkitTextFillColor: "#3d1c00",
             textShadow: "1px 2px rgba(0,0,0,0.5)",
             padding: "0 1rem",
@@ -88,11 +85,9 @@ export default function Welcome() {
         <Link
           to="/login"
           style={{
-            fontFamily: "'Roboto', sans-serif",
             padding: "0.5rem 1.5rem",
-            marginTop: "0.5rem",
             fontSize: "0.875rem",
-            fontWeight: 500,
+            fontWeight: 600,
             borderRadius: "0.375rem",
             border: "1px solid black",
             backgroundColor: "transparent",
@@ -100,12 +95,8 @@ export default function Welcome() {
             textDecoration: "none",
             transition: "background-color 0.2s",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.backgroundColor = "rgba(243,244,246,0.6)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.backgroundColor = "transparent")
-          }
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(243,244,246,0.6)")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
         >
           LOG IN
         </Link>
@@ -113,31 +104,17 @@ export default function Welcome() {
         <Link
           to="/register"
           style={{
-            marginTop: "0.5rem",
-            fontFamily: "'Roboto', sans-serif",
             padding: "0.5rem 1.5rem",
             fontSize: "0.875rem",
-            fontWeight: 500,
-            color: "#fff",
-            background: "linear-gradient(to bottom, #5a3e36, #3d261f)",
-            border: "none",
+            fontWeight: 600,
             borderRadius: "0.375rem",
-            boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
-            cursor: "pointer",
-            transition: "all 0.2s ease-in-out",
+            backgroundColor: "#563d28",
+            color: "white",
             textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            transition: "background-color 0.2s",
           }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(to bottom, #3e2b1c, #2e1c0f)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.background =
-              "linear-gradient(to bottom, #5a3e36, #3d261f)")
-          }
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#3d1c00")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#563d28")}
         >
           SIGN UP
         </Link>
@@ -173,3 +150,8 @@ export default function Welcome() {
     </div>
   );
 }
+
+
+
+
+
