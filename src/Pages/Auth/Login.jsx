@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import TextInput from './TextInput';
-import InputLabel from './InputLabel';
-import InputError from './InputError';
-import PrimaryButton from './PrimaryButton';
-import Checkbox from './Checkbox';
+import InputError from '@/Component/InputError';
+import Checkbox from '@/Components/Checkbox';
+import TextInput from '@/Components/TextInput';
+import InputError from '@/Components/InputError';
+import InputLabel from '@/Components/InputLabel';
+import PrimaryButton from '@/Components/PrimaryButton';
 
 export default function Login() {
   const [email, setEmail] = useState('');
