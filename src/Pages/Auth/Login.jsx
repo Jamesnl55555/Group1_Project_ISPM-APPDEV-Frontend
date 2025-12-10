@@ -323,10 +323,10 @@ export default function Login() {
                         >
                         Already have an account?{' '}
                         <Link
-                            to="/login"
+                            to="/register"
                             style={{ color: '#2563EB', fontWeight: '500', textDecoration: 'underline' }}
                         >
-                            Log In
+                            Register
                         </Link>
                     </p>
                     </form>
