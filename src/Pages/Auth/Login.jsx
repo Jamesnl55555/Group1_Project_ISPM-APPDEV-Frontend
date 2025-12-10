@@ -140,6 +140,7 @@ export default function Login() {
                     backgroundColor: errors.email ? '#ffe5e5' : data.email ? '#fff4e5ff' : '#ffffff',
                     boxSizing: 'border-box'
                     }}
+                    placeholder = "E-mail"
                 />
                 <InputError message={errors.email} />
               </div>
@@ -167,12 +168,14 @@ export default function Login() {
                   id="password"
                   type="password"
                   value={data.password}
+                  placeholder= "Password"
                   onChange={(e) => setDataField('password', e.target.value)}
                   style={{
                     width: '100%',
                     border: 'none',
                     outline: 'none',
                     background: 'transparent',
+
                   }}
                 />
               </div>
