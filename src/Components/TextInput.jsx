@@ -1,7 +1,7 @@
 import { forwardRef, useState, useRef, useImperativeHandle } from 'react';
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-export default forwardRef(function TextInput({ type = 'text', className = '', ...props }, ref) {
+export default forwardRef(function TextInput({ type = 'text', className = '', placeholder, ...props }, ref) {
   const localRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -18,6 +18,7 @@ export default forwardRef(function TextInput({ type = 'text', className = '', ..
         {...props}
         type={inputType}
         ref={localRef}
+        placeholder={placeholder}
         style={{
           width: '100%',
           paddingRight: isPassword ? '2.5rem' : '0.5rem', // extra space for eye icon

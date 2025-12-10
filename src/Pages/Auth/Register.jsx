@@ -83,7 +83,7 @@ export default function Register() {
         return null;
     }
   };
-
+  
   return (
     <div
       style={{
@@ -154,11 +154,12 @@ export default function Register() {
               <div key={field} style={{ marginBottom: '1rem', position: 'relative' }}>
                 <InputLabel htmlFor={field} value={labelText} />
                 <div style={{ position: 'relative', width: "100%" }}>
-                  {iconForField(field)}
+                
                   <TextInput
                     id={field}
                     type={isPassword || isConfirm ? 'password' : 'text'}
                     value={data[field]}
+                    placeholder={field}
                     onChange={(e) => setDataField(field, e.target.value)}
                     {...inputHandlers(field)}
                     style={{
