@@ -1,30 +1,53 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useState, useRef, useImperativeHandle } from 'react';
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-export default forwardRef(function TextInput(
-    { type = 'text', className = '', isFocused = false, ...props },
-    ref,
-) {
-    const localRef = useRef(null);
+export default forwardRef(function TextInput({ type = 'text', className = '', ...props }, ref) {
+  const localRef = useRef(null);
+  const [showPassword, setShowPassword] = useState(false);
 
-    useImperativeHandle(ref, () => ({
-        focus: () => localRef.current?.focus(),
-    }));
+  const isPassword = type === "password";
+  const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 
-    useEffect(() => {
-        if (isFocused) {
-            localRef.current?.focus();
-        }
-    }, [isFocused]);
+  useImperativeHandle(ref, () => ({
+    focus: () => localRef.current?.focus(),
+  }));
 
-    return (
-        <input
-            {...props}
-            type={type}
-            className={
-                'rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 ' +
-                className
-            }
-            ref={localRef}
-        />
-    );
+  return (
+    <div style={{ position: 'relative', width: '100%' }}>
+      <input
+        {...props}
+        type={inputType}
+        ref={localRef}
+        style={{
+          width: '100%',
+          paddingRight: isPassword ? '2.5rem' : '0.5rem', // extra space for eye icon
+          borderRadius: '6px',
+          border: '1px solid #D1D5DB',
+          padding: '0.5rem',
+          transition: 'all 0.2s',
+          color: '#111827',
+          ...props.style,
+        }}
+      />
+      {isPassword && (
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          style={{
+            position: 'absolute',
+            right: '0.5rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            border: 'none',
+            background: 'transparent',
+            cursor: 'pointer',
+            padding: 0,
+          }}
+          tabIndex={-1}
+        >
+          {showPassword ? <IconEyeOff size={20} /> : <IconEye size={20} />}
+        </button>
+      )}
+    </div>
+  );
 });

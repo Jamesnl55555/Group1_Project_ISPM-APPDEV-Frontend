@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export default function Welcome() {
   return (
@@ -37,35 +37,40 @@ export default function Welcome() {
           position: "relative",
           zIndex: 20,
           textAlign: "center",
+          padding: "0 1rem",
         }}
       >
         <img
           src="/images/2.png"
           alt="88 Chocolates & More Logo"
           style={{
-            width: "384px",
-            marginTop: "-3rem",
+            width: "45vw",
+            maxWidth: "450px",
+            minWidth: "200px",
+            marginTop: "3rem",
             display: "block",
             marginLeft: "auto",
             marginRight: "auto",
             filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.3))",
           }}
         />
+
         <p
           style={{
-            fontSize: "2rem",
-            fontWeight: 800,
-            lineHeight: "1.2",
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: "1.7rem",
+            fontWeight: 1000,
+            lineHeight: "1.1",
             marginTop: "1rem",
             color: "#3d1c00",
-            WebkitTextStroke: ".2px white",
+            WebkitTextStroke: ".3px white",
             WebkitTextFillColor: "#3d1c00",
             textShadow: "1px 2px rgba(0,0,0,0.5)",
             padding: "0 1rem",
           }}
         >
-          Bringing you quality chocolates at an <br />
-          affordable price, always near your place.
+          "Bringing you quality chocolates at an <br />
+          affordable price, always near your place."
         </p>
       </div>
 
@@ -83,9 +88,11 @@ export default function Welcome() {
         <Link
           to="/login"
           style={{
+            fontFamily: "'Roboto', sans-serif",
             padding: "0.5rem 1.5rem",
+            marginTop: "0.5rem",
             fontSize: "0.875rem",
-            fontWeight: 600,
+            fontWeight: 500,
             borderRadius: "0.375rem",
             border: "1px solid black",
             backgroundColor: "transparent",
@@ -93,8 +100,12 @@ export default function Welcome() {
             textDecoration: "none",
             transition: "background-color 0.2s",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(243,244,246,0.6)")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.backgroundColor = "rgba(243,244,246,0.6)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.backgroundColor = "transparent")
+          }
         >
           LOG IN
         </Link>
@@ -102,26 +113,63 @@ export default function Welcome() {
         <Link
           to="/register"
           style={{
+            marginTop: "0.5rem",
+            fontFamily: "'Roboto', sans-serif",
             padding: "0.5rem 1.5rem",
             fontSize: "0.875rem",
-            fontWeight: 600,
+            fontWeight: 500,
+            color: "#fff",
+            background: "linear-gradient(to bottom, #5a3e36, #3d261f)",
+            border: "none",
             borderRadius: "0.375rem",
-            backgroundColor: "#563d28",
-            color: "white",
+            boxShadow: "0 4px 6px rgba(0,0,0,0.2)",
+            cursor: "pointer",
+            transition: "all 0.2s ease-in-out",
             textDecoration: "none",
-            transition: "background-color 0.2s",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#3d1c00")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#563d28")}
+          onMouseEnter={(e) =>
+            (e.currentTarget.style.background =
+              "linear-gradient(to bottom, #3e2b1c, #2e1c0f)")
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.background =
+              "linear-gradient(to bottom, #5a3e36, #3d261f)")
+          }
         >
           SIGN UP
         </Link>
       </div>
+
+      {/* Responsive CSS */}
+      <style>{`
+        @media (max-width: 768px) {
+          p {
+            font-size: 1.4rem !important;
+          }
+          img {
+            width: 55vw !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          p {
+            font-size: 1.1rem !important;
+          }
+          img {
+            width: 65vw !important;
+          }
+
+          /* Buttons stack on mobile */
+          div[style*="top: 1.5rem"] {
+            flex-direction: column !important;
+            right: 1rem !important;
+            gap: 0.6rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
-
-
-
-
-
