@@ -134,7 +134,7 @@ export default function Login() {
                   onMouseEnter={(e) => hoverEnter(e.target)}
                   onMouseLeave={(e) => hoverLeave(e.target, data.email, !!errors.email)}
                   style={{
-                    width: '90%',
+                    width: '100%',
                     padding: '0.5rem 2.5rem',
                     border: `1px solid ${errors.email ? 'red' : '#D1D5DB'}`,
                     backgroundColor: errors.email ? '#ffe5e5' : data.email ? '#fff4e5ff' : '#ffffff',
@@ -145,7 +145,7 @@ export default function Login() {
             </div>
 
             {/* PASSWORD */}
-            <div style={{ marginBottom: '1rem', position: 'relative', width: '24.7rem' }}>
+            <div style={{ marginBottom: '1rem', position: 'relative', width: '24.5rem' }}>
               <InputLabel htmlFor="password" value="Password" />
               <div
                 style={{
@@ -218,7 +218,7 @@ export default function Login() {
             <PrimaryButton
                 type="submit"
                 disabled={loading}
-                className="" // remove any inherited classes
+                className="" 
                 style={{
                 width: '120px',
                 padding: '0.6rem',
@@ -229,6 +229,8 @@ export default function Login() {
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
+                textAlign: 'center',
+                display: 'inline-block'
                 }}
             >
                 SIGN IN
