@@ -206,7 +206,7 @@ export default function Login() {
               </label>
 
               <Link
-                to="/forgotpassword"
+                to="/forgot-password"
                 style={{
                   color: '#000000',
                   fontWeight: 750,

@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: false, 
+  baseURL: import.meta.env.VITE_API_BASE_URL,  //During local deploy use REACT_APP_API_URL
+  withCredentials: true, 
   headers: {
     "Accept": "application/json",
   },

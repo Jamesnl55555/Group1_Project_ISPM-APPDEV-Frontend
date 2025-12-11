@@ -1,16 +1,72 @@
-# React + Vite
+## Team Information
+- Jorilyn Pantallano
+- Czarina Fombuena
+- Ellissea Montes
+- Maffia Khate Guaro
+- Jimmy Lumaad
+- Nathaniel Miguel
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+# Project Overview and Objectives
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+> Our system entitled “88Chocolates Inventory and Transaction System,” developed for our client, 88 Chocolates, a small retail store that sells both imported and local food products.
 
-## Expanding the ESLint configuration
+At present, the store manages its inventory and transaction records manually. This traditional method makes it difficult to monitor product availability, track sales accurately, and avoid errors in recording. Manual processes are also time-consuming and may lead to misplaced records, incorrect stock counts, and slow business operations.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+To address these challenges, we proposed the 88Chocolates Inventory and Transaction System, a computerized system designed to help the business efficiently manage its product inventory and daily transactions. This system will allow the store to record sales accurately, monitor stock levels in real time, and generate necessary reports, making operations faster, more organized, and more reliable.
+
+Through this system, we aim to help 88 Chocolate improve its overall business performance by providing a modern, efficient, and user-friendly solution for managing inventory and transactions.
+
+---
+
+## Tech Stack Used
+**Frontend:**
+- React.js
+- React Router
+- Axios
+- Recharts
+- TailwindCSS / CSS
+- Mantine Tabler Icons
+- Vite
+
+**Backend:**
+- Laravel (PHP)
+- Laravel Sanctum or JWT (Authentication)
+- MySQL / PostgreSQL
+- Laravel Eloquent (ORM)
+- Composer (Dependency Manager)
+
+**DevOps / Hosting:**
+- Git / GitHub
+- Docker (optional)
+- Cloud hosting (Vercel, Render)
+
+---
+
+## Setup & Installation
+
+### Backend (Laravel)
+
+cd Group1_Project_ISPM-APPDEV-Backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+
+### Frontend (React)
+cd Group1_Project_ISPM-APPDEV-Frontend
+npm install
+npm run build
+npm run dev
+
+
+Deployment Links
+### Backend
+- https://group1-project-ispm-appdev-backend.onrender.com
+
+### Frontend
+- https://ispmappdevfrontend.vercel.app/
