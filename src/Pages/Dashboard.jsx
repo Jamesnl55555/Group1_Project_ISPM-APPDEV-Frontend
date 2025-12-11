@@ -188,7 +188,7 @@ export default function Dashboard() {
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
                 {user_name ? [
-                  { label: "Total Sales", value: total_quantity },
+                  { label: "Total # of product sold", value: total_quantity },
                   { label: "Total Cost of Sales", value: total_amount },
                   { label: "Cashier", value: user_name },
                 ].map((item) => (
