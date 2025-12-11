@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '@/api/axios'; 
 import { IconAlertTriangle } from '@tabler/icons-react';
 
-const LowStockProducts = () => {
+function InventoryAlertComponent() {
   const [lowStockCount, setLowStockCount] = useState(null);
 
   useEffect(() => {
@@ -27,4 +27,4 @@ const LowStockProducts = () => {
   );
 };
 
-export default LowStockProducts;
+export default InventoryAlertComponent;

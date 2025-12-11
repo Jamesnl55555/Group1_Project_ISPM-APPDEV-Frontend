@@ -4,16 +4,12 @@ import axios from "@/api/axios";
 import Import from "@/Components/Import";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { MantineProvider } from "@mantine/core"; 
-import InventoryAlertComponent from "@/Components/InventoryAlertComponent"
-import InventoryReportComponent from "../Components/InventoryReportComponent";
-import RecentTransactionsComponent from "../Components/RecentTransactionsComponent";
-import SalesReportComponent from "../Components/SalesReportComponent";
+import InventoryAlertComponent from "@/Components/InventoryAlertComponent";
+import InventoryReportComponent from "@/Components/InventoryReportComponent";
+import RecentTransactionsComponent from "@/Components/RecentTransactionsComponent";
+import SalesReportComponent from "@/Components/SalesReportComponent";
 
 export default function Dashboard() {
-  const [stock, setStock] = useState(null);
-  const [inventory, setInventory] =useState(null);
-  const [transactions, setTransactions] = useState(null);
-  const [totalSales, setTotalSales] = useState(0);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user_name, setfetchedUser] = useState("None");
@@ -57,16 +53,14 @@ export default function Dashboard() {
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <AuthenticatedLayout
         header={
-          <h1
-            style={{
-              marginLeft: "10.5rem",
-              marginTop: "1rem",
-              marginBottom: "1rem",
-              fontSize: "2.25rem",
-              fontWeight: "bold",
-              color: "#111827",
-            }}
-          >
+          <h1 style={{
+            marginLeft: "10.5rem",
+            marginTop: "1rem",
+            marginBottom: "1rem",
+            fontSize: "2.25rem",
+            fontWeight: "bold",
+            color: "#111827",
+          }}>
             Welcome, {user.name ? user.name.toUpperCase() : "[USERNAME]"}!
           </h1>
         }
@@ -75,42 +69,32 @@ export default function Dashboard() {
           <div style={{ maxWidth: "96rem", margin: "0 auto", padding: "0 9rem" }}>
 
             {/* Dashboard Cards */}
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(2, 1fr)",
-                gridAutoRows: "auto",
-                gap: "0.75rem",
-                marginTop: "-1rem",
-              }}
-            >
-              <DashboardCard
-                title="Sales Report"
-                link="/sales-report"
-                image="/images/3.png"
-              >
-                <SalesReportComponent />
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)",
+              gridAutoRows: "auto",
+              gap: "0.75rem",
+              marginTop: "-1rem",
+            }}>
+              <DashboardCard title="Sales Report" link="/sales-report" image="/images/3.png">
+                <div style={{ minHeight: "250px" }}>
+                  <SalesReportComponent />
+                </div>
               </DashboardCard>
-              <DashboardCard
-                title="Inventory Alert!"
-                link="/inventory1"
-                image="/images/5.png"
-              >
-                <InventoryAlertComponent />
+              <DashboardCard title="Inventory Alert!" link="/inventory1" image="/images/5.png">
+                <div style={{ minHeight: "250px" }}>
+                  <InventoryAlertComponent />
+                </div>
               </DashboardCard>
-              <DashboardCard
-                title="Recent Transactions"
-                link="/transaction-rec-sec"
-                image="/images/4.png"
-              >
-                <RecentTransactionsComponent />
+              <DashboardCard title="Recent Transactions" link="/transaction-rec-sec" image="/images/4.png">
+                <div style={{ minHeight: "250px" }}>
+                  <RecentTransactionsComponent />
+                </div>
               </DashboardCard>
-              <DashboardCard
-                title="Inventory"
-                link="/inventory1"
-                image="/images/5.png"
-              >
-                <InventoryReportComponent />
+              <DashboardCard title="Inventory" link="/inventory1" image="/images/5.png">
+                <div style={{ minHeight: "250px" }}>
+                  <InventoryReportComponent />
+                </div>
               </DashboardCard>
             </div>
 
@@ -123,21 +107,18 @@ export default function Dashboard() {
                 Upload your Excel file to update products and transactions.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "1.5rem" }}>
-                <div
-                  style={{
-                    background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
-                    borderRadius: "1rem",
-                    border: "1px solid black",
-                    padding: "2rem",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    transition: "box-shadow 0.3s",
-                    boxShadow: "none",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "8px 8px 18px rgba(0,0,0,0.35)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-                >
+                <div style={{
+                  background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
+                  borderRadius: "1rem",
+                  border: "1px solid black",
+                  padding: "2rem",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  transition: "box-shadow 0.3s",
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.boxShadow = "8px 8px 18px rgba(0,0,0,0.35)"}
+                onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
                   <Import />
                 </div>
               </div>
@@ -155,62 +136,46 @@ export default function Dashboard() {
                   { img: "/images/8.png", label: "Add Product", href: "/add-product" },
                   { img: "/images/9.png", label: "Generate\nReport", href: "/sales-report" },
                 ].map((item) => (
-                  <Link
-                    key={item.href}
-                    to={item.href}
-                    style={{
+                  <Link key={item.href} to={item.href} style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    cursor: "pointer",
+                    transition: "transform 0.3s",
+                    textDecoration: "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "scale(1.05)";
+                    e.currentTarget.querySelector("span").style.fontWeight = "600";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "scale(1)";
+                    e.currentTarget.querySelector("span").style.fontWeight = "300";
+                  }}>
+                    <div style={{
                       display: "flex",
-                      flexDirection: "column",
                       alignItems: "center",
-                      cursor: "pointer",
-                      transition: "transform 0.3s",
-                      textDecoration: "none",
+                      justifyContent: "center",
+                      width: "5rem",
+                      height: "5rem",
+                      borderRadius: "9999px",
+                      background: "linear-gradient(to bottom, #f3dfc3, #d7bfa0)",
+                      border: "1px solid #4b2e17",
+                      transition: "box-shadow 0.3s",
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.05)";
-                      e.currentTarget.querySelector("span").style.fontWeight = "600";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.querySelector("span").style.fontWeight = "300";
-                    }}
-                  >
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "5rem",
-                        height: "5rem",
-                        borderRadius: "9999px",
-                        background: "linear-gradient(to bottom, #f3dfc3, #d7bfa0)",
-                        border: "1px solid #4b2e17",
-                        transition: "box-shadow 0.3s",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.boxShadow = "5px 5px 15px rgba(75,46,23,0.6)")
-                      }
-                      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-                    >
-                      <img
-                        src={item.img}
-                        alt="icon"
-                        style={{ width: "2.5rem", height: "2.5rem", objectFit: "contain" }}
-                      />
+                    onMouseEnter={(e) => e.currentTarget.style.boxShadow = "5px 5px 15px rgba(75,46,23,0.6)"}
+                    onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
+                      <img src={item.img} alt="icon" style={{ width: "2.5rem", height: "2.5rem", objectFit: "contain" }} />
                     </div>
-                    <span
-                      style={{
-                        marginTop: "0.5rem",
-                        fontSize: "0.875rem",
-                        color: "#000",
-                        fontWeight: 300,
-                        textAlign: "center",
-                        whiteSpace: "pre-line",
-                        transition: "font-weight 0.2s",
-                      }}
-                    >
-                      {item.label}
-                    </span>
+                    <span style={{
+                      marginTop: "0.5rem",
+                      fontSize: "0.875rem",
+                      color: "#000",
+                      fontWeight: 300,
+                      textAlign: "center",
+                      whiteSpace: "pre-line",
+                      transition: "font-weight 0.2s",
+                    }}>{item.label}</span>
                   </Link>
                 ))}
               </div>
@@ -222,35 +187,28 @@ export default function Dashboard() {
                 Recent Activity
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1.5rem" }}>
-                {user_name ? (
-                  [
-                    { label: "Total Sales", value: total_quantity },
-                    { label: "Total Cost of Sales", value: total_amount },
-                    { label: "Cashier", value: user_name },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      style={{
-                        background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
-                        textAlign: "center",
-                        height: "10rem",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        borderRadius: "1rem",
-                        border: "1px solid black",
-                        transition: "box-shadow 0.3s",
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "10px 10px 15px rgba(0,0,0,0.3)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-                    >
-                      <h3 style={{ fontSize: "2.25rem", fontWeight: 800, color: "#4b2e17" }}>{item.value}</h3>
-                      <p style={{ fontSize: "1rem", marginTop: "0.75rem", fontWeight: 500, color: "#4b2e17" }}>{item.label}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p>No recent transactions.</p>
-                )}
+                {user_name ? [
+                  { label: "Total Sales", value: total_quantity },
+                  { label: "Total Cost of Sales", value: total_amount },
+                  { label: "Cashier", value: user_name },
+                ].map((item) => (
+                  <div key={item.label} style={{
+                    background: "linear-gradient(to bottom, #f9e7d0, #e8d4b8)",
+                    textAlign: "center",
+                    height: "10rem",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    borderRadius: "1rem",
+                    border: "1px solid black",
+                    transition: "box-shadow 0.3s",
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.boxShadow = "10px 10px 15px rgba(0,0,0,0.3)"}
+                  onMouseLeave={(e) => e.currentTarget.style.boxShadow = "none"}>
+                    <h3 style={{ fontSize: "2.25rem", fontWeight: 800, color: "#4b2e17" }}>{item.value}</h3>
+                    <p style={{ fontSize: "1rem", marginTop: "0.75rem", fontWeight: 500, color: "#4b2e17" }}>{item.label}</p>
+                  </div>
+                )) : <p>No recent transactions.</p>}
               </div>
             </div>
 
@@ -261,49 +219,51 @@ export default function Dashboard() {
   );
 }
 
-/* DashboardCard Subcomponent */
+/* DashboardCard Component */
 function DashboardCard({ title, link, image, children, minHeight = "13rem" }) {
   const [hover, setHover] = useState(false);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        backgroundColor: "white",
-        borderRadius: "1rem",
-        border: "1px solid black",
-        overflow: "hidden",
-        transition: "box-shadow 0.3s",
-        minHeight,
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "5px 5px 0px #4b2e17")}
-      onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
-    >
-      {/* Default content */}
-      <div style={{ padding: "1.5rem" }}>
+    <div style={{
+      position: "relative",
+      backgroundColor: "white",
+      borderRadius: "1rem",
+      border: "1px solid black",
+      overflow: "hidden",
+      transition: "box-shadow 0.3s",
+      minHeight,
+    }}
+    onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "5px 5px 0px #4b2e17")}
+    onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}>
+      
+      {/* Content */}
+      <div style={{ padding: "1.5rem", zIndex: 1 }}>
         <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
-      </div>
-      <div style={{ padding: "1.5rem", position: "relative", zIndex: 1 }}>
-        {children}
+        <div style={{ marginTop: "0.75rem" }}>{children}</div>
       </div>
 
-      {/* Hover overlay */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "1rem",
-          opacity: hover ? 1 : 0,
-          transition: "opacity 0.3s",
-        }}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-      >
+      {/* Hover overlay image */}
+      <div style={{
+        position: "absolute",
+        inset: 0,
+        borderRadius: "1rem",
+        opacity: hover ? 1 : 0,
+        transition: "opacity 0.3s",
+      }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}>
         <Link to={link} style={{ width: "100%", height: "100%", display: "block" }}>
           <img
             src={image}
             alt={title}
-            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "1rem", border: "1px solid black", cursor: "pointer" }}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "1rem",
+              border: "1px solid black",
+              cursor: "pointer",
+            }}
           />
         </Link>
       </div>
