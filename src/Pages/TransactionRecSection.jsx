@@ -58,7 +58,7 @@ export default function TransactionRecSection() {
             {/* Buttons */}
             <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginBottom: "48px" }}>
                 <button
-                    onClick={() => navigate("/make-transaction")}
+                    onClick={() => navigate("/create-transaction")}
                     style={{
                         display: "block",
                         textAlign: "left",

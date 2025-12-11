@@ -132,12 +132,6 @@ export default function App() {
 
 
         {/* Transactions */}
-        
-
-        <Route path="/make-transaction" element={
-          <PrivateRoute><MakeTransaction /></PrivateRoute>
-        } />
-
         <Route path="/transaction-history" element={
           <PrivateRoute><TransactionHistory /></PrivateRoute>
         } />
