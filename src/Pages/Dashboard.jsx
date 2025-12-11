@@ -241,12 +241,12 @@ function DashboardCard({ title, link, image, children, minHeight = "13rem" }) {
       onMouseLeave={() => setHover(false)}
     >
       {/* Main content */}
-      <div style={{ padding: "1.5rem", zIndex: 1, position: "relative" }}>
+      <div style={{ padding: "1.5rem", position: "relative", zIndex: 1 }}>
         <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
-        <div style={{ marginTop: "0.75rem" }}>{children}</div>
+        <div style={{ marginTop: "0.75rem", minHeight: "260px" }}>{children}</div>
       </div>
 
-      {/* Overlay image */}
+      {/* Hover overlay on top, but pointer-events disabled */}
       <Link
         to={link}
         style={{
@@ -254,7 +254,8 @@ function DashboardCard({ title, link, image, children, minHeight = "13rem" }) {
           inset: 0,
           opacity: hover ? 1 : 0,
           transition: "opacity 0.3s",
-          pointerEvents: hover ? "auto" : "none",
+          pointerEvents: "none", // <-- allow interaction below
+          zIndex: 10,            // <-- fully on top
         }}
       >
         <img
