@@ -8,7 +8,7 @@ import InventoryAlertComponent from "@/Components/InventoryAlertComponent";
 import InventoryReportComponent from "@/Components/InventoryReportComponent";
 import RecentTransactionsComponent from "@/Components/RecentTransactionsComponent";
 import SalesReportComponent from "@/Components/SalesReportComponent";
-
+import Loading from "@/Components/Loading";
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,6 +45,7 @@ export default function Dashboard() {
     fetchUser();
     fetchLatestTransaction();
   }, []);
+  if (!user) return <Loading />;
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <AuthenticatedLayout user={user}
