@@ -211,7 +211,6 @@ export default function Register() {
               style={{
                 maxWidth: '150px',
                 width: 'auto',
-                maxWidth: '150px',
                 padding: '0.6rem',
                 fontSize: '1rem',
                 fontWeight: 600,
