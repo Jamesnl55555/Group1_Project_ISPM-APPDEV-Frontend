@@ -50,13 +50,8 @@ export default function AddProduct() {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const submitProducts = async (e) => {
+ const submitProducts = async (e) => {
   e.preventDefault();
-
-  let imageUrl = null;
-  if (productData.file) {
-    imageUrl = await uploadToCloudinary(productData.file);
-  }
 
   const formData = new FormData();
   formData.append("name", productData.name);
@@ -64,7 +59,10 @@ export default function AddProduct() {
   formData.append("price", productData.price);
   formData.append("category", productData.category);
   formData.append("is_archived", productData.is_archived ? 1 : 0);
-  if (imageUrl) formData.append("file_path", imageUrl); // <- send Cloudinary URL
+
+  if (productData.file) {
+    formData.append("file", productData.file);
+  }
 
   postProduct("/api/postproducts", {
     data: formData,
@@ -74,7 +72,8 @@ export default function AddProduct() {
       setShowSuccessModal(true);
     },
   });
-  };
+};
+
 
 
   return (
