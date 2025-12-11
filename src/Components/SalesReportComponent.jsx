@@ -23,8 +23,8 @@ function SalesReportComponent() {
         </p>
 
         {/* Chart container with fixed minHeight */}
-        <div style={{ width: '100%', minHeight: '200px' }}>
-            <ResponsiveContainer width="100%" aspect={2}>
+        <div style={{ width: '100%', minHeight: "100%" }}>
+            <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                     data={data}
                     margin={{ top: 20, right: 30, left: 20, bottom: 5 }}

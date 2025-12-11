@@ -45,10 +45,6 @@ export default function Dashboard() {
     fetchUser();
     fetchLatestTransaction();
   }, []);
-
-  if (loading) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Loading...</p>;
-  if (!user) return <p style={{ textAlign: "center", marginTop: "2rem" }}>Please log in to view dashboard.</p>;
-
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
       <AuthenticatedLayout user={user}
