@@ -20,7 +20,6 @@ const RecentTransactionsComponent = () => {
 
   return (
     <div>
-      <h3>{userName}'s Latest Transactions</h3>
       <ul>
         {transactions.map((tx, index) => (
           <>
