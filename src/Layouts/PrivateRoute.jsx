@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from '../api/axios';
-import Loading from '@/Components/Loading';
+import Loading from '@/Pages/Loading';
 
 export default function PrivateRoute({ children }) {
   const [loading, setLoading] = useState(true);
