@@ -24,9 +24,6 @@ export default function Register() {
     setData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: '' }));
   };
-  const navigation = () =>{
-    navigate('/dashboard');
-  }
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -288,7 +285,7 @@ export default function Register() {
               The System is not set for email services due purchase constraints. But we will still create an account for you in this system
             </p>
             <PrimaryButton
-              onClick={() => {setShowModal(false), navigation('/dashboard')}}
+              onClick={() => {setShowModal(false), navigate('/welcome')}}
               style={{
                 padding: '0.6rem 1.2rem',
                 borderRadius: '6px',
