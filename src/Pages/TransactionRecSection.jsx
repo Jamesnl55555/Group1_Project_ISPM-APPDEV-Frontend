@@ -77,7 +77,7 @@ export default function TransactionRecSection() {
                     onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#e8d4b8")}
                     onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#f9f5f0")}
                 >
-                    Make a Transaction Record Form
+                    Make a Sales Record
                 </button>
 
                 <button

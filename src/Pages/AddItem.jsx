@@ -89,7 +89,7 @@ export default function AddItem() {
       <div style={{ padding: "3rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
         {/* Title */}
         <h1 style={{ fontSize: "2rem", fontWeight: "bold", marginBottom: "1.5rem", color: "#000", textAlign: "center" }}>
-          Record Transaction Form
+          Create a Sales Record
         </h1>
 
         <div style={{ display: "flex", gap: "1rem" }}>
