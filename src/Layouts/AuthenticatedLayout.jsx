@@ -51,9 +51,6 @@ export default function AuthenticatedLayout({ header, children }) {
       }
     }
   }, [location]);
-
-  if (!user) return <p className="text-center mt-10">Loading...</p>;
-
   return (
     <div
       style={{

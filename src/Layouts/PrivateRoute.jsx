@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import axios from '../api/axios';
+import Loading from '@/Components/Loading';
 
 export default function PrivateRoute({ children }) {
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ export default function PrivateRoute({ children }) {
     checkAuth();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <Loading />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return children;
