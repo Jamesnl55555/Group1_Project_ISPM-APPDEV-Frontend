@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from '@/api/axios';
 import TextInput from '@/Components/TextInput';
 import InputError from '@/Components/InputError';
@@ -8,6 +8,7 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import { IconUser, IconMail, IconLock } from "@tabler/icons-react";
 
 export default function Register() {
+  const navigate = useNavigate();
   const [data, setData] = useState({
     name: '',
     email: '',
@@ -30,7 +31,7 @@ export default function Register() {
     setErrors({});
 
     try {
-      const response = await axios.post('/api/register-pending', data);
+      const response = await axios.post('/api/register', data);
       if (response.data.success) setShowModal(true);
     } catch (err) {
       if (err.response?.data?.errors) {
@@ -279,10 +280,10 @@ export default function Register() {
           >
             <h3 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Verification Email Sent</h3>
             <p style={{ marginBottom: '1.5rem', color: '#555' }}>
-              We sent a verification link to your email. Please check your inbox to complete registration.
+              The System is not set for email services due purchase constraints. But we will still create an account for you in this system
             </p>
             <PrimaryButton
-              onClick={() => setShowModal(false)}
+              onClick={() => {setShowModal(false), navigate('/login')}}
               style={{
                 padding: '0.6rem 1.2rem',
                 borderRadius: '6px',
