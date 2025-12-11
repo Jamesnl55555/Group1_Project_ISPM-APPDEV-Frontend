@@ -12,7 +12,7 @@ function SalesReportComponent() {
         .catch(error => console.error(error));
 
         axios.get('/api/fetchtotaltransactions')
-        .then(response => setTotalSales(response.data))
+        .then(response => setTotalSales(response.data.total_amount))
         .catch(error => console.error(error));
     }, []);
 
