@@ -17,39 +17,35 @@ function SalesReportComponent() {
     }, []);
 
     return (
-      <div style={{ width: '100%', minHeight: '260px', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ width: '100%', minHeight: '260px', display: 'flex', flexDirection: 'column' }}>
         <p style={{ fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
-          Total Sales: ₱ {totalSales}
+            Total Sales: ₱ {totalSales}
         </p>
 
-        {/* FIXED CHART CONTAINER */}
-        <div style={{
-          width: '100%',
-          minHeight: '200px',
-          position: 'relative',
-          zIndex: 2
-        }}>
-          <ResponsiveContainer width="100%" aspect={2}>
-            <LineChart
-              data={data}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line
-                type="monotone"
-                dataKey="total_amount"
-                stroke="#8884d8"
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        {/* Chart container with fixed minHeight */}
+        <div style={{ width: '100%', minHeight: '200px' }}>
+            <ResponsiveContainer width="100%" aspect={2}>
+                <LineChart
+                    data={data}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                        type="monotone"
+                        dataKey="total_amount"
+                        stroke="#8884d8"
+                        strokeWidth={2}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
         </div>
-      </div>
+    </div>
     );
-}
+
+};
 
 export default SalesReportComponent;
