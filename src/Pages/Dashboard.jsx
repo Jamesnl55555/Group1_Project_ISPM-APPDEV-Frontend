@@ -51,7 +51,7 @@ export default function Dashboard() {
 
   return (
     <MantineProvider withGlobalStyles withNormalizeCSS>
-      <AuthenticatedLayout
+      <AuthenticatedLayout user={user}
         header={
           <h1 style={{
             marginLeft: "10.5rem",
