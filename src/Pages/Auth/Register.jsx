@@ -32,7 +32,10 @@ export default function Register() {
 
     try {
       const response = await axios.post('/api/register', data);
-      if (response.data.success) setShowModal(true);
+      if (response.data?.token) {
+        localStorage.setItem("auth_token", response.data.token);
+        setShowModal(true);
+      }
     } catch (err) {
       if (err.response?.data?.errors) {
         setErrors(err.response.data.errors);
