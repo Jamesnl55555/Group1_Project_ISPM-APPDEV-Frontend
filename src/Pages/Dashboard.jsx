@@ -77,25 +77,25 @@ export default function Dashboard() {
               marginTop: "-1rem",
             }}>
               <DashboardCard title="Sales Report" link="/sales-report" image="/images/3.png">
-                <div style={{ minHeight: "250px" }}>
+                <div style={{ minHeight: "260px" }}>
                   <SalesReportComponent />
                 </div>
               </DashboardCard>
 
               <DashboardCard title="Inventory Alert!" link="/inventory1" image="/images/5.png">
-                <div style={{ minHeight: "250px" }}>
+                <div style={{ minHeight: "260px" }}>
                   <InventoryAlertComponent />
                 </div>
               </DashboardCard>
 
               <DashboardCard title="Recent Transactions" link="/transaction-rec-sec" image="/images/4.png">
-                <div style={{ minHeight: "250px" }}>
+                <div style={{ minHeight: "260px" }}>
                   <RecentTransactionsComponent />
                 </div>
               </DashboardCard>
 
               <DashboardCard title="Inventory" link="/inventory1" image="/images/5.png">
-                <div style={{ minHeight: "250px" }}>
+                <div style={{ minHeight: "260px" }}>
                   <InventoryReportComponent />
                 </div>
               </DashboardCard>
@@ -222,53 +222,56 @@ export default function Dashboard() {
   );
 }
 
-/* New DashboardCard Component (Option B) */
-function DashboardCard({ title, link, image, children, minHeight = "13rem" }) {
+/* Clickable DashboardCard with hover image */
+function DashboardCard({ title, link, image, children, minHeight = "260px" }) {
   const [hover, setHover] = useState(false);
 
   return (
-    <div
-      style={{
-        position: "relative",
-        backgroundColor: "white",
-        borderRadius: "1rem",
-        border: "1px solid black",
-        overflow: "hidden",
-        transition: "box-shadow 0.3s",
-        minHeight,
-      }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      {/* Main content */}
-      <div style={{ padding: "1.5rem", zIndex: 1, position: "relative" }}>
-        <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
-        <div style={{ marginTop: "0.75rem" }}>{children}</div>
-      </div>
-
-      {/* Overlay image */}
-      <Link
-        to={link}
+    <Link to={link} style={{ textDecoration: "none" }}>
+      <div
         style={{
-          position: "absolute",
-          inset: 0,
-          opacity: hover ? 1 : 0,
-          transition: "opacity 0.3s",
-          pointerEvents: hover ? "auto" : "none",
+          position: "relative",
+          backgroundColor: "white",
+          borderRadius: "1rem",
+          border: "1px solid black",
+          overflow: "hidden",
+          transition: "box-shadow 0.3s",
+          minHeight,
+          cursor: "pointer",
         }}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
       >
-        <img
-          src={image}
-          alt={title}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: "1rem",
-            border: "1px solid black",
-          }}
-        />
-      </Link>
-    </div>
+        {/* Main content */}
+        <div style={{ padding: "1.5rem", position: "relative", zIndex: 1 }}>
+          <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
+          <div style={{ marginTop: "0.75rem", minHeight: "200px" }}>{children}</div>
+        </div>
+
+        {/* Hover overlay */}
+        {hover && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              zIndex: 10,
+            }}
+          >
+            <img
+              src={image}
+              alt={title}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                borderRadius: "1rem",
+                border: "1px solid black",
+                pointerEvents: "none",
+              }}
+            />
+          </div>
+        )}
+      </div>
+    </Link>
   );
 }
