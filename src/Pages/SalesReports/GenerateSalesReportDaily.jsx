@@ -88,15 +88,6 @@ export default function GenerateSalesReportDaily() {
             <span>Net Profit/Loss</span>
             <span>₱ {overallTotal}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <button
-              style={{ padding: "0.5rem 1.5rem", backgroundColor: "#4b2e17", color: "#fff", border: "none", borderRadius: "0.375rem", fontWeight: "bold", cursor: "pointer", transition: "all 0.2s" }}
-              onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#39210f")}
-              onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4b2e17")}
-            >
-              Export Report
-            </button>
-          </div>
         </div>
 
         {/* TABLE */}

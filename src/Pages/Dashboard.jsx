@@ -79,7 +79,7 @@ export default function Dashboard() {
                 </div>
               </DashboardCard>
 
-              <DashboardCard title="Inventory Alert!" link="/inventory1" image="/images/5.png">
+              <DashboardCard title="Stock Alert!" link="/inventory1" image="/images/5.png">
                 <div style={{ minHeight: "260px" }}>
                   <InventoryAlertComponent />
                 </div>

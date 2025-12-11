@@ -19,7 +19,6 @@ function InventoryAlertComponent() {
 
   return (
     <div style={{ padding: '1rem', border: '1px solid #ddd', borderRadius: '8px', width: '200px' }}>
-      <h4>Stock Alert!</h4>
       <p style={{ fontSize: '1.5rem', fontWeight: 'bold', color: lowStockCount > 0 ? 'red' : 'green' }}>
         <IconAlertTriangle/> <div>{lowStockCount} items low in stock!</div>
       </p>
