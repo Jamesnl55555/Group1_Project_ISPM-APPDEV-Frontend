@@ -17,27 +17,35 @@ function SalesReportComponent() {
     }, []);
 
     return (
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <p style={{ fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
-                Total Sales: ₱ {totalSales}
-            </p>
-            <div style={{ flexGrow: 1 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                        data={data}
-                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                    >
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line type="monotone" dataKey="total_amount" stroke="#8884d8" strokeWidth={2} />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
+    <div style={{ width: '100%', minHeight: '260px', display: 'flex', flexDirection: 'column' }}>
+        <p style={{ fontWeight: 'bold', fontSize: '1.25rem', marginBottom: '0.5rem' }}>
+            Total Sales: ₱ {totalSales}
+        </p>
+
+        {/* Chart container with fixed minHeight */}
+        <div style={{ width: '100%', minHeight: '200px' }}>
+            <ResponsiveContainer width="100%" aspect={2}>
+                <LineChart
+                    data={data}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Line
+                        type="monotone"
+                        dataKey="total_amount"
+                        stroke="#8884d8"
+                        strokeWidth={2}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
         </div>
+    </div>
     );
+
 };
 
 export default SalesReportComponent;
