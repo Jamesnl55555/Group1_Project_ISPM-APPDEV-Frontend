@@ -57,7 +57,7 @@ export default function Dashboard() {
             fontWeight: "bold",
             color: "#111827",
           }}>
-            Welcome, {user.name ? user.name.toUpperCase() : "[USERNAME]"}!
+            Welcome, {user?.name ? user.name.toUpperCase() : "[USERNAME]"}!
           </h1>
         }
       >
