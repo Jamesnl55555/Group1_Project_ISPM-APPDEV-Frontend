@@ -3,14 +3,22 @@ import { Link } from "react-router-dom";
 import axios from "@/api/axios";
 import Import from "@/Components/Import";
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider } from "@mantine/core"; 
+import InventoryAlertComponent from "@/Components/InventoryAlertComponent"
+import InventoryReportComponent from "../Components/InventoryReportComponent";
+import RecentTransactionsComponent from "../Components/RecentTransactionsComponent";
+import SalesReportComponent from "../Components/SalesReportComponent";
 
 export default function Dashboard() {
+  const [stock, setStock] = useState(null);
+  const [inventory, setInventory] =useState(null);
+  const [transactions, setTransactions] = useState(null);
+  const [totalSales, setTotalSales] = useState(0);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [user_name, setfetchedUser] = useState(null);
-  const [total_amount, setTotalAmount] = useState(null);
-  const [total_quantity, setTotalQuantity] = useState(null);
+  const [user_name, setfetchedUser] = useState("None");
+  const [total_amount, setTotalAmount] = useState(0);
+  const [total_quantity, setTotalQuantity] = useState(0);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -29,7 +37,6 @@ export default function Dashboard() {
       try {
         const response = await axios.get("/api/latest-transaction");
         if (response.data.success) {
-          const transaction = response.data.transaction;
           setTotalQuantity(response.data.total_quantity);
           setTotalAmount(response.data.total_amount);
           setfetchedUser(response.data.user_name);
@@ -66,7 +73,7 @@ export default function Dashboard() {
       >
         <div style={{ paddingTop: "0.25rem" }}>
           <div style={{ maxWidth: "96rem", margin: "0 auto", padding: "0 9rem" }}>
-            
+
             {/* Dashboard Cards */}
             <div
               style={{
@@ -79,28 +86,32 @@ export default function Dashboard() {
             >
               <DashboardCard
                 title="Sales Report"
-                subtitle={`Capital: ${user.capital}`}
-                image="/images/3.png"
                 link="/sales-report"
-              />
+                image="/images/3.png"
+              >
+                <SalesReportComponent />
+              </DashboardCard>
               <DashboardCard
                 title="Inventory Alert!"
-                subtitle="3 items low in stock!"
-                image="/images/5.png"
                 link="/inventory1"
-              />
+                image="/images/5.png"
+              >
+                <InventoryAlertComponent />
+              </DashboardCard>
               <DashboardCard
                 title="Recent Transactions"
-                subtitle="Latest transaction list"
-                image="/images/4.png"
                 link="/transaction-rec-sec"
-              />
+                image="/images/4.png"
+              >
+                <RecentTransactionsComponent />
+              </DashboardCard>
               <DashboardCard
                 title="Inventory"
-                subtitle="View detailed stock info"
-                image="/images/5.png"
                 link="/inventory1"
-              />
+                image="/images/5.png"
+              >
+                <InventoryReportComponent />
+              </DashboardCard>
             </div>
 
             {/* Import Excel Section */}
@@ -251,7 +262,9 @@ export default function Dashboard() {
 }
 
 /* DashboardCard Subcomponent */
-function DashboardCard({ title, subtitle, image, link }) {
+function DashboardCard({ title, link, image, children, minHeight = "13rem" }) {
+  const [hover, setHover] = useState(false);
+
   return (
     <div
       style={{
@@ -261,35 +274,36 @@ function DashboardCard({ title, subtitle, image, link }) {
         border: "1px solid black",
         overflow: "hidden",
         transition: "box-shadow 0.3s",
-        height: "13rem",
+        minHeight,
       }}
       onMouseEnter={(e) => (e.currentTarget.style.boxShadow = "5px 5px 0px #4b2e17")}
       onMouseLeave={(e) => (e.currentTarget.style.boxShadow = "none")}
     >
+      {/* Default content */}
       <div style={{ padding: "1.5rem" }}>
         <h2 style={{ fontSize: "1.125rem", fontWeight: "bold", color: "#1f2937" }}>{title}</h2>
-        <p style={{ marginTop: "0.75rem", fontSize: "0.875rem", color: "#4b5563" }}>{subtitle}</p>
       </div>
+      <div style={{ padding: "1.5rem", position: "relative", zIndex: 1 }}>
+        {children}
+      </div>
+
+      {/* Hover overlay */}
       <div
         style={{
           position: "absolute",
           inset: 0,
-          backgroundColor: "rgba(0,0,0,0.53)",
-          opacity: 0,
-          transition: "opacity 0.3s",
           borderRadius: "1rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
+          opacity: hover ? 1 : 0,
+          transition: "opacity 0.3s",
         }}
-        onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
-        onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
       >
-        <Link to={link} style={{ width: "100%", height: "100%" }}>
+        <Link to={link} style={{ width: "100%", height: "100%", display: "block" }}>
           <img
             src={image}
             alt={title}
-            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "1rem", cursor: "pointer", border: "1px solid black" }}
+            style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "1rem", border: "1px solid black", cursor: "pointer" }}
           />
         </Link>
       </div>
