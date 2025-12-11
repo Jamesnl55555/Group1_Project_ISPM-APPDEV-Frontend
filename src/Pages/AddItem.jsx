@@ -114,48 +114,58 @@ export default function AddItem() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id} style={{ borderBottom: "1px solid #ccc" }}>
-                    <td style={{ padding: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                      <button
-                        onClick={() => addToCart(product)}
-                        disabled={product.quantity === 0}
-                        style={{
-                          width: "1.5rem",
-                          height: "1.5rem",
-                          borderRadius: "50%",
-                          border: "1px solid #4b2e17",
-                          backgroundColor: product.quantity === 0 ? "#ccc" : "#e6d6c3",
-                          color: product.quantity === 0 ? "#888" : "#4b2e17",
-                          cursor: product.quantity === 0 ? "not-allowed" : "pointer",
-                          fontWeight: "bold",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
-                      >
-                        +
-                      </button>
-                      {product.name}
-                    </td>
+              {products.map((product) => (
+                <tr key={product.id} style={{ borderBottom: "1px solid #ccc" }}>
+                  <td style={{ padding: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                    <button
+                      onClick={() => addToCart(product)}
+                      disabled={product.quantity === 0}
+                      style={{
+                        width: "1.5rem",
+                        height: "1.5rem",
+                        borderRadius: "50%",
+                        border: "1px solid #4b2e17",
+                        backgroundColor: product.quantity === 0 ? "#ccc" : "#e6d6c3",
+                        color: product.quantity === 0 ? "#888" : "#4b2e17",
+                        cursor: product.quantity === 0 ? "not-allowed" : "pointer",
+                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      +
+                    </button>
 
-                    <td style={{ padding: "0.5rem" }}>₱{product.price}</td>
-
-                    <td style={{ padding: "0.5rem", textAlign: "center", color: product.quantity > 0 ? "green" : "red" }}>
-                      {product.quantity > 0 ? product.quantity : "Out of Stock"}
-                    </td>
-
-                    <td style={{ padding: "0.5rem", textAlign: "center" }}>
-                      <input
-                        type="number"
-                        min="1"
-                        value={quantities[product.id] || 1}
-                        onChange={(e) => handleQuantityChange(product.id, e.target.value)}
-                        style={{ width: "3rem", textAlign: "center", border: "1px solid #ccc" }}
+                    {/* Image */}
+                    {product.file_path && product.file_path !== 'empty' ? (
+                      <img
+                        src={product.file_path}
+                        alt={product.name}
+                        style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "0.25rem" }}
                       />
-                    </td>
-                  </tr>
-                ))}
+                    ) : (
+                      <div style={{ width: "40px", height: "40px", backgroundColor: "#ccc", borderRadius: "0.25rem" }} />
+                    )}
+
+                    {product.name}
+                  </td>
+
+                  <td style={{ padding: "0.5rem" }}>₱{product.price}</td>
+                  <td style={{ padding: "0.5rem", textAlign: "center", color: product.quantity > 0 ? "green" : "red" }}>
+                    {product.quantity > 0 ? product.quantity : "Out of Stock"}
+                  </td>
+                  <td style={{ padding: "0.5rem", textAlign: "center" }}>
+                    <input
+                      type="number"
+                      min="1"
+                      value={quantities[product.id] || 1}
+                      onChange={(e) => handleQuantityChange(product.id, e.target.value)}
+                      style={{ width: "3rem", textAlign: "center", border: "1px solid #ccc" }}
+                    />
+                  </td>
+                </tr>
+              ))}
               </tbody>
             </table>
           </div>

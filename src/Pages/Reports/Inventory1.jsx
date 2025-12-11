@@ -201,12 +201,14 @@ const InventoryTableWithPagination = React.forwardRef(
                 products.map((item) => (
                   <tr key={item.id} style={{ backgroundColor: lowStock ? "#fff4e1" : "#f9f5f0" }}>
                     <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>
-                      <img
-                        src={`/${item.file_path}`}
-                        alt={item.name}
-                        style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                        onError={(e) => (e.target.style.display = "none")}
-                      />
+                      {item.file_path !== "empty" && (
+                        <img
+                          src={item.file_path}
+                          alt={item.name}
+                          style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                          onError={(e) => (e.target.style.display = "none")}
+                        />
+                      )}
                     </td>
                     <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.id}</td>
                     <td style={{ border: "1px solid #6b3e1f", padding: "0.5rem", textAlign: "center" }}>{item.category}</td>

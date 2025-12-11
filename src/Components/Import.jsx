@@ -130,7 +130,7 @@ export default function Import() {
             ref={fileInputRef}
             type="file"
             name="excel_file"
-            accept=".xlsx, .xls, .csv"
+            accept=".xlsx"
             onChange={handleFileChange}
             style={{ width: "100%", color: "#424242ff" }}
           />

@@ -5,6 +5,33 @@ import { useNavigate } from "react-router-dom";
 
 export default function AddProduct() {
   const navigate = useNavigate();
+  
+  const uploadToCloudinary = async (file) => {
+  if (!file) return null;
+
+  try {
+    // Get signed parameters from Laravel
+    const res = await fetch("/api/sign-upload");
+    const { signature, timestamp, api_key, cloud_name } = await res.json();
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("api_key", api_key);
+    formData.append("timestamp", timestamp);
+    formData.append("signature", signature);
+
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloud_name}/upload`, {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await response.json();
+    return data.secure_url; // Return the uploaded image URL
+  } catch (error) {
+    console.error("Cloudinary upload failed:", error);
+    return null;
+  }
+  };
 
   const {
     data: productData,
@@ -23,29 +50,32 @@ export default function AddProduct() {
 
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const submitProducts = (e) => {
-    e.preventDefault();
+  const submitProducts = async (e) => {
+  e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("name", productData.name);
-    formData.append("quantity", productData.quantity);
-    formData.append("price", productData.price);
-    formData.append("category", productData.category);
-    formData.append("is_archived", productData.is_archived ? 1 : 0);
+  let imageUrl = null;
+  if (productData.file) {
+    imageUrl = await uploadToCloudinary(productData.file);
+  }
 
-    if (productData.file) {
-      formData.append("file", productData.file);
-    }
+  const formData = new FormData();
+  formData.append("name", productData.name);
+  formData.append("quantity", productData.quantity);
+  formData.append("price", productData.price);
+  formData.append("category", productData.category);
+  formData.append("is_archived", productData.is_archived ? 1 : 0);
+  if (imageUrl) formData.append("file_path", imageUrl); // <- send Cloudinary URL
 
-    postProduct("/api/postproducts", {
-      data: formData,
-      headers: { "Content-Type": "multipart/form-data" },
-      onSuccess: () => {
-        resetForm();
-        setShowSuccessModal(true);
-      },
-    });
+  postProduct("/api/postproducts", {
+    data: formData,
+    headers: { "Content-Type": "multipart/form-data" },
+    onSuccess: () => {
+      resetForm();
+      setShowSuccessModal(true);
+    },
+  });
   };
+
 
   return (
     <AuthenticatedLayout>
