@@ -8,7 +8,7 @@ import InventoryAlertComponent from "@/Components/InventoryAlertComponent";
 import InventoryReportComponent from "@/Components/InventoryReportComponent";
 import RecentTransactionsComponent from "@/Components/RecentTransactionsComponent";
 import SalesReportComponent from "@/Components/SalesReportComponent";
-import Loading from "@/Components/Loading";
+import Loading from "@/Pages/Loading";
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
